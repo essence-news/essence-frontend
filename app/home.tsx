@@ -210,6 +210,8 @@ const Home = () => {
     handleTryItOut();
   }, []);
 
+  console.log("Home page")
+
   return (
     <HomeContainer>
       <MainContent smallScreen={isTabletOrMobileDevice}>

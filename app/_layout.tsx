@@ -100,12 +100,6 @@ export default function Root() {
     <ThemeProvider theme={theme}>
       <AuthProvider>
         <Slot />
-        {/* <Stack>
-          <Stack.Screen name="index" options={{ title: "Home" }} />
-          <Stack.Screen name="home" options={{ title: "Home" }} />
-          <Stack.Screen name="sign-in" options={{ title: "Sign In" }} />
-          <Stack.Screen name="player" options={{ title: "Player" }} />
-        </Stack> */}
       </AuthProvider>
     </ThemeProvider>
   );

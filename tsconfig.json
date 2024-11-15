@@ -10,7 +10,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "app/1_layout.ts1x"
+    "expo-env.d.ts"
   ]
 }

@@ -1,4 +1,4 @@
-import { ScrollViewStyleReset } from "expo-router/html";
+import { ScrollViewStyleReset } from 'expo-router/html';
 
 // This file is web-only and used to configure the root HTML for every
 // web page during static rendering.
@@ -10,11 +10,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no"
-        />
-        <title>Essence - Your own news player</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
         {/* 
           Disable body scrolling on web. This makes ScrollView components work closer to how they do on native. 
@@ -32,36 +28,11 @@ export default function Root({ children }: { children: React.ReactNode }) {
 }
 
 const responsiveBackground = `
-html, body, #root {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-
 body {
-  font-family: "Inter ";
-  background-color: #fcfaf7;
-  color: #FFFFFF;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  background-color: #fff;
 }
-
-#root {
-  overflow-y: scroll;
-  display: flex;
-  flex-direction: column;
-}
-
-h1, h2 {
-  font-family: 'Nunito' ;
-}
-
-h3, h4, h5, h6 {
-  font-family: 'Nunito' ;
-  font-weight: 400;
-}
-
-* {
-  box-sizing: border-box;
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #000;
+  }
 }`;

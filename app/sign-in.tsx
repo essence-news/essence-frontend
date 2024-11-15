@@ -19,21 +19,20 @@ import { useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 
 export default function Login() {
-  const { user, logout, login, verify } = useAuth();
+  const { logout, login, verify } = useAuth();
   const [promptForToken, setPromptForToken] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [firstName, onChangeFirstName] = useState("");
   const [email, onChangeEmail] = useState("");
   const [verificationCode, onChangeVerificationCode] = useState("");
-  // useEffect(() => {
-  //   async function init() {
-  //     if ((await AsyncStorage.getItem("userToken")) !== null)
-  //       router.push("/player");
-  //     else logout();
-  //   }
-  //   init();
-  // }, []);
+  useEffect(() => {
+    // async function init() {
+    //   if ((await AsyncStorage.getItem("userToken")) !== null)
+    //     router.push("/player");
+    AsyncStorage.clear();
+
+  }, []);
   const handleSignin = async () => {
     const signInResponse = await login(email, firstName, "GB", "EN");
     // const result = await verifyEmail(email, name);
@@ -59,7 +58,6 @@ export default function Login() {
       setIsLoading(false);
     }
   };
-  console.log({ user });
   return (
     <View>
       {promptForToken ? (
