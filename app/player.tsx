@@ -155,7 +155,7 @@ export default function Player() {
         "audioCompleted",
         articles[currentNewsIndex].id,
         articles[currentNewsIndex].title,
-        currentNewsIndex
+        currentNewsIndex,
       );
     }
   };
@@ -168,7 +168,7 @@ export default function Player() {
       articles[currentNewsIndex].id,
       articles[currentNewsIndex].title,
       currentNewsIndex,
-      progress
+      progress,
     );
   };
 
@@ -205,7 +205,7 @@ export default function Player() {
         articles[currentNewsIndex].audio_summary,
         articles[currentNewsIndex].id,
         articles[currentNewsIndex].title,
-        currentNewsIndex
+        currentNewsIndex,
       );
     }
     console.log("Playing Sound", articles[currentNewsIndex], sound._key.src);
@@ -223,7 +223,7 @@ export default function Player() {
                 articles[currentNewsIndex].id,
                 articles[currentNewsIndex].title,
                 currentNewsIndex,
-                progress
+                progress,
               );
               // console.log("Src=", await getData("src"))
               setIsPlaying(true);
@@ -238,11 +238,11 @@ export default function Player() {
                 articles[currentNewsIndex]?.title,
                 currentNewsIndex,
                 0,
-                { errorType: "autoplay-play", message: error.message }
+                { errorType: "autoplay-play", message: error.message },
               );
             });
         },
-        autoPlayStarted.current ? 0 : 500
+        autoPlayStarted.current ? 0 : 500,
       );
     }
   }
@@ -255,7 +255,7 @@ export default function Player() {
       articles[currentNewsIndex].id,
       articles[currentNewsIndex].title,
       currentNewsIndex,
-      progress
+      progress,
     );
   }
 
@@ -263,7 +263,7 @@ export default function Player() {
     uri: string,
     id = "",
     title = "",
-    index = -1
+    index = -1,
   ) => {
     const audio = await Audio.Sound.createAsync({
       uri,
@@ -303,7 +303,7 @@ export default function Player() {
                 articles[backIndex].audio_summary,
                 articles[backIndex].id,
                 articles[backIndex].title,
-                backIndex
+                backIndex,
               );
               soundRefs.current[backIndex] = sound;
             }
@@ -324,7 +324,7 @@ export default function Player() {
                 articles[frontIndex].audio_summary,
                 articles[frontIndex].id,
                 articles[frontIndex].title,
-                frontIndex
+                frontIndex,
               );
               soundRefs.current[frontIndex] = sound;
             }
@@ -341,10 +341,12 @@ export default function Player() {
   };
 
   const isLessThan2Hours = (lastTime: number) => {
-    console.log('isLessThen2Hrs value', { lastTime, 
-      current: new Date().getTime(), 
-      diff:new Date().getTime() - lastTime, 
-      Twohrs: 2 * 60 * 60 * 1000 })
+    console.log("isLessThen2Hrs value", {
+      lastTime,
+      current: new Date().getTime(),
+      diff: new Date().getTime() - lastTime,
+      Twohrs: 2 * 60 * 60 * 1000,
+    });
     return new Date().getTime() - lastTime <= 2 * 60 * 60 * 1000;
   };
 
@@ -454,14 +456,12 @@ export default function Player() {
         newsResponse.current = modifiedResponse;
         await AsyncStorage.setItem(
           "newsData",
-          JSON.stringify(modifiedResponse)
+          JSON.stringify(modifiedResponse),
         );
 
         if (articlesResponse.intro_audio)
           setAndPlayWelcomeSound(articlesResponse.intro_audio);
-        else
-        welcomeSoundStatus = "ignored"
-
+        else welcomeSoundStatus = "ignored";
       } catch (err) {
         if (err.message >= 400) {
           logout();
@@ -492,7 +492,11 @@ export default function Player() {
         nextAppState === "active"
       ) {
         console.log("App has come to the foreground!", isPlaying);
-        if(!isPlaying && (welcomeSoundStatus === 'completed' || welcomeSoundStatus === 'ignored') )
+        if (
+          !isPlaying &&
+          (welcomeSoundStatus === "completed" ||
+            welcomeSoundStatus === "ignored")
+        )
           load();
       }
 
@@ -540,7 +544,7 @@ export default function Player() {
       articles[currentNewsIndex].id,
       articles[currentNewsIndex].title,
       currentNewsIndex,
-      progress
+      progress,
     );
     AsyncStorage.setItem("currentNewsIndex", "" + newIndex);
     setCurrentNewsIndex(newIndex);
@@ -556,7 +560,7 @@ export default function Player() {
       articles[currentNewsIndex].id,
       articles[currentNewsIndex].title,
       currentNewsIndex,
-      progress
+      progress,
     );
     AsyncStorage.setItem("currentNewsIndex", "" + newIndex);
     setCurrentNewsIndex(newIndex);
@@ -580,7 +584,7 @@ export default function Player() {
           currentItem.id,
           currentItem.title,
           currentNewsIndex,
-          progress
+          progress,
         );
         setRatingMessage("Thanks for rating!");
         setTimeout(() => setRatingMessage(""), 3000);
