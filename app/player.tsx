@@ -341,7 +341,11 @@ export default function Player() {
   };
 
   const isLessThan2Hours = (lastTime: number) => {
-    return new Date().getTime() - lastTime < 2 * 60 * 60 * 1000;
+    console.log('isLessThen2Hrs value', { lastTime, 
+      current: new Date().getTime(), 
+      diff:new Date().getTime() - lastTime, 
+      Twohrs: 2 * 60 * 60 * 1000 })
+    return new Date().getTime() - lastTime <= 2 * 60 * 60 * 1000;
   };
 
   const isNextDay = (lastTime: number) => {
@@ -386,7 +390,7 @@ export default function Player() {
     if (
       !append &&
       newsData &&
-      currentNewsIndex &&
+      currentNewsIndex > -1 &&
       inactiveSince &&
       isLessThan2Hours(+inactiveSince)
     ) {
@@ -487,8 +491,9 @@ export default function Player() {
         appState.current.match(/inactive|background/) &&
         nextAppState === "active"
       ) {
-        console.log("App has come to the foreground!");
-        load();
+        console.log("App has come to the foreground!", isPlaying);
+        if(!isPlaying && (welcomeSoundStatus === 'completed' || welcomeSoundStatus === 'ignored') )
+          load();
       }
 
       if (
