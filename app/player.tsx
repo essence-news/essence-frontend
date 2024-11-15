@@ -350,8 +350,8 @@ export default function Player() {
     return new Date().getTime() - lastTime <= 2 * 60 * 60 * 1000;
   };
 
-  const isNextDay = (lastTime: number) => {
-    return new Date(lastTime).getDate() < new Date().getDate();
+  const isSameDay = (lastTime: number) => {
+    return new Date(lastTime).getDate() === new Date().getDate();
   };
 
   const setAndPlayWelcomeSound = async (welcomeSoundUri: string) => {
@@ -411,19 +411,17 @@ export default function Player() {
           isFirstTimeEver: (user?.isFirstTimeEver || true).toString(),
           isFirstTimeToday: (user?.isFirstTimeToday || true).toString(),
         });
-
         // If first time or coming back on next day
-        let articlesToSet = articlesResponse.articles;
-
+        let articlesToSet;
         if (newsData && currentNewsIndex !== null) {
-          if (inactiveSince && !isNextDay(+inactiveSince)) {
-            console.log("current day", {
+          if (inactiveSince && isSameDay(+inactiveSince)) {
+            // if coming back within current day
+            console.log("same day", {
               append,
               inactiveSince: new Date(+inactiveSince),
               newsData,
               currentNewsIndex,
             });
-            // if coming back within current day
             const parsed: News = JSON.parse(newsData);
             if (append) {
               // If reached end of list, add new items
@@ -432,17 +430,24 @@ export default function Player() {
                 ...articlesResponse.articles,
               ];
             } else {
+              // after hrs, add new items to beginning of list
               articlesToSet = [
                 ...articlesResponse.articles,
                 ...parsed.articles.splice(+currentNewsIndex),
               ];
+              soundRefs.current = []; // reset objects
               setCurrentNewsIndex(0);
               await AsyncStorage.setItem("currentNewsIndex", "0");
             }
           } else {
-            setCurrentNewsIndex(+currentNewsIndex);
+            // on next day
+            soundRefs.current = []; // reset objects
+            articlesToSet = articlesResponse.articles;
+            setCurrentNewsIndex(0);
           }
         } else {
+          articlesToSet = articlesResponse.articles;
+          soundRefs.current = []; // reset objects
           setCurrentNewsIndex(0);
         }
 
@@ -461,7 +466,7 @@ export default function Player() {
 
         if (articlesResponse.intro_audio)
           setAndPlayWelcomeSound(articlesResponse.intro_audio);
-        else welcomeSoundStatus = "ignored";
+        else setWelcomeSoundStatus("ignored");
       } catch (err) {
         if (err.message >= 400) {
           logout();
