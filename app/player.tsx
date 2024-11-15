@@ -400,6 +400,7 @@ export default function Player() {
     } else {
       console.log("not within 2 hrs", { inactiveSince, user });
       try {
+        setWelcomeSoundStatus("loading");
         const articlesResponse: News = await fetchNews({
           isFirstTimeEver: (user?.isFirstTimeEver || true).toString(),
           isFirstTimeToday: (user?.isFirstTimeToday || true).toString(),
@@ -454,6 +455,9 @@ export default function Player() {
 
         if (articlesResponse.intro_audio)
           setAndPlayWelcomeSound(articlesResponse.intro_audio);
+        else
+        welcomeSoundStatus = "ignored"
+
       } catch (err) {
         if (err.message >= 400) {
           logout();
@@ -589,7 +593,7 @@ export default function Player() {
   return (
     <SafeAreaView style={styles.container}>
       <BrandHeader />
-      {welcomeSoundStatus === "playing" ? (
+      {welcomeSoundStatus === "playing" || welcomeSoundStatus === "loading" ? (
         <FullScreenBackground src={"../assets/logo.png"} />
       ) : (
         <AppContainer>

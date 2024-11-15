@@ -1,3 +1,5 @@
+import { router } from "expo-router";
+
 const API_BASE_URL = "https://mkhg9ap0r7.execute-api.us-east-1.amazonaws.com";
 
 //"https://x8y29ocps8.execute-api.us-east-1.amazonaws.com"; // process.env.REACT_APP_API_BASE_URL;
@@ -12,6 +14,7 @@ const setToken = (token: string) => {
 
 const clearToken = () => {
   localStorage.removeItem("userToken");
+  router.push('/sign-in')
 };
 
 const apiCall = async (endpoint: string, method = "GET", data?: unknown) => {
@@ -35,7 +38,6 @@ const apiCall = async (endpoint: string, method = "GET", data?: unknown) => {
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-
   if (response.status === 401) {
     clearToken();
     throw new Error("Unauthorized");
