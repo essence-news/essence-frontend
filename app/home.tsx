@@ -198,6 +198,10 @@ const Home = () => {
   });
 
   const handleTryItOut = async () => {
+    router.push("/sign-in");
+  };
+
+  const init = async () => {
     const token = await AsyncStorage.getItem("userToken");
     const firstName = await AsyncStorage.getItem("firstName");
     if (token) {
@@ -207,8 +211,9 @@ const Home = () => {
     }
   };
 
+
   useEffect(() => {
-    handleTryItOut();
+    init();
   }, []);
 
   console.log("Home page");
