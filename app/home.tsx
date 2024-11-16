@@ -1,7 +1,7 @@
 import styled from "styled-components/native";
 
 import { useAuth } from "../utils/AuthProvider";
-import { Pressable, Text, View } from "react-native";
+import { View } from "react-native";
 import { Link, router } from "expo-router";
 import "@expo/match-media";
 import { useMediaQuery } from "react-responsive";
@@ -199,10 +199,11 @@ const Home = () => {
 
   const handleTryItOut = async () => {
     const token = await AsyncStorage.getItem("userToken");
+    const firstName = await AsyncStorage.getItem("firstName");
     if (token) {
       router.push("/player");
     } else {
-      router.push("/sign-in");
+      if (firstName) router.push("/sign-in");
     }
   };
 
@@ -210,7 +211,7 @@ const Home = () => {
     handleTryItOut();
   }, []);
 
-  console.log("Home page")
+  console.log("Home page");
 
   return (
     <HomeContainer>

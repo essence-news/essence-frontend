@@ -14,7 +14,7 @@ const setToken = (token: string) => {
 
 const clearToken = () => {
   localStorage.removeItem("userToken");
-  router.push('/sign-in')
+  router.push("/sign-in");
 };
 
 const apiCall = async (endpoint: string, method = "GET", data?: unknown) => {
@@ -50,7 +50,7 @@ export const signIn = async (
   email: string,
   firstName: string,
   country: string,
-  language: string
+  language: string,
 ) => {
   const response = await apiCall("/user/signin", "POST", {
     email,

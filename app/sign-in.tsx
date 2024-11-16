@@ -16,10 +16,10 @@ import { useAuth } from "@/utils/AuthProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Text, View } from "react-native";
 
 export default function Login() {
-  const { logout, login, verify } = useAuth();
+  const { login, verify } = useAuth();
   const [promptForToken, setPromptForToken] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -27,10 +27,14 @@ export default function Login() {
   const [email, onChangeEmail] = useState("");
   const [verificationCode, onChangeVerificationCode] = useState("");
   useEffect(() => {
-    // async function init() {
-    //   if ((await AsyncStorage.getItem("userToken")) !== null)
-    //     router.push("/player");
-    AsyncStorage.clear();
+    async function init() {
+      const firstName = await AsyncStorage.getItem("firstName");
+      await AsyncStorage.clear();
+      if (firstName) {
+        await AsyncStorage.setItem("firstName", firstName);
+      }
+    }
+    init();
   }, []);
   const handleSignin = async () => {
     const signInResponse = await login(email, firstName, "GB", "EN");

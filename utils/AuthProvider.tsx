@@ -17,7 +17,7 @@ export type Auth = {
     email: string,
     inputFirstName: string,
     country: string,
-    language: string
+    language: string,
   ) => Promise<{ token?: string }>;
   verify: (email: string, verificationCode: string) => Promise<boolean>;
   logout: () => void;
@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email: string,
       inputFirstName: string,
       country: string,
-      language: string
+      language: string,
     ) => {
       try {
         const result = await signIn(email, inputFirstName, country, language);
@@ -158,7 +158,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
     },
-    [getLoginStatus, updateFirstName]
+    [getLoginStatus, updateFirstName],
   );
 
   // Modified verify method
@@ -172,7 +172,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           await AsyncStorage.setItem("isFirstTimeEver", "true");
           await AsyncStorage.setItem(
             "lastLoginTime",
-            "" + new Date().getTime()
+            "" + new Date().getTime(),
           );
 
           const { firstName, isFirstTimeEver, isFirstTimeToday } =
@@ -191,7 +191,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
     },
-    [getLoginStatus, updateFirstName]
+    [getLoginStatus, updateFirstName],
   );
 
   useEffect(() => {
