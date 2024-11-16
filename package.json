@@ -5,7 +5,7 @@
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
-    "build:web": "expo export -p web && npx workbox-cli generateSW workbox-config.js",
+    "build:web": "expo export -p web --output-dir build && npx workbox-cli generateSW workbox-config.js",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
