@@ -41,6 +41,25 @@ import BrandHeader from "@/components/BrandHeader";
 import { useAuth } from "@/utils/AuthProvider";
 import { mockNewsData } from "@/constants/mock";
 import { flushQueue, trackEvent } from "@/utils/trackingUtil";
+import styled from "styled-components/native";
+
+export const CircularButton = styled.Pressable`
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+  border: 1px solid #999;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+`;
+
+export const startButtonStyles = {
+  startButton: {
+    transform: [{ translateX: -50 }, { translateY: -50 }],
+  },
+};
 
 export interface News {
   articles: Article[];
@@ -97,6 +116,7 @@ export default function Player() {
   const [isLoading, setIsLoading] = useState(true);
   const [articles, setArticles] = useState<Article[]>([]);
   const [progress, setProgress] = useState(0);
+  const [needsUserInput, setNeedsUserInput] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [welcomeSoundStatus, setWelcomeSoundStatus] = useState<string>("");
   const [ratingMessage, setRatingMessage] = useState("");
@@ -231,6 +251,7 @@ export default function Player() {
               sound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
             })
             .catch((error) => {
+              setNeedsUserInput(true);
               console.error("Auto-play failed:", error.message);
               trackEvent(
                 "error",
@@ -376,6 +397,7 @@ export default function Player() {
             });
           })
           .catch((error) => {
+            setNeedsUserInput(true);
             console.info("User has not interacted with document yet.");
           });
       }, 500);
@@ -603,12 +625,24 @@ export default function Player() {
 
   // console.log({ progress, showPlayerControls });
   if (articles.length === 0) return null;
-  // console.log({ isPlaying, isLoading });
+  console.log({ isPlaying, isLoading, style: startButtonStyles.startButton });
   return (
     <SafeAreaView style={styles.container}>
       <BrandHeader />
-      {welcomeSoundStatus === "playing" || welcomeSoundStatus === "loading" ? (
-        <FullScreenBackground src={"../assets/logo.png"} />
+      {welcomeSoundStatus === "playing" ||
+      welcomeSoundStatus === "loading" ||
+      needsUserInput ? (
+        <>
+          <FullScreenBackground src={"../assets/logo.png"} />
+          {needsUserInput && (
+            <CircularButton
+              style={startButtonStyles.startButton}
+              onPress={() => setNeedsUserInput(false)}
+            >
+              START
+            </CircularButton>
+          )}
+        </>
       ) : (
         <AppContainer>
           <FullScreenBackground

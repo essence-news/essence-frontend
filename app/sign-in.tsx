@@ -31,7 +31,6 @@ export default function Login() {
     //   if ((await AsyncStorage.getItem("userToken")) !== null)
     //     router.push("/player");
     AsyncStorage.clear();
-
   }, []);
   const handleSignin = async () => {
     const signInResponse = await login(email, firstName, "GB", "EN");
@@ -48,7 +47,7 @@ export default function Login() {
         router.replace("/player");
       } else {
         throw new Error(
-          "Verification failed. Please check your code and try again."
+          "Verification failed. Please check your code and try again.",
         );
       }
     } catch (error) {
