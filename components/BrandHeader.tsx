@@ -6,15 +6,15 @@ const BrandName = styled.Text`
   margin: 0;
   color: ${({ theme }) => theme.colors.white};
   font-family: "${({ theme }) => theme.fonts.brand}";
-  font-size: 28;
+  font-size: 28px;
   display: inline;
   text-align: left;
   font-weight: bold;
 `;
 
 const Logo = styled.Image`
-  height: 24;
-  margin-right: 20;
+  height: 24px;
+  margin-right: 20px;
 `;
 
 const BrandHeader = () => (

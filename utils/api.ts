@@ -1,24 +1,26 @@
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const API_BASE_URL = "https://mkhg9ap0r7.execute-api.us-east-1.amazonaws.com";
 
 //"https://x8y29ocps8.execute-api.us-east-1.amazonaws.com"; // process.env.REACT_APP_API_BASE_URL;
 
-const getToken = () => {
-  return localStorage.getItem("userToken");
+const getToken = async () => {
+
+  return await AsyncStorage.getItem("userToken");
 };
 
-const setToken = (token: string) => {
-  localStorage.setItem("userToken", token);
+const setToken = async (token: string) => {
+  await AsyncStorage.setItem("userToken", token);
 };
 
-const clearToken = () => {
-  localStorage.removeItem("userToken");
+const clearToken = async () => {
+  await AsyncStorage.removeItem("userToken");
   router.push("/sign-in");
 };
 
 const apiCall = async (endpoint: string, method = "GET", data?: unknown) => {
-  const token = getToken();
+  const token = await getToken();
   const headers: { [key: string]: string } = {
     "Content-Type": "application/json",
   };
@@ -90,7 +92,7 @@ export const verifyEmail = async (email: string, verificationCode: string) => {
   }
 
   const data = await response.json();
-  setToken(data.token);
+  await setToken(data.token);
   return data;
 };
 
@@ -130,7 +132,7 @@ export const verifyToken = async () => {
     }
     return await response.json();
   } catch (error) {
-    clearToken();
+    await clearToken();
     throw error;
   }
 };
@@ -146,7 +148,7 @@ export const refreshToken = async () => {
       throw new Error("Token refresh failed");
     }
     const data = await response.json();
-    setToken(data.token);
+    await setToken(data.token);
     return data.token;
   } catch (error) {
     console.error("Error refreshing token:", error);

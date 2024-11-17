@@ -21,7 +21,7 @@ const HomeContainer = styled.View`
   flex-direction: column;
   min-height: 100%;
   color: #fff;
-  padding: 2rem;
+  padding: 32px;
   background: #333;
 `;
 
@@ -40,7 +40,7 @@ const LeftSection = styled.View<{ smallScreen: boolean }>`
 
 const RightSection = styled.View<{ smallScreen: boolean }>`
   border-radius: 10px;
-  margin-top: 4rem;
+  margin-top: 64px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -71,49 +71,49 @@ const InsightCard = styled.View<{ smallScreen: boolean }>`
 
 const Brand = styled.Text`
   font-family: "${({ theme }) => theme.fonts.brand}";
-  font-size: 5rem;
+  font-size: 80px;
   font-weight: 300;
   color: ${({ theme }) => theme.colors.brand};
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
   margin-top: 0;
 `;
 
 const Headline = styled.Text`
   font-family: "${({ theme }) => theme.fonts.heading}";
-  font-size: 3rem;
+  font-size: 48px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text};
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 `;
 
 const Subheadline = styled.Text`
   font-family: "${({ theme }) => theme.fonts.body}";
-  font-size: 1.2rem;
+  font-size: 20px;
   color: ${({ theme }) => theme.colors.text};
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 `;
 
 const InsightTitle = styled.Text`
   font-family: "${({ theme }) => theme.fonts.body}";
-  font-size: 1.8rem;
+  font-size: 25px;
   font-weight: 400;
   margin-top: 0;
   color: ${({ theme }) => theme.colors.text};
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 `;
 
 const InsightTitleSmall = styled.Text`
   font-family: "${({ theme }) => theme.fonts.heading}";
-  font-size: 1rem;
+  font-size: 16px;
   margin: 0;
   color: ${({ theme }) => theme.colors.primaryLighter};
 `;
 
 const InsightSubtitle = styled.Text`
   font-family: "${({ theme }) => theme.fonts.body}";
-  font-size: 1rem;
+  font-size: 16px;
   color: ${({ theme }) => theme.colors.background};
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 `;
 
 const AppImage = styled.Image<{ smallScreen: boolean }>`
@@ -155,16 +155,16 @@ const Footer = styled.View`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 4rem;
-  padding: 2rem;
+  margin-top: 64px;
+  padding: 32px;
   color: #fff;
 `;
 
 const FooterLinks = styled.View`
   display: flex;
-  gap: 1rem;
+  gap: 16px;
   flex-direction: row;
-  margin-top: 2rem;
+  margin-top: 32px;
   align-items: center;
   justify-content: center;
 `;
@@ -197,8 +197,11 @@ const Home = () => {
     query: "(max-device-width: 768px)",
   });
 
-  const handleTryItOut = async () => {
+  const handleSignin = async () => {
     router.push("/sign-in");
+  };
+  const handleGotoNews = async () => {
+    router.push("/player");
   };
 
   const init = async () => {
@@ -211,10 +214,9 @@ const Home = () => {
     }
   };
 
-
-  useEffect(() => {
-    init();
-  }, []);
+  // useEffect(() => {
+  //   init();
+  // }, []);
 
   console.log("Home page");
 
@@ -228,7 +230,7 @@ const Home = () => {
             Essence delivers curated, personalized audio insights for busy
             professionals. Get informed on your commute, no reading required.
           </Subheadline>
-          <StyledPressable onPress={handleTryItOut}>
+          <StyledPressable onPress={() => user ? handleGotoNews() : handleSignin()}>
             {user ? (
               <ButtonText>Go to News</ButtonText>
             ) : (
@@ -312,7 +314,7 @@ const Home = () => {
       <Footer>
         <Brand>essence</Brand>
 
-        <StyledPressable onPress={handleTryItOut}>
+        <StyledPressable onPress={() => user ? handleGotoNews() : handleSignin()}>
           {user ? (
             <ButtonText>Go to News</ButtonText>
           ) : (

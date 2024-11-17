@@ -83,7 +83,7 @@ export default function Login() {
                   />
                   {error ? <ErrorMessage>{error}</ErrorMessage> : <Text></Text>}
                   <Button onPress={handleVerify} disabled={isLoading}>
-                    {isLoading ? "Verifying..." : "Verify"}
+                    {isLoading ? <Text>Verifying...</Text> : <Text>Verify</Text>}
                   </Button>
                 </FormContainer>
               </MainContent>
@@ -113,7 +113,7 @@ export default function Login() {
                   />
                   {error ? <ErrorMessage>{error}</ErrorMessage> : <Text></Text>}
                   <Button onPress={handleSignin} disabled={isLoading}>
-                    {isLoading ? "Signing In..." : "Sign In"}
+                    {isLoading ? <Text>Signing In...</Text> : <Text>Sign In</Text>}
                   </Button>
                 </FormContainer>
               </SigninMainContent>

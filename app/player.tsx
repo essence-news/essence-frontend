@@ -134,7 +134,7 @@ export default function Player() {
     );
   }, [articles, currentNewsIndex]);
 
-  const renderContent = useMemo(() => {
+  const renderContent = () => {
     if (
       !articles ||
       articles.length === 0 ||
@@ -160,7 +160,7 @@ export default function Player() {
         </CategoryContainer>
       </>
     );
-  }, [currentNewsIndex, articles]);
+  }
 
   const onPlaybackStatusUpdate = (status: any) => {
     // console.log({ status });
@@ -193,7 +193,7 @@ export default function Player() {
   };
 
   async function playSound() {
-    console.log({ welcomeSoundStatus });
+    console.log({ welcomeSoundStatus, articles } );
     if (
       welcomeSoundStatus !== "completed" &&
       welcomeSoundStatus !== "ignored"
@@ -622,15 +622,13 @@ export default function Player() {
       }
     }
   };
-
   // console.log({ progress, showPlayerControls });
-  if (articles.length === 0) return null;
-  console.log({ isPlaying, isLoading, style: startButtonStyles.startButton });
+  // if (!isWelcomeSoundPlaying() && articles.length === 0) return <ErrorMessage>No news</Text>;
+  console.log({ welcomeSoundStatus, isPlaying, isLoading, style: startButtonStyles.startButton });
   return (
     <SafeAreaView style={styles.container}>
       <BrandHeader />
-      {welcomeSoundStatus === "playing" ||
-      welcomeSoundStatus === "loading" ||
+      {welcomeSoundStatus === "playing" || welcomeSoundStatus === "loading" ||
       needsUserInput ? (
         <>
           <FullScreenBackground src={"../assets/logo.png"} />
@@ -670,7 +668,7 @@ export default function Player() {
                       <Subtitle>Your {getTimeOfDay()} newscast</Subtitle>
                     </PlaylistInfo>
                     <NewsInfo welcomeShown={showWelcome}>
-                      {renderContent}
+                      {renderContent()}
                     </NewsInfo>
                   </TopSection>
                   {showPlayerControls ? (

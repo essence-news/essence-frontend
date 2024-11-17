@@ -1,6 +1,7 @@
 import GlobalStyle from "@/components/GlobalStyle";
 import theme from "@/constants/theme";
 import { AuthProvider, useAuth } from "@/utils/AuthProvider";
+import { Platform } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Redirect, SplashScreen, Stack, router } from "expo-router";
 import { ThemeProvider } from "styled-components/native";
@@ -88,7 +89,7 @@ export default function Root() {
 
   useEffect(() => {
     if (loaded) {
-      if (document) document.title = "Essence - Your own news player";
+      if (Platform.OS === 'web' && document) document.title = "Essence - Your own news player";
       SplashScreen.hideAsync();
     }
   }, [loaded]);

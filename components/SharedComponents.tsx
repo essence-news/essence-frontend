@@ -95,8 +95,8 @@ export const Subtitle = styled.Text`
 export const SubtitleDark = styled.Text`
   font-size: 20px;
   margin-top: 0;
-  font-family: "${({ theme }) => theme.fonts.body};
-  color: ${({ theme }) => theme.colors.primary}";
+  font-family: "${({ theme }) => theme.fonts.body}";
+  color: "${({ theme }) => theme.colors.primary}";
 `;
 
 export const ButtonText = styled.Text`
@@ -128,19 +128,19 @@ export const Input = styled.TextInput`
   border-radius: 5px;
   margin-bottom: 10px;
   padding: 0 10px;
-  font-size: 1em;
+  font-size: 16px;
   font-family: "${({ theme }) => theme.fonts.body}";
   background-color: #fff;
   width: 100%;
 `;
 
 // Add this near the top of the file with other styled components
-export const ErrorMessage = styled.View`
+export const ErrorMessage = styled.Text`
   font-family: "${({ theme }) => theme.fonts.body}";
   color: ${({ theme }) => theme.colors.error};
   text-align: center;
   margin-top: 20px;
-  font-size: 1rem;
+  font-size: 16px;
   padding: 10px;
 `;
 
@@ -384,7 +384,7 @@ export const CategoryButton = styled.Text`
   color: ${(props) => props.theme.colors.background};
   border-radius: 5px;
   font-weight: 500;
-  font-size: 1em;
+  font-size: 16px;
 `;
 
 export const CategoryContainer = styled.View`

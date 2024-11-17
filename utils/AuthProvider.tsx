@@ -3,7 +3,6 @@ import {
   useState,
   useContext,
   useEffect,
-  useCallback,
   ReactNode,
 } from "react";
 import { signIn, verifyEmail, verifyToken, refreshToken } from "./api";
@@ -46,7 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(false);
 
   // New function to update firstName in localStorage and state
-  const updateFirstName = useCallback(async (newFirstName: string) => {
+  const updateFirstName = async (newFirstName: string) => {
     if (newFirstName) {
       await AsyncStorage.setItem("firstName", toCamelCase(newFirstName));
       setUser((prevUser) => ({
@@ -54,10 +53,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         firstName: toCamelCase(newFirstName),
       }));
     }
-  }, []);
+  };
 
   // Modified getLoginStatus method
-  const getLoginStatus = useCallback(async () => {
+  const getLoginStatus = async () => {
     const today = new Date().toDateString();
     const firstName = (await AsyncStorage.getItem("firstName")) || "";
     const lastLoginDate = await AsyncStorage.getItem("lastLoginDate");
@@ -71,10 +70,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     return { firstName, isFirstTimeEver, isFirstTimeToday };
-  }, []);
+  };
 
   // Modified logout method
-  const logout = useCallback(async () => {
+  const logout = async () => {
     const firstName = await AsyncStorage.getItem("firstName");
     await AsyncStorage.clear();
     if (firstName) {
@@ -82,7 +81,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     setUser(undefined);
     router.push("/sign-in");
-  }, []);
+  };
 
   // New method to check token expiration
   const ensureTokenValidity = async () => {
@@ -129,7 +128,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Modified login method
-  const login = useCallback(
+  const login = 
     async (
       email: string,
       inputFirstName: string,
@@ -157,12 +156,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error("Login error:", error);
         throw error;
       }
-    },
-    [getLoginStatus, updateFirstName],
-  );
+    };
 
   // Modified verify method
-  const verify = useCallback(
+  const verify = 
     async (email: string, verificationCode: string) => {
       try {
         const userData = await verifyEmail(email, verificationCode);
@@ -190,9 +187,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error("Verification error:", error);
         throw error;
       }
-    },
-    [getLoginStatus, updateFirstName],
-  );
+    }
 
   useEffect(() => {
     async function init() {

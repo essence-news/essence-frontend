@@ -18,9 +18,9 @@ const theme = {
     darkOverlay: "rgba(0, 0, 0, 0.7)",
   },
   fonts: {
-    body: "Inter_400Regular, sans-serif",
-    heading: "Nunito_400Regular, sans-serif",
-    brand: "Comfortaa_400Regular, sans-serif",
+    body: "Inter_400Regular",
+    heading: "Nunito_400Regular",
+    brand: "Comfortaa_400Regular",
   },
   sizes: {
     maxWidth: "400px",
