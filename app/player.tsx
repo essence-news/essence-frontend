@@ -124,6 +124,7 @@ export default function Player() {
   const soundRefs = useRef<Sound[] | null[]>([]);
   const autoPlayStarted = useRef(false);
   const newsResponse = useRef<News>();
+  const welcomeSoundRef = useRef<Sound | null>(null);
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
   const { logout } = useAuth();
@@ -382,6 +383,7 @@ export default function Player() {
       console.error("welcomeSoundUri Create Async failed:", error);
       return;
     });
+    welcomeSoundRef.current = sound;
     console.log("Playing welcomeSound", welcomeSoundUri);
     if (sound) {
       const tryToPlay = setInterval(async () => {
@@ -393,6 +395,7 @@ export default function Player() {
             sound.setOnPlaybackStatusUpdate((status) => {
               if (status.didJustFinish) {
                 setWelcomeSoundStatus("completed");
+                welcomeSoundRef.current = null;
               }
             });
           })
@@ -545,6 +548,10 @@ export default function Player() {
     return () => {
       clearTimeout(timer);
       subscription.remove();
+      currentlyPlaying.current?.stopAsync();
+      currentlyPlaying.current?.unloadAsync();
+      welcomeSoundRef.current?.stopAsync();
+      welcomeSoundRef.current?.unloadAsync();
     };
   }, []);
 

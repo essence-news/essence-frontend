@@ -11,12 +11,13 @@ import {
   SigninMainContent,
   SubtitleDark,
   Title,
+  ButtonText
 } from "@/components/SharedComponents";
 import { useAuth } from "@/utils/AuthProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Text, View, Dimensions } from "react-native";
 
 export default function Login() {
   const { login, verify } = useAuth();
@@ -66,7 +67,7 @@ export default function Login() {
       {promptForToken ? (
         <>
           <BrandHeader />
-          <AppContainer>
+          <AppContainer width={Dimensions.get('window').width} height={Dimensions.get('window').width}>
             <ContentContainer>
               <MainContent>
                 <Header>
@@ -83,7 +84,7 @@ export default function Login() {
                   />
                   {error ? <ErrorMessage>{error}</ErrorMessage> : <Text></Text>}
                   <Button onPress={handleVerify} disabled={isLoading}>
-                    {isLoading ? <Text>Verifying...</Text> : <Text>Verify</Text>}
+                    {isLoading ? <ButtonText>Verifying...</ButtonText> : <ButtonText>Verify</ButtonText>}
                   </Button>
                 </FormContainer>
               </MainContent>
@@ -93,7 +94,9 @@ export default function Login() {
       ) : (
         <>
           <BrandHeader />
-          <AppContainer>
+          
+          <AppContainer width={Dimensions.get('window').width} height={Dimensions.get('window').width}>
+          
             <ContentContainer>
               <SigninMainContent>
                 <Header>
@@ -113,7 +116,7 @@ export default function Login() {
                   />
                   {error ? <ErrorMessage>{error}</ErrorMessage> : <Text></Text>}
                   <Button onPress={handleSignin} disabled={isLoading}>
-                    {isLoading ? <Text>Signing In...</Text> : <Text>Sign In</Text>}
+                    {isLoading ? <ButtonText>Signing In...</ButtonText> : <ButtonText>Sign In</ButtonText>}
                   </Button>
                 </FormContainer>
               </SigninMainContent>

@@ -1,8 +1,8 @@
 import styled from "styled-components/native";
 
-export const AppContainer = styled.View`
-  width: 100vw;
-  height: 100vh;
+export const AppContainer = styled.View<{width: number; height: number}>`
+  width: ${props => props.width + 'px' || '100vw'};
+  height: ${props => props.height + 'px' || '100vh'};
   max-width: 100%;
   max-height: 100%;
   display: flex;
@@ -18,12 +18,12 @@ export const AppContainer = styled.View`
   overflow: hidden;
 `;
 
-export const HeaderContainer = styled.View`
+export const HeaderContainer = styled.View<{width: number}>`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  width: 100vw;
+  width: ${props => props.width + 'px' || '100vw'};
   max-width: 100%;
   box-sizing: border-box;
   position: absolute;

@@ -1,7 +1,7 @@
 import GlobalStyle from "@/components/GlobalStyle";
 import theme from "@/constants/theme";
 import { AuthProvider, useAuth } from "@/utils/AuthProvider";
-import { Platform } from 'react-native';
+import { Platform, ScrollView } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Redirect, SplashScreen, Stack, router } from "expo-router";
 import { ThemeProvider } from "styled-components/native";
@@ -100,7 +100,9 @@ export default function Root() {
   return (
     <ThemeProvider theme={theme}>
       <AuthProvider>
+        <ScrollView>
         <Slot />
+        </ScrollView>
       </AuthProvider>
     </ThemeProvider>
   );

@@ -9,11 +9,11 @@ import { ButtonText } from "@/components/SharedComponents";
 import { useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const screenshot1 = { uri: "../assets/screenshots/1.jpg" };
-const ecommercePic = { uri: "../assets/cliparts/ecommerce.jpg" };
-const audioPic = { uri: "../assets/cliparts/audio.jpg" };
-const hourglassPic = { uri: "../assets/cliparts/hourglass.jpg" };
-const podcastPic = { uri: "../assets/cliparts/podcast.jpg" };
+import screenshot1 from "@/assets/screenshots/1.jpg";
+import ecommercePic from "@/assets/cliparts/ecommerce.jpg";
+import audioPic from "@/assets/cliparts/audio.jpg";
+import hourglassPic from "@/assets/cliparts/hourglass.jpg";
+import podcastPic from "@/assets/cliparts/podcast.jpg";
 
 // Keep the existing styled components that are specific to Home
 const HomeContainer = styled.View`
@@ -71,7 +71,7 @@ const InsightCard = styled.View<{ smallScreen: boolean }>`
 
 const Brand = styled.Text`
   font-family: "${({ theme }) => theme.fonts.brand}";
-  font-size: 80px;
+  font-size: 68px;
   font-weight: 300;
   color: ${({ theme }) => theme.colors.brand};
   margin-bottom: 32px;
@@ -156,7 +156,7 @@ const Footer = styled.View`
   flex-direction: column;
   align-items: center;
   margin-top: 64px;
-  padding: 32px;
+  padding: 12px;
   color: #fff;
 `;
 
