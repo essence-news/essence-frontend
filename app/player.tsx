@@ -647,186 +647,191 @@ export default function Player() {
   // if (!isWelcomeSoundPlaying() && articles.length === 0) return <ErrorMessage>No news</Text>;
   // console.log({ welcomeSoundStatus, isPlaying, isLoading, style: startButtonStyles.startButton });
   return (
-    <SafeAreaView style={styles.container}>
+    <>
       <BrandHeader />
-      <ScrollView>
-        {welcomeSoundStatus === "playing" ||
-        welcomeSoundStatus === "loading" ||
-        needsUserInput ? (
-          <>
-            {/* <FullScreenBackground
+      {welcomeSoundStatus === "playing" ||
+      welcomeSoundStatus === "loading" ||
+      needsUserInput ? (
+        <>
+          {/* <FullScreenBackground
             src={"@/assets/logo.png"}
           /> */}
-            <ImageBackground
-              source={require("@/assets/logo.png")}
-              style={{
-                ...styles.backgroundImage,
-                width: Dimensions.get("screen").width,
-                height: Dimensions.get("screen").height,
-              }}
-            >
-              {needsUserInput && (
-                <CircularButton
-                  style={startButtonStyles.startButton}
-                  onPress={() => setNeedsUserInput(false)}
-                >
-                  START
-                </CircularButton>
-              )}
-            </ImageBackground>
-          </>
-        ) : (
-          <AppContainer
-            width={Dimensions.get("window").width}
-            height={Dimensions.get("window").height}
+          <ImageBackground
+            source={require("@/assets/logo.png")}
+            style={{
+              ...styles.backgroundImage,
+              width: Dimensions.get("screen").width,
+              height: Dimensions.get("screen").height,
+            }}
           >
-            <FullScreenBackground
-              src={articles?.[currentNewsIndex]?.image || "@/assets/bg1.jpg"}
-            />
-            <ContentContainer>
-              <Card>
-                <BackgroundOverlay
-                  source={
-                    articles?.[currentNewsIndex]?.image
-                      ? { uri: articles?.[currentNewsIndex]?.image }
-                      : require("../assets/bg1.jpg")
+            {needsUserInput && (
+              <CircularButton
+                style={startButtonStyles.startButton}
+                onPress={() => setNeedsUserInput(false)}
+              >
+                START
+              </CircularButton>
+            )}
+          </ImageBackground>
+        </>
+      ) : (
+        <SafeAreaProvider>
+          <SafeAreaView style={styles.container} edges={["top"]}>
+            <AppContainer
+              width={Dimensions.get("window").width}
+              height={Dimensions.get("window").height}
+            >
+              <ScrollView>
+                <FullScreenBackground
+                  src={
+                    articles?.[currentNewsIndex]?.image || "@/assets/bg1.jpg"
                   }
                 />
+                <ContentContainer>
+                  <Card>
+                    <BackgroundOverlay
+                      source={
+                        articles?.[currentNewsIndex]?.image
+                          ? { uri: articles?.[currentNewsIndex]?.image }
+                          : require("../assets/bg1.jpg")
+                      }
+                    />
 
-                <ContentWrapper>
-                  <MainContent>
-                    <TopSection welcomeShown={showWelcome}>
-                      <PlaylistInfo show={showWelcome}>
-                        <Title>Hello {user?.firstName || ""}</Title>
-                        <Subtitle>Your {getTimeOfDay()} newscast</Subtitle>
-                      </PlaylistInfo>
-                      <NewsInfo welcomeShown={showWelcome}>
-                        {renderContent()}
-                      </NewsInfo>
-                    </TopSection>
-                    {showPlayerControls ? (
-                      <>
-                        <ControlsWrapper>
-                          <RatingButtons>
-                            <RatingMessage visible={!!ratingMessage}>
-                              {ratingMessage}
-                            </RatingMessage>
-                            <RatingButton
-                              onPress={() => handleRating("negative")}
-                              disabled={isLoading}
-                            >
-                              <Svg fill="#fff" viewBox="0 0 24 24">
-                                <Path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" />
-                              </Svg>
-                            </RatingButton>
-                            <RatingButton
-                              onPress={() => handleRating("positive")}
-                              disabled={isLoading}
-                            >
-                              <Svg fill="#fff" viewBox="0 0 24 24">
-                                <Path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
-                              </Svg>
-                            </RatingButton>
-                          </RatingButtons>
-                          <ProgressBar>
-                            <Progress progress={progress} />
-                          </ProgressBar>
-                          <Controls>
-                            <ControlButton
-                              onPress={handlePrev}
-                              disabled={currentNewsIndex <= 0}
-                            >
-                              <Svg
-                                viewBox="0 0 24 24"
-                                width={30}
-                                height={30}
-                                fill={theme.colors.text}
-                              >
-                                <Path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
-                              </Svg>
-                            </ControlButton>
-                            <ControlButton
-                              onPress={() =>
-                                isPlaying ? pauseSound() : playSound()
-                              }
-                              disabled={isLoading}
-                            >
-                              {isLoading ? (
-                                <Svg
-                                  viewBox="0 0 24 24"
-                                  width={30}
-                                  height={30}
-                                  fill={theme.colors.text}
+                    <ContentWrapper
+                      width={Dimensions.get("window").width}
+                      style={{ flex: 1 }}
+                    >
+                      <MainContent>
+                        <TopSection welcomeShown={showWelcome}>
+                          <PlaylistInfo show={showWelcome}>
+                            <Title>Hello {user?.firstName || ""}</Title>
+                            <Subtitle>Your {getTimeOfDay()} newscast</Subtitle>
+                          </PlaylistInfo>
+                          <NewsInfo welcomeShown={showWelcome}>
+                            {renderContent()}
+                          </NewsInfo>
+                        </TopSection>
+                        {showPlayerControls ? (
+                          <>
+                            <ControlsWrapper>
+                              <RatingButtons>
+                                <RatingMessage visible={!!ratingMessage}>
+                                  {ratingMessage}
+                                </RatingMessage>
+                                <RatingButton
+                                  onPress={() => handleRating("negative")}
+                                  disabled={isLoading}
                                 >
-                                  <Path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z" />
-                                </Svg>
-                              ) : isPlaying ? (
-                                <Svg
-                                  viewBox="0 0 24 24"
-                                  width={30}
-                                  height={30}
-                                  fill={theme.colors.text}
+                                  <Svg fill="#fff" viewBox="0 0 24 24">
+                                    <Path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" />
+                                  </Svg>
+                                </RatingButton>
+                                <RatingButton
+                                  onPress={() => handleRating("positive")}
+                                  disabled={isLoading}
                                 >
-                                  <Path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                                </Svg>
-                              ) : (
-                                <Svg
-                                  viewBox="0 0 24 24"
-                                  width={30}
-                                  height={30}
-                                  fill={theme.colors.text}
+                                  <Svg fill="#fff" viewBox="0 0 24 24">
+                                    <Path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+                                  </Svg>
+                                </RatingButton>
+                              </RatingButtons>
+                              <ProgressBar>
+                                <Progress progress={progress} />
+                              </ProgressBar>
+                              <Controls>
+                                <ControlButton
+                                  onPress={handlePrev}
+                                  disabled={currentNewsIndex <= 0}
                                 >
-                                  <Path d="M8 5v14l11-7z" />
-                                </Svg>
-                              )}
-                            </ControlButton>
-                            <ControlButton
-                              onPress={handleNext}
-                              disabled={
-                                !articles ||
-                                currentNewsIndex >= articles.length - 1
-                              }
-                            >
-                              <Svg
-                                viewBox="0 0 24 24"
-                                width={30}
-                                height={30}
-                                fill={theme.colors.text}
-                              >
-                                <Path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
-                              </Svg>
-                            </ControlButton>
-                          </Controls>
-                        </ControlsWrapper>
-                        <SummaryWrapper>
-                          <SummaryTitle>Summary</SummaryTitle>
-                          <SummaryText>
-                            {articles[currentNewsIndex]?.summary_50 ||
-                              "No summary available."}
-                          </SummaryText>
-                        </SummaryWrapper>
-                      </>
-                    ) : (
-                      <Text></Text>
-                    )}
-                  </MainContent>
-                </ContentWrapper>
-              </Card>
-            </ContentContainer>
-          </AppContainer>
-        )}
-      </ScrollView>
-    </SafeAreaView>
+                                  <Svg
+                                    viewBox="0 0 24 24"
+                                    width={30}
+                                    height={30}
+                                    fill={theme.colors.text}
+                                  >
+                                    <Path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+                                  </Svg>
+                                </ControlButton>
+                                <ControlButton
+                                  onPress={() =>
+                                    isPlaying ? pauseSound() : playSound()
+                                  }
+                                  disabled={isLoading}
+                                >
+                                  {isLoading ? (
+                                    <Svg
+                                      viewBox="0 0 24 24"
+                                      width={30}
+                                      height={30}
+                                      fill={theme.colors.text}
+                                    >
+                                      <Path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z" />
+                                    </Svg>
+                                  ) : isPlaying ? (
+                                    <Svg
+                                      viewBox="0 0 24 24"
+                                      width={30}
+                                      height={30}
+                                      fill={theme.colors.text}
+                                    >
+                                      <Path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                                    </Svg>
+                                  ) : (
+                                    <Svg
+                                      viewBox="0 0 24 24"
+                                      width={30}
+                                      height={30}
+                                      fill={theme.colors.text}
+                                    >
+                                      <Path d="M8 5v14l11-7z" />
+                                    </Svg>
+                                  )}
+                                </ControlButton>
+                                <ControlButton
+                                  onPress={handleNext}
+                                  disabled={
+                                    !articles ||
+                                    currentNewsIndex >= articles.length - 1
+                                  }
+                                >
+                                  <Svg
+                                    viewBox="0 0 24 24"
+                                    width={30}
+                                    height={30}
+                                    fill={theme.colors.text}
+                                  >
+                                    <Path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+                                  </Svg>
+                                </ControlButton>
+                              </Controls>
+                            </ControlsWrapper>
+                            <SummaryWrapper>
+                              <SummaryTitle>Summary</SummaryTitle>
+                              <SummaryText>
+                                {articles[currentNewsIndex]?.summary_50 ||
+                                  "No summary available."}
+                              </SummaryText>
+                            </SummaryWrapper>
+                          </>
+                        ) : (
+                          <Text></Text>
+                        )}
+                      </MainContent>
+                    </ContentWrapper>
+                  </Card>
+                </ContentContainer>
+              </ScrollView>
+            </AppContainer>
+          </SafeAreaView>
+        </SafeAreaProvider>
+      )}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: "100%",
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    // position: "absolute"
   },
   flex: {
     flexDirection: "column",

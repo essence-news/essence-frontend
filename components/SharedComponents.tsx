@@ -47,7 +47,6 @@ export const Card = styled.View`
   width: 100%;
   height: 100%;
   background-color: ${({ theme }) => theme.colors.darkOverlay};
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -165,12 +164,13 @@ export const BackgroundOverlay = styled.Image`
   background-size: cover;
 `;
 
-export const ContentWrapper = styled.View`
+export const ContentWrapper = styled.View<{ width: number }>`
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: ${(props) => props.width + "px"};
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 

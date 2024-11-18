@@ -1,9 +1,7 @@
-import GlobalStyle from "@/components/GlobalStyle";
 import theme from "@/constants/theme";
 import { AuthProvider } from "@/utils/AuthProvider";
-import { Platform, ScrollView } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Redirect, SplashScreen, Stack, router } from "expo-router";
+import { Platform, StyleSheet, ScrollView } from "react-native";
+import { SplashScreen } from "expo-router";
 import { ThemeProvider } from "styled-components/native";
 import { Slot } from "expo-router";
 import { useEffect } from "react";
@@ -45,6 +43,7 @@ import {
   Comfortaa_700Bold,
 } from "@expo-google-fonts/comfortaa";
 import { useFonts } from "expo-font";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function Root() {
   const [loaded, error] = useFonts({
@@ -100,10 +99,20 @@ export default function Root() {
   return (
     <ThemeProvider theme={theme}>
       <AuthProvider>
-        <ScrollView>
-          <Slot />
-        </ScrollView>
+        <SafeAreaProvider>
+          <SafeAreaView style={styles.container} edges={["top"]}>
+            <ScrollView>
+              <Slot />
+            </ScrollView>
+          </SafeAreaView>
+        </SafeAreaProvider>
       </AuthProvider>
     </ThemeProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
