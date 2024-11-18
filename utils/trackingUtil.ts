@@ -16,7 +16,7 @@ export const trackEvent = (
   newsItemTitle: string | null,
   currentNewsIndex?: number | null,
   audioPlaybackTime = null as number | null,
-  additionalData = {} as unknown
+  additionalData = {} as unknown,
 ) => {
   const event = {
     eventType,
@@ -27,7 +27,7 @@ export const trackEvent = (
     audioPlaybackTime,
     additionalData,
   };
-
+  console.log("push to queue", event);
   eventQueue.push(event);
 };
 
@@ -38,6 +38,7 @@ export const flushQueue = async () => {
   eventQueue.length = 0;
 
   try {
+    console.log({ eventsToSend });
     await trackEvents(eventsToSend);
   } catch (error) {
     console.error("Failed to send events:", error);

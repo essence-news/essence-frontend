@@ -128,66 +128,61 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Modified login method
-  const login = 
-    async (
-      email: string,
-      inputFirstName: string,
-      country: string,
-      language: string,
-    ) => {
-      try {
-        const result = await signIn(email, inputFirstName, country, language);
-        if (result.token) {
-          await AsyncStorage.setItem("userToken", result.token);
-          updateFirstName(inputFirstName);
+  const login = async (
+    email: string,
+    inputFirstName: string,
+    country: string,
+    language: string,
+  ) => {
+    try {
+      const result = await signIn(email, inputFirstName, country, language);
+      if (result.token) {
+        await AsyncStorage.setItem("userToken", result.token);
+        updateFirstName(inputFirstName);
 
-          const { firstName, isFirstTimeEver, isFirstTimeToday } =
-            await getLoginStatus();
+        const { firstName, isFirstTimeEver, isFirstTimeToday } =
+          await getLoginStatus();
 
-          setUser({
-            token: result.token,
-            firstName,
-            isFirstTimeEver,
-            isFirstTimeToday,
-          });
-        }
-        return result;
-      } catch (error) {
-        console.error("Login error:", error);
-        throw error;
+        setUser({
+          token: result.token,
+          firstName,
+          isFirstTimeEver,
+          isFirstTimeToday,
+        });
       }
-    };
+      return result;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
+  };
 
   // Modified verify method
-  const verify = 
-    async (email: string, verificationCode: string) => {
-      try {
-        const userData = await verifyEmail(email, verificationCode);
-        if (userData.token) {
-          await AsyncStorage.setItem("userToken", userData.token);
-          updateFirstName(userData.firstName);
-          await AsyncStorage.setItem("isFirstTimeEver", "true");
-          await AsyncStorage.setItem(
-            "lastLoginTime",
-            "" + new Date().getTime(),
-          );
+  const verify = async (email: string, verificationCode: string) => {
+    try {
+      const userData = await verifyEmail(email, verificationCode);
+      if (userData.token) {
+        await AsyncStorage.setItem("userToken", userData.token);
+        updateFirstName(userData.firstName);
+        await AsyncStorage.setItem("isFirstTimeEver", "true");
+        await AsyncStorage.setItem("lastLoginTime", "" + new Date().getTime());
 
-          const { firstName, isFirstTimeEver, isFirstTimeToday } =
-            await getLoginStatus();
+        const { firstName, isFirstTimeEver, isFirstTimeToday } =
+          await getLoginStatus();
 
-          setUser({
-            token: userData.token,
-            firstName,
-            isFirstTimeEver,
-            isFirstTimeToday,
-          });
-        }
-        return true;
-      } catch (error) {
-        console.error("Verification error:", error);
-        throw error;
+        setUser({
+          token: userData.token,
+          firstName,
+          isFirstTimeEver,
+          isFirstTimeToday,
+        });
       }
+      return true;
+    } catch (error) {
+      console.error("Verification error:", error);
+      throw error;
     }
+  };
 
   useEffect(() => {
     async function init() {

@@ -230,7 +230,9 @@ const Home = () => {
             Essence delivers curated, personalized audio insights for busy
             professionals. Get informed on your commute, no reading required.
           </Subheadline>
-          <StyledPressable onPress={() => user ? handleGotoNews() : handleSignin()}>
+          <StyledPressable
+            onPress={() => (user ? handleGotoNews() : handleSignin())}
+          >
             {user ? (
               <ButtonText>Go to News</ButtonText>
             ) : (
@@ -314,7 +316,9 @@ const Home = () => {
       <Footer>
         <Brand>essence</Brand>
 
-        <StyledPressable onPress={() => user ? handleGotoNews() : handleSignin()}>
+        <StyledPressable
+          onPress={() => (user ? handleGotoNews() : handleSignin())}
+        >
           {user ? (
             <ButtonText>Go to News</ButtonText>
           ) : (

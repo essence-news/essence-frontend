@@ -1,8 +1,8 @@
 import styled from "styled-components/native";
 
-export const AppContainer = styled.View<{width: number; height: number}>`
-  width: ${props => props.width + 'px' || '100vw'};
-  height: ${props => props.height + 'px' || '100vh'};
+export const AppContainer = styled.View<{ width: number; height: number }>`
+  width: ${(props) => props.width + "px" || "100vw"};
+  height: ${(props) => props.height + "px" || "100vh"};
   max-width: 100%;
   max-height: 100%;
   display: flex;
@@ -18,12 +18,12 @@ export const AppContainer = styled.View<{width: number; height: number}>`
   overflow: hidden;
 `;
 
-export const HeaderContainer = styled.View<{width: number}>`
+export const HeaderContainer = styled.View<{ width: number }>`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  width: ${props => props.width + 'px' || '100vw'};
+  width: ${(props) => props.width + "px" || "100vw"};
   max-width: 100%;
   box-sizing: border-box;
   position: absolute;
@@ -32,12 +32,6 @@ export const HeaderContainer = styled.View<{width: number}>`
   z-index: 10;
 
   background-color: rgba(0, 0, 0, 0.5);
-
-  @media (max-width: 400px) {
-    width: 100%;
-    border-radius: 0;
-    border: none;
-  }
 `;
 
 export const ContentContainer = styled.View`
@@ -82,6 +76,7 @@ export const Title = styled.Text`
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 5px;
+  text-transform: capitalize;
   color: ${({ theme }) => theme.colors.brand};
   font-family: "${({ theme }) => theme.fonts.heading}";
 `;
@@ -258,17 +253,9 @@ export const RatingButton = styled.Pressable`
   cursor: pointer;
   margin-left: 40px;
   padding: 0;
-  transition: opacity 0.3s ease;
-  &:disabled {
-    opacity: 0.5;
-  }
   width: 24px;
   height: 24px;
   fill: ${({ theme }) => theme.colors.text};
-  transition: fill 0.3s ease;
-  &:hover:not(:disabled) svg {
-    fill: ${({ theme }) => theme.colors.accent};
-  }
 `;
 
 export const ProgressBar = styled.View`
@@ -352,22 +339,7 @@ export const FullScreenBackground = styled.View<{ src: string }>`
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  filter: blur(5px) brightness(1.3) opacity(0.5);
   z-index: -1;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-
-  @media (min-width: 768px) {
-    display: block;
-  }
 `;
 
 export const RatingMessage = styled.Text<{ visible: boolean }>`
