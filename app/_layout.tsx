@@ -101,9 +101,9 @@ export default function Root() {
       <AuthProvider>
         <SafeAreaProvider>
           <SafeAreaView style={styles.container} edges={["top"]}>
-            <ScrollView>
-              <Slot />
-            </ScrollView>
+            {/* <ScrollView> */}
+            <Slot />
+            {/* </ScrollView> */}
           </SafeAreaView>
         </SafeAreaProvider>
       </AuthProvider>

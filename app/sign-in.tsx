@@ -38,10 +38,19 @@ export default function Login() {
     init();
   }, []);
   const handleSignin = async () => {
-    const signInResponse = await login(email, firstName, "GB", "EN");
-    // const result = await verifyEmail(email, name);
-    console.log({ signInResponse });
-    setPromptForToken(true);
+    setError("");
+    setIsLoading(true);
+    try {
+      const signInResponse = await login(email, firstName, "GB", "EN");
+      // const result = await verifyEmail(email, name);
+      console.log({ signInResponse });
+      setPromptForToken(true);
+    } catch (error) {
+      console.error("sign in  error:", error);
+      setError(error.message || "An error occurred during sign in.");
+    } finally {
+      setIsLoading(false);
+    }
   };
   const handleVerify = async () => {
     setError("");

@@ -4,7 +4,7 @@ export const mockNewsData = {
       audio_summary:
         "https://essence-news.s3.amazonaws.com/dev/44e478cf71a7ab4bf134d5d674609b238bf368d2d48a1b68d9dfd3fbc89ff3cb/en-UK-False.mp3?AWSAccessKeyId=AKIAUWF6I5PZFWK4M3PL&Signature=N33Bq2agyMrTJMRTO9%2FYobqx0zg%3D&Expires=1732549025",
       audio_summary_url: null,
-      categories: [],
+      categories: ["one", "two", "three"],
       date_created: "2024-11-18T08:27:29.162433+00:00",
       date_published: "2024-11-18T16:35:00+00:00",
       domain: "nssmag.com",
@@ -33,7 +33,7 @@ export const mockNewsData = {
       audio_summary:
         "https://essence-news.s3.amazonaws.com/dev/49b909bfb2a5a45f7843ca45b4b997b5a802c8f16208cf5d947b492195dc41bf/en-UK-False.mp3?AWSAccessKeyId=AKIAUWF6I5PZFWK4M3PL&Signature=UfCqNw5ie3fchBV6cYBgQE0xQyA%3D&Expires=1732549025",
       audio_summary_url: null,
-      categories: [],
+      categories: ["one", "two", "three"],
       date_created: "2024-11-18T08:27:34.954372+00:00",
       date_published: "2024-11-18T08:20:15+00:00",
       domain: "perenews.com",

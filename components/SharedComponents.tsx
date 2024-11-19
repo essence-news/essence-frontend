@@ -230,6 +230,7 @@ export const NewsInfo = styled.View<{ welcomeShown: boolean }>`
   text-align: center;
   color: ${({ theme }) => theme.colors.text};
   margin: 100px 0;
+  background-color: "rgba(0, 0, 0, 0.7)";
   transition: transform 1s ease-out;
 `;
 
@@ -246,6 +247,7 @@ export const RatingButtons = styled.View`
   width: 100%;
   margin-bottom: 20px;
   flex-direction: row;
+  padding-inline: 20px;
 `;
 
 export const RatingButton = styled.Pressable`
@@ -315,17 +317,20 @@ export const SummaryWrapper = styled.View`
   background-color: rgba(0, 0, 0, 0.7);
   border-radius: 10px;
   margin-bottom: 20px;
+  font-family: "${({ theme }) => theme.fonts.body}";
 `;
 
 export const SummaryTitle = styled.Text`
   font-size: 18px;
   color: ${({ theme }) => theme.colors.text};
   margin: 0 0 10px 0;
+  font-family: "${({ theme }) => theme.fonts.body}";
 `;
 
 export const SummaryText = styled.Text`
   font-size: 14px;
   color: ${({ theme }) => theme.colors.secondary};
+  font-family: "${({ theme }) => theme.fonts.body}";
 `;
 
 export const FullScreenBackground = styled.View<{ src: string }>`
@@ -347,6 +352,7 @@ export const RatingMessage = styled.Text<{ visible: boolean }>`
   font-size: 14px;
   color: ${({ theme }) => theme.colors.accent};
   margin-left: 10px;
+  font-family: "${({ theme }) => theme.fonts.body}";
   transition: opacity 0.3s ease;
 `;
 
@@ -357,6 +363,7 @@ export const CategoryButton = styled.Text`
   border-radius: 5px;
   font-weight: 500;
   font-size: 16px;
+  text-transform: capitalize;
 `;
 
 export const CategoryContainer = styled.View`

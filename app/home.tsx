@@ -1,7 +1,7 @@
 import styled from "styled-components/native";
 
 import { useAuth } from "../utils/AuthProvider";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { Link, router } from "expo-router";
 import "@expo/match-media";
 import { useMediaQuery } from "react-responsive";
@@ -221,15 +221,102 @@ const Home = () => {
   console.log("Home page");
 
   return (
-    <HomeContainer>
-      <MainContent smallScreen={isTabletOrMobileDevice}>
-        <LeftSection smallScreen={isTabletOrMobileDevice}>
+    <ScrollView style={{ flex: 1 }}>
+      <HomeContainer>
+        <MainContent smallScreen={isTabletOrMobileDevice}>
+          <LeftSection smallScreen={isTabletOrMobileDevice}>
+            <Brand>essence</Brand>
+            <Headline>e-commerce news in 30-second soundbites</Headline>
+            <Subheadline>
+              Essence delivers curated, personalized audio insights for busy
+              professionals. Get informed on your commute, no reading required.
+            </Subheadline>
+            <StyledPressable
+              onPress={() => (user ? handleGotoNews() : handleSignin())}
+            >
+              {user ? (
+                <ButtonText>Go to News</ButtonText>
+              ) : (
+                <ButtonText>Try it out</ButtonText>
+              )}
+            </StyledPressable>
+          </LeftSection>
+          <RightSection smallScreen={isTabletOrMobileDevice}>
+            <AppImage
+              smallScreen={isTabletOrMobileDevice}
+              source={screenshot1}
+              alt="App screenshot"
+            />
+          </RightSection>
+        </MainContent>
+        <InsightsSection smallScreen={isTabletOrMobileDevice}>
+          <InsightCard smallScreen={isTabletOrMobileDevice}>
+            <View>
+              <InsightTitleSmall>Your Industry. Your News.</InsightTitleSmall>
+              <InsightTitle>Tailored for You</InsightTitle>
+              <InsightSubtitle>
+                Essence curates content from top sources, tailored to your
+                specific industry and role. Stay relevant without the noise
+              </InsightSubtitle>
+            </View>
+            <InsightImage
+              smallScreen={isTabletOrMobileDevice}
+              source={ecommercePic}
+              alt="App screenshot"
+            />
+          </InsightCard>
+          <InsightCard smallScreen={isTabletOrMobileDevice}>
+            <View>
+              <InsightTitleSmall>Listen, Don't Read</InsightTitleSmall>
+              <InsightTitle>Audio-First Experience</InsightTitle>
+              <InsightSubtitle>
+                Transform your daily routine into a learning opportunity. Catch
+                up on industry trends while you commute, exercise, or prep for
+                your day.
+              </InsightSubtitle>
+            </View>
+            <InsightImage
+              smallScreen={isTabletOrMobileDevice}
+              source={audioPic}
+              alt="App screenshot"
+            />
+          </InsightCard>
+        </InsightsSection>
+        <InsightsSection smallScreen={isTabletOrMobileDevice}>
+          <InsightCard smallScreen={isTabletOrMobileDevice}>
+            <View>
+              <InsightTitleSmall>News in byte size</InsightTitleSmall>
+              <InsightTitle>30 Seconds to Savvy</InsightTitle>
+              <InsightSubtitle>
+                Each news item is distilled into a 30-second audio clip. Get the
+                essentials quickly, without sacrificing depth.
+              </InsightSubtitle>
+            </View>
+            <InsightImage
+              smallScreen={isTabletOrMobileDevice}
+              source={hourglassPic}
+              alt="App screenshot"
+            />
+          </InsightCard>
+          <InsightCard smallScreen={isTabletOrMobileDevice}>
+            <View>
+              <InsightTitleSmall>Engaging dialogue</InsightTitleSmall>
+              <InsightTitle>News That Feels Like Conversation</InsightTitle>
+              <InsightSubtitle>
+                Our hosts present insights in a lively, podcast-style format.
+                It's not just information—it's infotainment.
+              </InsightSubtitle>
+            </View>
+            <InsightImage
+              smallScreen={isTabletOrMobileDevice}
+              source={podcastPic}
+              alt="App screenshot"
+            />
+          </InsightCard>
+        </InsightsSection>
+        <Footer>
           <Brand>essence</Brand>
-          <Headline>e-commerce news in 30-second soundbites</Headline>
-          <Subheadline>
-            Essence delivers curated, personalized audio insights for busy
-            professionals. Get informed on your commute, no reading required.
-          </Subheadline>
+
           <StyledPressable
             onPress={() => (user ? handleGotoNews() : handleSignin())}
           >
@@ -239,105 +326,20 @@ const Home = () => {
               <ButtonText>Try it out</ButtonText>
             )}
           </StyledPressable>
-        </LeftSection>
-        <RightSection smallScreen={isTabletOrMobileDevice}>
-          <AppImage
-            smallScreen={isTabletOrMobileDevice}
-            source={screenshot1}
-            alt="App screenshot"
-          />
-        </RightSection>
-      </MainContent>
-      <InsightsSection smallScreen={isTabletOrMobileDevice}>
-        <InsightCard smallScreen={isTabletOrMobileDevice}>
-          <View>
-            <InsightTitleSmall>Your Industry. Your News.</InsightTitleSmall>
-            <InsightTitle>Tailored for You</InsightTitle>
-            <InsightSubtitle>
-              Essence curates content from top sources, tailored to your
-              specific industry and role. Stay relevant without the noise
-            </InsightSubtitle>
-          </View>
-          <InsightImage
-            smallScreen={isTabletOrMobileDevice}
-            source={ecommercePic}
-            alt="App screenshot"
-          />
-        </InsightCard>
-        <InsightCard smallScreen={isTabletOrMobileDevice}>
-          <View>
-            <InsightTitleSmall>Listen, Don't Read</InsightTitleSmall>
-            <InsightTitle>Audio-First Experience</InsightTitle>
-            <InsightSubtitle>
-              Transform your daily routine into a learning opportunity. Catch up
-              on industry trends while you commute, exercise, or prep for your
-              day.
-            </InsightSubtitle>
-          </View>
-          <InsightImage
-            smallScreen={isTabletOrMobileDevice}
-            source={audioPic}
-            alt="App screenshot"
-          />
-        </InsightCard>
-      </InsightsSection>
-      <InsightsSection smallScreen={isTabletOrMobileDevice}>
-        <InsightCard smallScreen={isTabletOrMobileDevice}>
-          <View>
-            <InsightTitleSmall>News in byte size</InsightTitleSmall>
-            <InsightTitle>30 Seconds to Savvy</InsightTitle>
-            <InsightSubtitle>
-              Each news item is distilled into a 30-second audio clip. Get the
-              essentials quickly, without sacrificing depth.
-            </InsightSubtitle>
-          </View>
-          <InsightImage
-            smallScreen={isTabletOrMobileDevice}
-            source={hourglassPic}
-            alt="App screenshot"
-          />
-        </InsightCard>
-        <InsightCard smallScreen={isTabletOrMobileDevice}>
-          <View>
-            <InsightTitleSmall>Engaging dialogue</InsightTitleSmall>
-            <InsightTitle>News That Feels Like Conversation</InsightTitle>
-            <InsightSubtitle>
-              Our hosts present insights in a lively, podcast-style format. It's
-              not just information—it's infotainment.
-            </InsightSubtitle>
-          </View>
-          <InsightImage
-            smallScreen={isTabletOrMobileDevice}
-            source={podcastPic}
-            alt="App screenshot"
-          />
-        </InsightCard>
-      </InsightsSection>
-      <Footer>
-        <Brand>essence</Brand>
-
-        <StyledPressable
-          onPress={() => (user ? handleGotoNews() : handleSignin())}
-        >
-          {user ? (
-            <ButtonText>Go to News</ButtonText>
-          ) : (
-            <ButtonText>Try it out</ButtonText>
-          )}
-        </StyledPressable>
-        <FooterLinks>
-          <Link href="/">
-            <FooterLink>Terms</FooterLink>
-          </Link>
-          <Link href="/">
-            <FooterLink>Privacy</FooterLink>
-          </Link>
-          <Link href="/">
-            <FooterLink>Contact</FooterLink>
-          </Link>
-        </FooterLinks>
-      </Footer>
-    </HomeContainer>
+          <FooterLinks>
+            <Link href="/">
+              <FooterLink>Terms</FooterLink>
+            </Link>
+            <Link href="/">
+              <FooterLink>Privacy</FooterLink>
+            </Link>
+            <Link href="/">
+              <FooterLink>Contact</FooterLink>
+            </Link>
+          </FooterLinks>
+        </Footer>
+      </HomeContainer>
+    </ScrollView>
   );
 };
 

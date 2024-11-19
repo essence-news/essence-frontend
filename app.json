@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.essencenews.essenceapp"
     },
     "web": {
       "bundler": "metro",
@@ -35,6 +36,14 @@
     },
     "expo": {
       "entryPoint": "./index.tsx"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "528bf03d-d711-4759-bbe1-0ff35f4140c9"
+      }
     }
   }
 }
