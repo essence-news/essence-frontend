@@ -1,8 +1,11 @@
 {
   "build": {
-    "preview": {
+    "dev": {
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_ESSENCE_REST_API_URL": "https://mkhg9ap0r7.execute-api.us-east-1.amazonaws.com"
       }
     },
     "preview2": {

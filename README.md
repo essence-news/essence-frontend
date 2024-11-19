@@ -14,9 +14,15 @@ Run these commands
 `npm start`
 and once its running, press `w` for web version
 
-**To build**
+**To build for web**
 
 `npm run build:web`
+
+**To build for APK**
+
+`npm run build:apk`
+
+You will need EAS credentials for this.
 
 **To preview build**
 
