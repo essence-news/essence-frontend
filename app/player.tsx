@@ -672,6 +672,7 @@ export default function Player() {
               contentContainerStyle={{
                 flex: 1,
                 justifyContent: "space-between",
+                backgroundColor: "rgba(0, 0, 0, 0.7)",
               }}
             >
               <View>
@@ -801,7 +802,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   flex: {
     flex: 1,

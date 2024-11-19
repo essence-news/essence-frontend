@@ -230,7 +230,6 @@ export const NewsInfo = styled.View<{ welcomeShown: boolean }>`
   text-align: center;
   color: ${({ theme }) => theme.colors.text};
   margin: 100px 0;
-  background-color: "rgba(0, 0, 0, 0.7)";
   transition: transform 1s ease-out;
 `;
 
