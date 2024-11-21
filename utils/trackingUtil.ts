@@ -27,7 +27,7 @@ export const trackEvent = (
     audioPlaybackTime,
     additionalData,
   };
-  console.log("push to queue", event);
+  // console.log("push to queue", event);
   eventQueue.push(event);
 };
 
@@ -38,7 +38,7 @@ export const flushQueue = async () => {
   eventQueue.length = 0;
 
   try {
-    console.log({ eventsToSend });
+    console.log({ eventsToSendLength: eventsToSend.length });
     await trackEvents(eventsToSend);
   } catch (error) {
     console.error("Failed to send events:", error);
