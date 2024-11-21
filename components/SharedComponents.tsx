@@ -112,7 +112,7 @@ export const Button = styled.Pressable`
   transition: background-color 0.3s ease;
   &:hover {
     background-color: ${({ theme }) =>
-      `color-mix(in srgb, ${theme.colors.accent} 85%, black)`};
+    `color-mix(in srgb, ${theme.colors.accent} 85%, black)`};
   }
 `;
 
@@ -362,6 +362,7 @@ export const CategoryButton = styled.Text`
   border-radius: 5px;
   font-weight: 500;
   font-size: 16px;
+  font-family: "${({ theme }) => theme.fonts.body}";
   text-transform: capitalize;
 `;
 

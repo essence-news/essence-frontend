@@ -146,7 +146,7 @@ export default function Player() {
         <NewsHeadline>{article.title}</NewsHeadline>
         <CategoryContainer>
           {article.categories.map((category, index) => (
-            <CategoryButton key={index}>{category}</CategoryButton>
+            <CategoryButton key={index}>#{category}</CategoryButton>
           ))}
         </CategoryContainer>
       </>
