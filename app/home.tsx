@@ -54,7 +54,7 @@ const RightSection = styled.View<{ smallScreen: boolean }>`
 const InsightsSection = styled.View<{ smallScreen: boolean }>`
   display: flex;
   flex-direction: column;
-  gap: ${(props) => (props.smallScreen ? "0" : "2rem")};
+  gap: ${(props) => (props.smallScreen ? "0" : "32px")};
   flex-direction: ${(props) => (props.smallScreen ? "column" : "row")};
 `;
 
@@ -64,8 +64,8 @@ const InsightCard = styled.View<{ smallScreen: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: ${(props) => (props.smallScreen ? "2rem" : "4rem")};
-  padding: ${(props) => (props.smallScreen ? "2rem 1rem" : "2rem")};
+  margin-top: ${(props) => (props.smallScreen ? "32px" : "48px")};
+  padding: ${(props) => (props.smallScreen ? "32px 16px" : "32px")};
   flex: ${(props) => (props.smallScreen ? "none" : 1)};
 `;
 
