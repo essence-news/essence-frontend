@@ -146,7 +146,7 @@ export default function Player() {
         <NewsHeadline>{article.title}</NewsHeadline>
         <CategoryContainer>
           {article.categories.map((category, index) => (
-            <CategoryButton key={index}>{category}</CategoryButton>
+            <CategoryButton key={index}>#{category}</CategoryButton>
           ))}
         </CategoryContainer>
       </>
@@ -248,14 +248,14 @@ export default function Player() {
               sound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
             })
             .catch((error) => {
-              if (error.message.contains("interact")) setNeedsUserInput(true);
+              console.error(
+                "Auto-play failed:",
+                error,
+                error.message,
+                articles[currentNewsIndex],
+              );
+              if (error.message.includes("interact")) setNeedsUserInput(true);
               else {
-                console.error(
-                  "Auto-play failed:",
-                  error,
-                  error.message,
-                  articles[currentNewsIndex],
-                );
                 trackEvent(
                   "error",
                   articles[currentNewsIndex]?.id,
@@ -685,8 +685,8 @@ export default function Player() {
           }}
         >
           {welcomeSoundStatus === "playing" ||
-          welcomeSoundStatus === "loading" ||
-          needsUserInput ? (
+            welcomeSoundStatus === "loading" ||
+            needsUserInput ? (
             <ImageBackground
               source={require("@/assets/logo512.png")}
               resizeMode="cover"
@@ -697,8 +697,8 @@ export default function Player() {
               source={
                 articles.length > 0 && currentNewsIndex < articles.length
                   ? {
-                      uri: articles[currentNewsIndex].image,
-                    }
+                    uri: articles[currentNewsIndex].image,
+                  }
                   : require("@/assets/bg1.jpg")
               }
               resizeMode="cover"
