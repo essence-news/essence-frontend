@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { mockNewsData } from "../constants/mock";
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_ESSENCE_REST_API_URL;
+const API_BASE_URL = "https://mkhg9ap0r7.execute-api.us-east-1.amazonaws.com";
 console.log({ API_BASE_URL });
 //"https://x8y29ocps8.execute-api.us-east-1.amazonaws.com"; // process.env.REACT_APP_API_BASE_URL;
 
