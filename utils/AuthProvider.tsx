@@ -20,12 +20,12 @@ export type Auth = {
   ) => Promise<{ token?: string }>;
   verify: (email: string, verificationCode: string) => Promise<boolean>;
   logout: () => void;
-  ensureTokenValidity: () => Promise<void>;
+  ensureTokenValidity: () => Promise<User | undefined>;
 };
 type User = {
   token?: string;
   firstName: string;
-  isFirstTimeEver?: boolean;
+  isFirstTimeEver?: string;
   isFirstTimeToday?: boolean;
 };
 const initialState = {
@@ -33,7 +33,7 @@ const initialState = {
   login: () => Promise.resolve({ token: "" }),
   logout: () => console.log("logout"),
   verify: () => Promise.resolve(true),
-  ensureTokenValidity: () => Promise.resolve(),
+  ensureTokenValidity: () => Promise.resolve(undefined),
 };
 
 const AuthContext = createContext<Auth>(initialState);
@@ -58,16 +58,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Modified getLoginStatus method
   const getLoginStatus = async () => {
     const today = new Date().toDateString();
-    const firstName = (await AsyncStorage.getItem("firstName")) || "";
+    const firstName = (await AsyncStorage.getItem("firstName")) ?? "";
     const lastLoginDate = await AsyncStorage.getItem("lastLoginDate");
     const isFirstTimeEver =
-      (await AsyncStorage.getItem("isFirstTimeEver")) !== "false";
+      (await AsyncStorage.getItem("isFirstTimeEver")) || "true";
     const isFirstTimeToday = lastLoginDate !== today;
 
     await AsyncStorage.setItem("lastLoginDate", today);
-    if (isFirstTimeEver) {
+    if (isFirstTimeEver === "true") {
       await AsyncStorage.setItem("isFirstTimeEver", "false");
     }
+
+    console.log("last login status", {
+      firstName,
+      isFirstTimeEver,
+      isFirstTimeToday,
+      today,
+      lastLoginDate,
+    });
 
     return { firstName, isFirstTimeEver, isFirstTimeToday };
   };
@@ -94,12 +102,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Get the user's login status - to update the login time, etc
         const { firstName, isFirstTimeEver, isFirstTimeToday } =
           await getLoginStatus();
-        setUser({
+        const userObj = {
           token,
           firstName,
           isFirstTimeEver,
           isFirstTimeToday,
-        });
+        };
+        setUser(userObj);
+        return userObj;
       } catch (error) {
         console.error("Token verification failed:", error);
         // If the token is invalid, try to refresh it
@@ -108,12 +118,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           await AsyncStorage.setItem("userToken", newToken);
           const { firstName, isFirstTimeEver, isFirstTimeToday } =
             await getLoginStatus();
-          setUser({
-            token: newToken,
+          const userObj = {
+            token,
             firstName,
             isFirstTimeEver,
             isFirstTimeToday,
-          });
+          };
+          setUser(userObj);
+          return userObj;
         } catch (refreshError) {
           console.error("Token refresh failed:", refreshError);
           // If the token refresh fails, log the user out
@@ -160,6 +172,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Modified verify method
   const verify = async (email: string, verificationCode: string) => {
     try {
+      setLoading(true);
       const userData = await verifyEmail(email, verificationCode);
       if (userData.token) {
         await AsyncStorage.setItem("userToken", userData.token);
@@ -181,6 +194,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Verification error:", error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 

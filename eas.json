@@ -1,8 +1,24 @@
 {
   "build": {
+    "dev-debug": {
+      "android": {
+        "buildType": "apk",
+        "distribution": "internal",
+        "withoutCredentials": true,
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "simulator": true,
+        "buildConfiguration": "Debug"
+      },
+      "env": {
+        "EXPO_PUBLIC_ESSENCE_REST_API_URL": "https://mkhg9ap0r7.execute-api.us-east-1.amazonaws.com"
+      }
+    },
     "dev": {
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
       },
       "env": {
         "EXPO_PUBLIC_ESSENCE_REST_API_URL": "https://mkhg9ap0r7.execute-api.us-east-1.amazonaws.com"
