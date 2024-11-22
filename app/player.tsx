@@ -101,8 +101,9 @@ const getTimeOfDay = () => {
 
 export default function Player() {
   const [currentNewsIndex, setCurrentNewsIndex] = useState<number>(-1);
-  const { user } = useAuth();
+  const { user, ensureTokenValidity } = useAuth();
   const mounted = useRef(false);
+  const userRef = useRef(user);
   const theme = useTheme();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -509,15 +510,28 @@ export default function Player() {
       setCurrentNewsIndex(+currentNewsIndex);
       setWelcomeSoundStatus("ignored");
     } else {
-      console.log("not within 2 hrs", { inactiveSince, user });
+      console.log("before", { user });
+
+      if (!user) {
+        userRef.current = await ensureTokenValidity();
+      }
+      console.log("not within 2 hrs", {
+        inactiveSince,
+        user,
+        userRef: userRef.current,
+      });
       try {
         if (!append) {
           // dont load welcome screen when loading next items
           setWelcomeSoundStatus("loading");
         }
         const articlesResponse: News = await fetchNews({
-          isFirstTimeEver: (user?.isFirstTimeEver || true).toString(),
-          isFirstTimeToday: (user?.isFirstTimeToday || true).toString(),
+          isFirstTimeEver: (
+            userRef.current?.isFirstTimeEver || true
+          ).toString(),
+          isFirstTimeToday: (
+            userRef.current?.isFirstTimeToday || true
+          ).toString(),
         });
         // If first time or coming back on next day
         let articlesToSet;
@@ -598,7 +612,7 @@ export default function Player() {
     const timer = setTimeout(() => {
       setShowWelcome(false);
     }, 10000); // 15000 milliseconds = 15 seconds
-
+    console.log("***********callling load");
     load();
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (
@@ -611,8 +625,11 @@ export default function Player() {
           (welcomeSoundStatus === "completed" ||
             welcomeSoundStatus === "ignored") &&
           !currentlyPlaying.current
-        )
+        ) {
+          console.log("++++++++++++++++++callling load");
+
           load();
+        }
       }
 
       if (
@@ -801,7 +818,7 @@ export default function Player() {
                 <View>
                   <TopSection welcomeShown={showWelcome}>
                     <PlaylistInfo show={showWelcome}>
-                      <Title>Hello {user?.firstName || ""}</Title>
+                      <Title>Hello {userRef.current?.firstName || ""}</Title>
                       <Subtitle>Your {getTimeOfDay()} newscast</Subtitle>
                     </PlaylistInfo>
                     <NewsInfo welcomeShown={showWelcome}>
