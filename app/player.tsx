@@ -527,10 +527,10 @@ export default function Player() {
         }
         const articlesResponse: News = await fetchNews({
           isFirstTimeEver: (
-            userRef.current?.isFirstTimeEver || true
+            userRef.current?.isFirstTimeEver ?? true
           ).toString(),
           isFirstTimeToday: (
-            userRef.current?.isFirstTimeToday || true
+            userRef.current?.isFirstTimeToday ?? true
           ).toString(),
         });
         // If first time or coming back on next day
@@ -818,7 +818,7 @@ export default function Player() {
                 <View>
                   <TopSection welcomeShown={showWelcome}>
                     <PlaylistInfo show={showWelcome}>
-                      <Title>Hello {userRef.current?.firstName || ""}</Title>
+                      <Title>Hello {userRef.current?.firstName ?? ""}</Title>
                       <Subtitle>Your {getTimeOfDay()} newscast</Subtitle>
                     </PlaylistInfo>
                     <NewsInfo welcomeShown={showWelcome}>

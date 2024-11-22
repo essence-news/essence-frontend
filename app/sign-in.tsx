@@ -125,7 +125,7 @@ export default function Login() {
             <ContentContainer>
               <SigninMainContent>
                 <Header>
-                  <Title>Welcome {userFirstName || ""}</Title>
+                  <Title>Welcome {userFirstName ?? ""}</Title>
                   <SubtitleDark>Please sign in</SubtitleDark>
                 </Header>
                 <FormContainer>

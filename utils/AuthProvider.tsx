@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Modified getLoginStatus method
   const getLoginStatus = async () => {
     const today = new Date().toDateString();
-    const firstName = (await AsyncStorage.getItem("firstName")) || "";
+    const firstName = (await AsyncStorage.getItem("firstName")) ?? "";
     const lastLoginDate = await AsyncStorage.getItem("lastLoginDate");
     const isFirstTimeEver =
       (await AsyncStorage.getItem("isFirstTimeEver")) || "true";
