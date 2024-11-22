@@ -1,8 +1,8 @@
 import styled from "styled-components/native";
 
 export const AppContainer = styled.View<{ width: number; height: number }>`
-  width: ${(props) => props.width + "px" || "100vw"};
-  height: ${(props) => props.height + "px" || "100vh"};
+  width: 100%;
+  height: 100%;
   max-width: 100%;
   max-height: 100%;
   display: flex;
@@ -23,7 +23,7 @@ export const HeaderContainer = styled.View<{ width: number }>`
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  width: ${(props) => props.width + "px" || "100vw"};
+  width: 100%;
   max-width: 100%;
   box-sizing: border-box;
   position: absolute;
@@ -110,10 +110,6 @@ export const Button = styled.Pressable`
   padding: 10px 20px;
   border-radius: 5px;
   transition: background-color 0.3s ease;
-  &:hover {
-    background-color: ${({ theme }) =>
-    `color-mix(in srgb, ${theme.colors.accent} 85%, black)`};
-  }
 `;
 
 export const Input = styled.TextInput`

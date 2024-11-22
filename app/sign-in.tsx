@@ -27,12 +27,14 @@ export default function Login() {
   const [firstName, onChangeFirstName] = useState("");
   const [email, onChangeEmail] = useState("");
   const [verificationCode, onChangeVerificationCode] = useState("");
+  const [userFirstName, setUserFirstName] = useState("");
   useEffect(() => {
     async function init() {
-      const firstName = await AsyncStorage.getItem("firstName");
+      const storageFirstName = await AsyncStorage.getItem("firstName");
       await AsyncStorage.clear();
-      if (firstName) {
-        await AsyncStorage.setItem("firstName", firstName);
+      if (storageFirstName) {
+        await AsyncStorage.setItem("firstName", storageFirstName);
+        setUserFirstName(storageFirstName);
       }
     }
     init();
@@ -41,7 +43,12 @@ export default function Login() {
     setError("");
     setIsLoading(true);
     try {
-      const signInResponse = await login(email, firstName, "GB", "EN");
+      const signInResponse = await login(
+        email,
+        userFirstName || firstName,
+        "GB",
+        "EN",
+      );
       // const result = await verifyEmail(email, name);
       console.log({ signInResponse });
       setPromptForToken(true);
@@ -118,19 +125,23 @@ export default function Login() {
             <ContentContainer>
               <SigninMainContent>
                 <Header>
-                  <Title>Welcome</Title>
+                  <Title>Welcome {userFirstName || ""}</Title>
                   <SubtitleDark>Please sign in</SubtitleDark>
                 </Header>
                 <FormContainer>
+                  {!userFirstName ? (
+                    <Input
+                      placeholder="First Name"
+                      value={firstName}
+                      onChangeText={onChangeFirstName}
+                    />
+                  ) : (
+                    <Text></Text>
+                  )}
                   <Input
                     placeholder="Email"
                     value={email}
                     onChangeText={onChangeEmail}
-                  />
-                  <Input
-                    placeholder="First Name"
-                    value={firstName}
-                    onChangeText={onChangeFirstName}
                   />
                   {error ? <ErrorMessage>{error}</ErrorMessage> : <Text></Text>}
                   <Button onPress={handleSignin} disabled={isLoading}>

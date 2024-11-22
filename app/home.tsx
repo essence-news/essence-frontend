@@ -214,9 +214,9 @@ const Home = () => {
     }
   };
 
-  // useEffect(() => {
-  //   init();
-  // }, []);
+  useEffect(() => {
+    init();
+  }, []);
 
   console.log("Home page");
 

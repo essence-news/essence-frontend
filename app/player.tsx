@@ -110,7 +110,8 @@ export default function Player() {
   const [progress, setProgress] = useState(0);
   const [needsUserInput, setNeedsUserInput] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
-  const [welcomeSoundStatus, setWelcomeSoundStatus] = useState<string>("");
+  const [welcomeSoundStatus, setWelcomeSoundStatus] =
+    useState<string>("loading");
   const [ratingMessage, setRatingMessage] = useState("");
   const currentlyPlaying = useRef<Sound | null>(null);
   const soundRefs = useRef<Sound[] | null[]>([]);
@@ -118,7 +119,6 @@ export default function Player() {
   const newsResponse = useRef<News>();
   const welcomeSoundRef = useRef<Sound | null>(null);
   const appState = useRef(AppState.currentState);
-  const [appStateVisible, setAppStateVisible] = useState(appState.current);
   const { logout } = useAuth();
 
   const showPlayerControls = useMemo(() => {
@@ -185,6 +185,8 @@ export default function Player() {
 
   async function playSound() {
     console.log({ welcomeSoundStatus, articles: articles.length });
+    const localCurrentNewsIndex = currentNewsIndex;
+
     if (
       (welcomeSoundStatus !== "completed" &&
         welcomeSoundStatus !== "ignored") ||
@@ -213,12 +215,28 @@ export default function Player() {
       sound = soundRefs.current[currentNewsIndex];
       console.log("got from ref", sound);
     } else {
+      console.log(
+        "Not found in refs, creating sound object",
+        currentNewsIndex,
+        articles[currentNewsIndex].audio_summary,
+      );
       sound = await createSoundObject(
         articles[currentNewsIndex].audio_summary,
         articles[currentNewsIndex].id,
         articles[currentNewsIndex].title,
         currentNewsIndex,
       );
+    }
+    if (localCurrentNewsIndex !== currentNewsIndex) {
+      // not the current sound to play
+      await sound?.stopAsync();
+      await sound?.unloadAsync();
+      sound = null;
+      console.log("not matching, will not play", {
+        localCurrentNewsIndex,
+        currentNewsIndex,
+      });
+      return;
     }
     console.log("Playing Sound", {
       index: currentNewsIndex,
@@ -229,8 +247,40 @@ export default function Player() {
     setIsLoading(false);
     if (sound) {
       currentlyPlaying.current = sound;
-      const tryToPlay = setInterval(
-        async () => {
+      if (autoPlayStarted.current) {
+        await sound
+          .playAsync()
+          .then(() => {
+            trackEvent(
+              "play",
+              articles[currentNewsIndex].id,
+              articles[currentNewsIndex].title,
+              currentNewsIndex,
+              progress,
+            );
+            // console.log("Src=", await getData("src"))
+            setIsPlaying(true);
+            sound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
+          })
+          .catch((error) => {
+            console.error(
+              "Auto-play failed:",
+              error,
+              error.message,
+              articles[currentNewsIndex],
+            );
+            trackEvent(
+              "error",
+              articles[currentNewsIndex]?.id,
+              articles[currentNewsIndex]?.title,
+              currentNewsIndex,
+              0,
+              { errorType: "autoplay-play", message: error.message },
+            );
+          });
+      } else {
+        // initial time, to handle user input waiting error
+        const tryToPlay = setInterval(async () => {
           await sound
             .playAsync()
             .then(() => {
@@ -267,9 +317,8 @@ export default function Player() {
                 clearInterval(tryToPlay);
               }
             });
-        },
-        autoPlayStarted.current ? 0 : 500,
-      );
+        }, 500);
+      }
     }
   }
 
@@ -296,7 +345,7 @@ export default function Player() {
       interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
       shouldDuckAndroid: true,
       playThroughEarpieceAndroid: true,
-      allowsRecordingIOS: true,
+      allowsRecordingIOS: false,
       interruptionModeIOS: InterruptionModeIOS.DoNotMix,
       playsInSilentModeIOS: true,
     });
@@ -330,6 +379,9 @@ export default function Player() {
           if (i === 4) {
             console.log("iunsetting", { backIndex });
             // unset the 5th object from back
+            if (soundRefs.current[backIndex]) {
+              await soundRefs.current[backIndex]?.unloadAsync();
+            }
             soundRefs.current[backIndex] = null;
           } else {
             if (!soundRefs.current[backIndex]) {
@@ -351,6 +403,9 @@ export default function Player() {
         if (frontIndex < articles.length) {
           if (i === 4 && frontIndex < soundRefs.current.length) {
             console.log("iunsetting", { frontIndex });
+            if (soundRefs.current[frontIndex]) {
+              await soundRefs.current[frontIndex]?.unloadAsync();
+            }
             soundRefs.current[frontIndex] = null;
           } else {
             if (!soundRefs.current[frontIndex]) {
@@ -413,8 +468,19 @@ export default function Player() {
             });
           })
           .catch((error) => {
-            setNeedsUserInput(true);
-            console.info("User has not interacted with document yet.");
+            if (error.message.includes("interact")) {
+              console.info("User has not interacted with document yet.");
+              setNeedsUserInput(true);
+            } else {
+              console.error(
+                "Welcome message Auto-play failed:",
+                error,
+                error.message,
+                welcomeSoundUri,
+              );
+              clearInterval(tryToPlay);
+              setWelcomeSoundStatus("completed");
+            }
           });
       }, 500);
     }
@@ -563,13 +629,13 @@ export default function Player() {
       console.log("AppState", appState.current);
     });
 
-    return () => {
+    return async () => {
       clearTimeout(timer);
       subscription.remove();
-      currentlyPlaying.current?.stopAsync();
-      currentlyPlaying.current?.unloadAsync();
-      welcomeSoundRef.current?.stopAsync();
-      welcomeSoundRef.current?.unloadAsync();
+      await currentlyPlaying.current?.stopAsync();
+      await currentlyPlaying.current?.unloadAsync();
+      await welcomeSoundRef.current?.stopAsync();
+      await welcomeSoundRef.current?.unloadAsync();
     };
   }, []);
 
@@ -583,8 +649,8 @@ export default function Player() {
 
   const handleNext = async () => {
     if (currentlyPlaying.current) {
-      currentlyPlaying.current?.stopAsync();
-      // currentlyPlaying.current?.unloadAsync();
+      await currentlyPlaying.current?.stopAsync();
+      //await currentlyPlaying.current?.unloadAsync();
       currentlyPlaying.current = null;
     }
     const newIndex = currentNewsIndex + 1;
@@ -602,9 +668,9 @@ export default function Player() {
     setCurrentNewsIndex(newIndex);
   };
 
-  const handlePrev = () => {
-    currentlyPlaying.current?.stopAsync();
-    // currentlyPlaying.current?.unloadAsync();
+  const handlePrev = async () => {
+    await currentlyPlaying.current?.stopAsync();
+    // await currentlyPlaying.current?.unloadAsync();
     currentlyPlaying.current = null;
     const newIndex = currentNewsIndex - 1;
     trackEvent(
@@ -663,8 +729,15 @@ export default function Player() {
     directionalOffsetThreshold: 80,
   };
   // console.log({ progress, showPlayerControls });
-  // if (!isWelcomeSoundPlaying() && articles.length === 0) return <ErrorMessage>No news</Text>;
-  // console.log({ welcomeSoundStatus, isPlaying, isLoading, style: startButtonStyles.startButton });
+  console.log({
+    welcomeSoundStatus,
+    isPlaying,
+    isLoading,
+    needsUserInput,
+    articles: articles.length,
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
+  });
   return (
     <SafeAreaView style={styles.container}>
       <BrandHeader />
@@ -677,53 +750,54 @@ export default function Player() {
         <View
           style={{
             flex: 1,
-            width: Dimensions.get("window").width,
-            maxWidth: "500px",
+            width: "100%",
+            maxWidth: 500,
             justifyContent: "flex-end",
             marginTop: "65px",
             border: "none",
           }}
         >
-          {welcomeSoundStatus === "playing" ||
+          <ScrollView
+            contentContainerStyle={{
+              flex: 1,
+              justifyContent: "space-between",
+              // backgroundColor: "rgba(0, 0, 0, 0.7)",
+            }}
+          >
+            {welcomeSoundStatus === "playing" ||
             welcomeSoundStatus === "loading" ||
             needsUserInput ? (
-            <ImageBackground
-              source={require("@/assets/logo512.png")}
-              resizeMode="cover"
-              style={styles.image}
-            />
-          ) : (
-            <ImageBackground
-              source={
-                articles.length > 0 && currentNewsIndex < articles.length
-                  ? {
-                    uri: articles[currentNewsIndex].image,
-                  }
-                  : require("@/assets/bg1.jpg")
-              }
-              resizeMode="cover"
-              style={styles.image}
-            >
-              <LinearGradient
-                id="gradient"
-                colors={["rgba(0,0,0,0.3)", "rgba(0,0,0,0.7)"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{
-                  position: "absolute",
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  height: "100%",
-                }}
+              <ImageBackground
+                source={require("@/assets/logo512.png")}
+                resizeMode="cover"
+                style={styles.image}
               />
-              <ScrollView
-                contentContainerStyle={{
-                  flex: 1,
-                  justifyContent: "space-between",
-                  // backgroundColor: "rgba(0, 0, 0, 0.7)",
-                }}
+            ) : (
+              <ImageBackground
+                source={
+                  articles.length > 0 && currentNewsIndex < articles.length
+                    ? {
+                        uri: articles[currentNewsIndex].image,
+                      }
+                    : require("@/assets/bg1.jpg")
+                }
+                resizeMode="cover"
+                style={styles.image}
               >
+                <LinearGradient
+                  id="gradient"
+                  colors={["rgba(0,0,0,0.3)", "rgba(0,0,0,0.7)"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    height: "100%",
+                  }}
+                />
+
                 <View>
                   <TopSection welcomeShown={showWelcome}>
                     <PlaylistInfo show={showWelcome}>
@@ -836,9 +910,9 @@ export default function Player() {
                     </SummaryWrapper>
                   </View>
                 )}
-              </ScrollView>
-            </ImageBackground>
-          )}
+              </ImageBackground>
+            )}
+          </ScrollView>
         </View>
       </GestureRecognizer>
     </SafeAreaView>
@@ -848,6 +922,7 @@ export default function Player() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "100%",
     alignItems: "center",
   },
   playerControls: {
@@ -862,6 +937,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   image: {
+    width: "100%",
     flex: 1,
     justifyContent: "center",
     overflow: "hidden",
