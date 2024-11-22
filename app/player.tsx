@@ -295,6 +295,7 @@ export default function Player() {
               );
               // console.log("Src=", await getData("src"))
               setIsPlaying(true);
+              setNeedsUserInput(false);
               autoPlayStarted.current = true;
               sound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
             })
@@ -461,6 +462,7 @@ export default function Player() {
           .then(() => {
             clearInterval(tryToPlay);
             setWelcomeSoundStatus("playing");
+            setNeedsUserInput(false);
             sound.setOnPlaybackStatusUpdate((status) => {
               if (status.didJustFinish) {
                 setWelcomeSoundStatus("completed");
