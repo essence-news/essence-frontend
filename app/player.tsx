@@ -667,7 +667,7 @@ export default function Player() {
   const handleNext = async () => {
     if (currentlyPlaying.current) {
       await currentlyPlaying.current?.stopAsync();
-      //await currentlyPlaying.current?.unloadAsync();
+      // await currentlyPlaying.current?.unloadAsync();
       currentlyPlaying.current = null;
     }
     const newIndex = currentNewsIndex + 1;
@@ -752,8 +752,7 @@ export default function Player() {
     isLoading,
     needsUserInput,
     articles: articles.length,
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
+    currentNewsIndex,
   });
   return (
     <SafeAreaView style={styles.container}>
@@ -815,7 +814,7 @@ export default function Player() {
                   }}
                 />
 
-                <View>
+                <View style={styles.container}>
                   <TopSection welcomeShown={showWelcome}>
                     <PlaylistInfo show={showWelcome}>
                       <Title>Hello {userRef.current?.firstName ?? ""}</Title>
