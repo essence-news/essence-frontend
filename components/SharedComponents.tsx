@@ -84,6 +84,7 @@ export const Subtitle = styled.Text`
   font-size: 20px;
   margin-top: 0;
   font-family: "${({ theme }) => theme.fonts.body}";
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 export const SubtitleDark = styled.Text`
@@ -197,7 +198,7 @@ export const SigninMainContent = styled.View`
 `;
 
 export const TopSection = styled.View<{ welcomeShown: boolean }>`
-  padding-top: ${(props) => (props.welcomeShown ? "80px" : "40px")};
+  padding-top: 40px;
   position: relative;
   flex-grow: 1;
   display: flex;
@@ -206,26 +207,40 @@ export const TopSection = styled.View<{ welcomeShown: boolean }>`
   transition: padding-top 1s ease-out;
 `;
 
+export const StartButton = styled.Pressable`
+  border-radius: 100%;
+  height: 100px;
+  width: 100px;
+  border: 1px solid #333;
+  color: ${({ theme }) => theme.colors.primaryDark};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  background: ${({ theme }) => theme.colors.text};
+`;
+
 export const PlaylistInfo = styled.View<{ show: boolean }>`
   opacity: ${(props) => (props.show ? 1 : 0)};
   pointerevents: ${(props) => (props.show ? "auto" : "none")};
   position: absolute;
   top: 0;
-  left: 0;
   right: 0;
   transition:
     opacity 1s ease-out,
     transform 1s ease-out;
   z-index: 10;
   padding: 20px;
+  width: 200px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
 `;
 
 export const NewsInfo = styled.View<{ welcomeShown: boolean }>`
-  transform: ${(props) =>
-    props.welcomeShown ? "translateY(0px)" : "translateY(-40px)"};
   text-align: center;
   color: ${({ theme }) => theme.colors.text};
-  margin: 100px 0;
+  margin: 40px 0;
   transition: transform 1s ease-out;
 `;
 
