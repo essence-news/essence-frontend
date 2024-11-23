@@ -22,6 +22,7 @@ import {
   ControlButton,
   Controls,
   ErrorMessage,
+  InfoMessage,
   NewsHeadline,
   NewsInfo,
   PlaylistInfo,
@@ -144,9 +145,10 @@ export default function Player() {
       currentNewsIndex >= articles.length
     ) {
       return (
-        <ErrorMessage>
-          All caught up! Check back later for more news
-        </ErrorMessage>
+        <InfoMessage>
+          Great job on listening!<br /><br /> All caught up!<br /> Please check back later for
+          more news
+        </InfoMessage>
       );
     }
 
@@ -778,7 +780,7 @@ export default function Player() {
             width: "100%",
             maxWidth: 500,
             justifyContent: "flex-end",
-            marginTop: "65px",
+            marginTop: "0px",
             border: "none",
           }}
         >
@@ -795,9 +797,9 @@ export default function Player() {
                   ? require("@/assets/cliparts/podcast.jpg")
                   : articles.length > 0 && currentNewsIndex < articles.length
                     ? {
-                        uri: articles[currentNewsIndex].image,
-                      }
-                    : require("@/assets/bg1.jpg")
+                      uri: articles[currentNewsIndex].image,
+                    }
+                    : require("@/assets/cliparts/ecommerce.jpg")
               }
               resizeMode="cover"
               style={styles.image}

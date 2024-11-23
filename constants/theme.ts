@@ -15,7 +15,8 @@ const theme = {
     error: "red",
     white: "#FFFFFF",
     accent: "#4790ff",
-    darkOverlay: "rgba(0, 0, 0, 0.7)",
+    overlay: "rgba(45, 42, 39, 0.6)",
+    darkOverlay: "rgba(45, 42, 39, 0.8)",
   },
   fonts: {
     body: "Inter_400Regular",

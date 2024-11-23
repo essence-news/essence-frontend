@@ -7,15 +7,14 @@ const BrandName = styled.Text`
   margin: 0;
   color: ${({ theme }) => theme.colors.white};
   font-family: "${({ theme }) => theme.fonts.brand}";
-  font-size: 32px;
+  font-size: 28px;
   display: inline;
   text-align: left;
-  margin-bottom: 10px;
 `;
 
 const Logo = styled.Image`
-  height: 32px;
-  width: 32px;
+  height: 28px;
+  width: 28px;
   margin-right: 20px;
 `;
 

@@ -30,8 +30,7 @@ export const HeaderContainer = styled.View<{ width: number }>`
   overflow: hidden;
   padding: 10px 20px;
   z-index: 10;
-
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: ${({ theme }) => theme.colors.darkOverlay};
 `;
 
 export const ContentContainer = styled.View`
@@ -135,6 +134,16 @@ export const ErrorMessage = styled.Text`
   padding: 10px;
 `;
 
+export const InfoMessage = styled.Text`
+  font-family: "${({ theme }) => theme.fonts.body}";
+  color: ${({ theme }) => theme.colors.secondary};
+  text-align: center;
+  margin-top: 20px;
+  font-size: 16px;
+  padding: 10px;
+`;
+
+
 export const ScrollableContent = styled.View`
   flex: 1;
   overflow-y: auto;
@@ -198,7 +207,7 @@ export const SigninMainContent = styled.View`
 `;
 
 export const TopSection = styled.View`
-  padding-top: 40px;
+  padding-top: 90px;
   width: 100%;
   position: relative;
   flex-grow: 1;
@@ -224,7 +233,7 @@ export const StartButton = styled.Pressable`
 
 export const PlaylistInfo = styled.View`
   position: absolute;
-  top: 0;
+  top: 50px;
   right: 0;
   transition:
     opacity 1s ease-out,
@@ -322,7 +331,7 @@ export const NewsHeadline = styled.Text`
 export const SummaryWrapper = styled.View`
   width: 100%;
   padding: 20px;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: ${({ theme }) => theme.colors.darkOverlay};
   border-radius: 10px;
   margin-bottom: 20px;
   font-family: "${({ theme }) => theme.fonts.body}";
@@ -336,7 +345,7 @@ export const SummaryTitle = styled.Text`
 `;
 
 export const SummaryText = styled.Text`
-  font-size: 14px;
+  font-size: 15px;
   color: ${({ theme }) => theme.colors.secondary};
   font-family: "${({ theme }) => theme.fonts.body}";
 `;
