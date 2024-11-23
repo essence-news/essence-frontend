@@ -6,6 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "build:web": "dotenv -e ./.env.local -- expo export -p web --output-dir build && npx workbox-cli generateSW workbox-config.js",
+    "build:web-dev": "dotenv -e ./.env.dev -- expo export -p web --output-dir build && npx workbox-cli generateSW workbox-config.js",
+    "build:web-live": "dotenv -e ./.env.production -- expo export -p web --output-dir build && npx workbox-cli generateSW workbox-config.js",
     "build:android": "eas build -p android --profile dev",
     "build:ios": "eas build -p ios --profile dev",
     "ios": "expo start --ios",
