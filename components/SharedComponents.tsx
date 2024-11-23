@@ -197,8 +197,9 @@ export const SigninMainContent = styled.View`
   padding-top: 100px;
 `;
 
-export const TopSection = styled.View<{ welcomeShown: boolean }>`
+export const TopSection = styled.View`
   padding-top: 40px;
+  width: 100%;
   position: relative;
   flex-grow: 1;
   display: flex;
@@ -221,9 +222,7 @@ export const StartButton = styled.Pressable`
   background: ${({ theme }) => theme.colors.text};
 `;
 
-export const PlaylistInfo = styled.View<{ show: boolean }>`
-  opacity: ${(props) => (props.show ? 1 : 0)};
-  pointerevents: ${(props) => (props.show ? "auto" : "none")};
+export const PlaylistInfo = styled.View`
   position: absolute;
   top: 0;
   right: 0;
@@ -232,12 +231,11 @@ export const PlaylistInfo = styled.View<{ show: boolean }>`
     transform 1s ease-out;
   z-index: 10;
   padding: 20px;
-  width: 200px;
+  width: 100%;
   background-color: rgba(0, 0, 0, 0.7);
-  border-radius: 10px;
 `;
 
-export const NewsInfo = styled.View<{ welcomeShown: boolean }>`
+export const NewsInfo = styled.View`
   text-align: center;
   color: ${({ theme }) => theme.colors.text};
   margin: 40px 0;

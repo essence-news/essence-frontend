@@ -111,7 +111,6 @@ export default function Player() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [progress, setProgress] = useState(0);
   const [needsUserInput, setNeedsUserInput] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(true);
   const [welcomeSoundStatus, setWelcomeSoundStatus] =
     useState<string>("loading");
   const [ratingMessage, setRatingMessage] = useState("");
@@ -621,9 +620,6 @@ export default function Player() {
   }, [welcomeSoundStatus]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowWelcome(false);
-    }, 10000); // 15000 milliseconds = 15 seconds
     console.log("***********callling load");
     load();
     const subscription = AppState.addEventListener("change", (nextAppState) => {
@@ -659,7 +655,6 @@ export default function Player() {
     });
 
     return async () => {
-      clearTimeout(timer);
       subscription.remove();
       await currentlyPlaying.current?.stopAsync();
       await currentlyPlaying.current?.unloadAsync();
@@ -830,18 +825,16 @@ export default function Player() {
                 </StartButton>
               )}
               <View style={styles.container}>
-                <TopSection welcomeShown={showWelcome}>
+                <TopSection>
                   {showWelcomeScreen && welcomeSoundStatus !== "loading" && (
-                    <PlaylistInfo show={showWelcome}>
+                    <PlaylistInfo>
                       <Title>
                         Hello {userRef.current?.firstName ?? user?.firstName}
                       </Title>
                       <Subtitle>Your {getTimeOfDay()} newscast</Subtitle>
                     </PlaylistInfo>
                   )}
-                  <NewsInfo welcomeShown={showWelcome}>
-                    {renderContent()}
-                  </NewsInfo>
+                  <NewsInfo>{renderContent()}</NewsInfo>
                 </TopSection>
               </View>
               {showPlayerControls && (
