@@ -222,9 +222,9 @@ export const StartButton = styled.Pressable`
   background: ${({ theme }) => theme.colors.text};
 `;
 
-export const PlaylistInfo = styled.View`
+export const PlaylistInfo = styled.View<{ mobile: boolean }>`
   position: absolute;
-  top: 0;
+  top: ${(props) => (props.mobile ? "80px" : 0)};
   right: 0;
   transition:
     opacity 1s ease-out,

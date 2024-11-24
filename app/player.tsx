@@ -45,6 +45,7 @@ import { mockNewsData } from "@/constants/mock";
 import { flushQueue, trackEvent } from "@/utils/trackingUtil";
 import styled from "styled-components/native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useMediaQuery } from "react-responsive";
 
 export const CircularButton = styled.Pressable`
   justify-content: center;
@@ -121,6 +122,9 @@ export default function Player() {
   const welcomeSoundRef = useRef<Sound | null>(null);
   const appState = useRef(AppState.currentState);
   const { logout } = useAuth();
+  const isTabletOrMobileDevice = useMediaQuery({
+    query: "(max-device-width: 600px)",
+  });
 
   const showWelcomeScreen =
     welcomeSoundStatus === "playing" ||
@@ -355,7 +359,7 @@ export default function Player() {
       staysActiveInBackground: true,
       interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
       shouldDuckAndroid: true,
-      playThroughEarpieceAndroid: true,
+      playThroughEarpieceAndroid: false,
       allowsRecordingIOS: false,
       interruptionModeIOS: InterruptionModeIOS.DoNotMix,
       playsInSilentModeIOS: true,
@@ -827,7 +831,7 @@ export default function Player() {
               <View style={styles.container}>
                 <TopSection>
                   {showWelcomeScreen && welcomeSoundStatus !== "loading" && (
-                    <PlaylistInfo>
+                    <PlaylistInfo mobile={isTabletOrMobileDevice}>
                       <Title>
                         Hello {userRef.current?.firstName ?? user?.firstName}
                       </Title>
