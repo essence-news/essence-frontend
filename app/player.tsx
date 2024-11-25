@@ -146,8 +146,10 @@ export default function Player() {
     ) {
       return (
         <InfoMessage>
-          Great job on listening!<br /><br /> All caught up!<br /> Please check back later for
-          more news
+          Great job on listening!
+          <br />
+          <br /> All caught up!
+          <br /> Please check back later for more news
         </InfoMessage>
       );
     }
@@ -357,7 +359,7 @@ export default function Player() {
       staysActiveInBackground: true,
       interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
       shouldDuckAndroid: true,
-      playThroughEarpieceAndroid: true,
+      playThroughEarpieceAndroid: false,
       allowsRecordingIOS: false,
       interruptionModeIOS: InterruptionModeIOS.DoNotMix,
       playsInSilentModeIOS: true,
@@ -797,8 +799,8 @@ export default function Player() {
                   ? require("@/assets/cliparts/podcast.jpg")
                   : articles.length > 0 && currentNewsIndex < articles.length
                     ? {
-                      uri: articles[currentNewsIndex].image,
-                    }
+                        uri: articles[currentNewsIndex].image,
+                      }
                     : require("@/assets/cliparts/ecommerce.jpg")
               }
               resizeMode="cover"
