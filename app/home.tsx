@@ -44,7 +44,6 @@ const RightSection = styled.View<{ smallScreen: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: ${({ theme }) => theme.colors.primaryDark};
   max-width: ${(props) => (props.smallScreen ? "100%" : "50%")};
   min-height: ${(props) => (props.smallScreen ? "90vh" : "initial")};
   margin-left: ${(props) => (props.smallScreen ? "0" : "20px")};
