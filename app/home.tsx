@@ -226,7 +226,7 @@ const Home = () => {
         <MainContent smallScreen={isTabletOrMobileDevice}>
           <LeftSection smallScreen={isTabletOrMobileDevice}>
             <Brand>essence</Brand>
-            <Headline>e-commerce news in 30-second soundbites</Headline>
+            <Headline>Retail news in 30-second soundbites</Headline>
             <Subheadline>
               Essence delivers curated, personalized audio insights for busy
               professionals. Get informed on your commute, no reading required.
