@@ -80,7 +80,7 @@ const Brand = styled.Text`
 
 const Headline = styled.Text`
   font-family: "${({ theme }) => theme.fonts.heading}";
-  font-size: 48px;
+  font-size: 40px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text};
   margin-bottom: 32px;
