@@ -129,7 +129,6 @@ export const ErrorMessage = styled.Text`
   font-family: "${({ theme }) => theme.fonts.body}";
   color: ${({ theme }) => theme.colors.error};
   text-align: center;
-  margin-top: 20px;
   font-size: 16px;
   padding: 10px;
 `;

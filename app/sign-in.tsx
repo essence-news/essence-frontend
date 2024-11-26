@@ -54,7 +54,7 @@ export default function Login() {
       setPromptForToken(true);
     } catch (error) {
       console.error("sign in  error:", error);
-      setError(error.message || "An error occurred during sign in.");
+      setError("An error occurred during sign in.");
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +73,7 @@ export default function Login() {
       }
     } catch (error) {
       console.error("Verification error:", error);
-      setError(error.message || "An error occurred during verification.");
+      setError("An error occurred during verification.");
     } finally {
       setIsLoading(false);
     }

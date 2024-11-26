@@ -40,7 +40,7 @@ const apiCall = async (endpoint: string, method = "GET", data?: unknown) => {
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
   if (response.status === 401) {
-    clearToken();
+    if (token) clearToken();
     throw new Error("Unauthorized");
   }
 
