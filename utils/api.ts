@@ -95,11 +95,11 @@ export const verifyEmail = async (email: string, verificationCode: string) => {
   return data;
 };
 
+let i = 0;
 export const fetchNews = async (user: {
   isFirstTimeEver: string;
   isFirstTimeToday: string;
 }) => {
-  // try {
   const firstTimeEver = user.isFirstTimeEver;
   const firstTimeToday = user.isFirstTimeToday;
   const currentTime = new Date().toISOString();
@@ -117,10 +117,8 @@ export const fetchNews = async (user: {
     throw new Error("" + response.status);
   }
   return await response.json();
-  // } catch (error) {
-  //   console.error("Error fetching news:", error);
-  //   return [];
-  // }
+  // i++;
+  // return Promise.resolve(i > 1 ? { articles: [] } : mockNewsData);
 };
 
 export const verifyToken = async () => {

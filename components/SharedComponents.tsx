@@ -143,7 +143,6 @@ export const InfoMessage = styled.Text`
   padding: 10px;
 `;
 
-
 export const ScrollableContent = styled.View`
   flex: 1;
   overflow-y: auto;
@@ -217,7 +216,7 @@ export const TopSection = styled.View`
   transition: padding-top 1s ease-out;
 `;
 
-export const StartButton = styled.Pressable`
+export const CenterButton = styled.Pressable`
   border-radius: 100%;
   height: 100px;
   width: 100px;
@@ -228,6 +227,18 @@ export const StartButton = styled.Pressable`
   align-items: center;
   position: absolute;
   left: 50%;
+  background: ${({ theme }) => theme.colors.text};
+`;
+
+export const ReplayButton = styled.Pressable`
+  border-radius: 100%;
+  height: 50px;
+  width: 50px;
+  border: 1px solid #333;
+  color: ${({ theme }) => theme.colors.primaryDark};
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: ${({ theme }) => theme.colors.text};
 `;
 

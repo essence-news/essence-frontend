@@ -31,13 +31,14 @@ import {
   RatingButton,
   RatingButtons,
   RatingMessage,
-  StartButton,
+  CenterButton,
   Subtitle,
   SummaryText,
   SummaryTitle,
   SummaryWrapper,
   Title,
   TopSection,
+  ReplayButton,
 } from "@/components/SharedComponents";
 import { useTheme } from "styled-components/native";
 import BrandHeader from "@/components/BrandHeader";
@@ -58,12 +59,6 @@ export const CircularButton = styled.Pressable`
   top: 50%;
   left: 50%;
 `;
-
-export const startButtonStyles = {
-  startButton: {
-    transform: [{ translateX: -50 }, { translateY: -50 }],
-  },
-};
 
 export interface News {
   articles: Article[];
@@ -150,6 +145,29 @@ export default function Player() {
           <br />
           <br /> All caught up!
           <br /> Please check back later for more news
+          <View
+            style={{
+              marginTop: 30,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ReplayButton
+              onPress={async () => {
+                await AsyncStorage.setItem("currentNewsIndex", "0");
+                setCurrentNewsIndex(0);
+              }}
+            >
+              <AntDesign
+                style={{ fontWeight: "bold" }}
+                name="reload1"
+                size={24}
+                color="black"
+              />
+            </ReplayButton>
+            <Text style={{ color: "#fff" }}>Replay</Text>
+          </View>
         </InfoMessage>
       );
     }
@@ -175,6 +193,7 @@ export default function Player() {
       setProgress(progressPercent);
     }
     if (status.didJustFinish) {
+      setIsPlaying(false);
       handleNext();
       trackEvent(
         "audioCompleted",
@@ -504,22 +523,29 @@ export default function Player() {
 
   async function load(append = false) {
     setIsLoading(true);
-    console.log("Loading Sound");
     const newsData = await AsyncStorage.getItem("newsData");
     const inactiveSince = await AsyncStorage.getItem("inactiveSince");
     const currentNewsIndex = await AsyncStorage.getItem("currentNewsIndex");
 
+    console.log("Loading Sound", {
+      currentNewsIndex,
+      articles: articles.length,
+      append,
+      inactiveSince,
+    });
+    const parsed: News = newsData ? JSON.parse(newsData) : null;
+
     if (
       !append &&
-      newsData &&
+      parsed &&
       currentNewsIndex &&
       +currentNewsIndex > -1 &&
+      +currentNewsIndex < parsed.articles.length &&
       inactiveSince &&
       isLessThan2Hours(+inactiveSince)
     ) {
       console.log("within 2 hrs", new Date(+inactiveSince));
       // If coming back in last 2 hrs, serve from cache
-      const parsed = JSON.parse(newsData);
       // console.log({ newsData: parsed });
       setArticles(parsed.articles);
       setCurrentNewsIndex(+currentNewsIndex);
@@ -536,8 +562,12 @@ export default function Player() {
         userRef: userRef.current,
       });
       try {
-        if (!append) {
-          // dont load welcome screen when loading next items
+        if (
+          !append &&
+          currentNewsIndex &&
+          +currentNewsIndex < articles.length
+        ) {
+          // dont load welcome screen when loading next items or when reached end
           setWelcomeSoundStatus("loading");
         }
         const articlesResponse: News = await fetchNews({
@@ -550,16 +580,15 @@ export default function Player() {
         });
         // If first time or coming back on next day
         let articlesToSet;
-        if (newsData && currentNewsIndex !== null) {
+        if (parsed && currentNewsIndex !== null) {
           if (inactiveSince && isSameDay(+inactiveSince)) {
             // if coming back within current day
             console.log("same day", {
               append,
               inactiveSince: new Date(+inactiveSince),
-              newsData,
+              parsed,
               currentNewsIndex,
             });
-            const parsed: News = JSON.parse(newsData);
             if (append) {
               // If reached end of list, add new items
               articlesToSet = [
@@ -600,11 +629,20 @@ export default function Player() {
           "newsData",
           JSON.stringify(modifiedResponse),
         );
-
-        if (articlesResponse.intro_audio && !append)
+        console.log({
+          inactiveSince,
+          lessThan: inactiveSince ? isLessThan2Hours(+inactiveSince) : "no",
+        });
+        if (
+          articlesResponse.intro_audio &&
+          !append &&
+          (!inactiveSince || !isLessThan2Hours(+inactiveSince))
+        ) {
           // handle when we get data after last entry
           setAndPlayWelcomeSound(articlesResponse.intro_audio);
-        else setWelcomeSoundStatus("ignored");
+        } else {
+          setWelcomeSoundStatus("ignored");
+        }
       } catch (err) {
         if (err.message >= 400) {
           logout();
@@ -621,17 +659,16 @@ export default function Player() {
     if (welcomeSoundStatus === "completed") {
       playSound();
     }
-  }, [welcomeSoundStatus]);
-
-  useEffect(() => {
-    console.log("***********callling load");
-    load();
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (
         appState.current.match(/inactive|background/) &&
         nextAppState === "active"
       ) {
-        console.log("App has come to the foreground!", isPlaying);
+        console.log("App has come to the foreground!", {
+          welcomeSoundStatus,
+          isPlaying,
+          currentlyPlaying: currentlyPlaying.current,
+        });
         if (
           !isPlaying &&
           (welcomeSoundStatus === "completed" ||
@@ -657,9 +694,17 @@ export default function Player() {
       appState.current = nextAppState;
       console.log("AppState", appState.current);
     });
+    return () => {
+      if (subscription) {
+        subscription.remove();
+      }
+    };
+  }, [welcomeSoundStatus, currentlyPlaying.current, isPlaying]);
 
+  useEffect(() => {
+    console.log("***********callling load");
+    load();
     return async () => {
-      subscription.remove();
       await currentlyPlaying.current?.stopAsync();
       await currentlyPlaying.current?.unloadAsync();
       await welcomeSoundRef.current?.stopAsync();
@@ -671,6 +716,9 @@ export default function Player() {
     if (mounted.current && currentNewsIndex < articles.length) {
       playSound();
       prepareSounds();
+    }
+    if (currentNewsIndex >= articles.length) {
+      setWelcomeSoundStatus("ignored");
     }
     mounted.current = true;
   }, [currentNewsIndex]);
@@ -820,13 +868,13 @@ export default function Player() {
                 }}
               />
               {needsUserInput && (
-                <StartButton
+                <CenterButton
                   style={{
                     transform: [{ translateX: -50 }],
                   }}
                 >
                   <AntDesign name="caretright" size={36} color="black" />
-                </StartButton>
+                </CenterButton>
               )}
               <View style={styles.container}>
                 <TopSection>
