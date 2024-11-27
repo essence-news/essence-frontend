@@ -44,7 +44,7 @@ export default function Login() {
     setIsLoading(true);
     try {
       const signInResponse = await login(
-        email,
+        email.toLowerCase(),
         userFirstName || firstName,
         "GB",
         "EN",
@@ -63,7 +63,7 @@ export default function Login() {
     setError("");
     setIsLoading(true);
     try {
-      const success = await verify(email, verificationCode);
+      const success = await verify(email.toLowerCase(), verificationCode);
       if (success) {
         router.replace("/player");
       } else {
@@ -141,7 +141,8 @@ export default function Login() {
                   <Input
                     placeholder="Email"
                     value={email}
-                    onChangeText={onChangeEmail}
+                    onChangeText={(text) => onChangeEmail(text.toLowerCase())}
+                    autoCapitalize="none"
                   />
                   {error ? <ErrorMessage>{error}</ErrorMessage> : <Text></Text>}
                   <Button onPress={handleSignin} disabled={isLoading}>

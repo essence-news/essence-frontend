@@ -141,10 +141,11 @@ export default function Player() {
     ) {
       return (
         <InfoMessage>
-          Great job on listening!
-          <br />
-          <br /> All caught up!
-          <br /> Please check back later for more news
+          <Text>
+            Great job on listening!{'\n\n'}
+            All caught up!{'\n'}
+            Please check back later for more news
+          </Text>
           <View
             style={{
               marginTop: 30,
@@ -217,6 +218,7 @@ export default function Player() {
   };
 
   async function playSound() {
+    console.log("playSound called");
     console.log({ welcomeSoundStatus, articles: articles.length });
     const localCurrentNewsIndex = currentNewsIndex;
 
@@ -357,6 +359,7 @@ export default function Player() {
   }
 
   async function pauseSound() {
+    console.log("pausing sound");
     await currentlyPlaying.current?.pauseAsync();
     setIsPlaying(false);
     trackEvent(
@@ -829,7 +832,7 @@ export default function Player() {
             flex: 1,
             width: "100%",
             maxWidth: 500,
-            justifyContent: "flex-end",
+            justifyContent: "flex-start",
             marginTop: "0px",
             border: "none",
           }}

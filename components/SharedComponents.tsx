@@ -95,9 +95,9 @@ export const SubtitleDark = styled.Text`
 
 export const ButtonText = styled.Text`
   font-size: 18px;
-  color: #fff;
   font-family: "${({ theme }) => theme.fonts.body}";
   text-align: center;
+  color: inherit;
 `;
 
 export const Button = styled.Pressable`
@@ -251,7 +251,6 @@ export const PlaylistInfo = styled.View`
   z-index: 10;
   padding: 20px;
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
 `;
 
 export const NewsInfo = styled.View`
