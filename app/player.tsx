@@ -72,7 +72,7 @@ export interface Article {
   categories: string[];
   date_published: string;
   full_text: any;
-  id: string;
+  article_id: string;
   image: string | null;
   importance_score: number;
   processing_status: string;
@@ -197,7 +197,7 @@ export default function Player() {
       handleNext();
       trackEvent(
         "audioCompleted",
-        articles[currentNewsIndex].id,
+        articles[currentNewsIndex].article_id,
         articles[currentNewsIndex].title,
         currentNewsIndex,
       );
@@ -209,7 +209,7 @@ export default function Player() {
     setIsPlaying(true);
     trackEvent(
       "pause",
-      articles[currentNewsIndex].id,
+      articles[currentNewsIndex].article_id,
       articles[currentNewsIndex].title,
       currentNewsIndex,
       progress,
@@ -255,7 +255,7 @@ export default function Player() {
       );
       sound = await createSoundObject(
         articles[currentNewsIndex].audio_summary,
-        articles[currentNewsIndex].id,
+        articles[currentNewsIndex].article_id,
         articles[currentNewsIndex].title,
         currentNewsIndex,
       );
@@ -286,7 +286,7 @@ export default function Player() {
           .then(() => {
             trackEvent(
               "play",
-              articles[currentNewsIndex].id,
+              articles[currentNewsIndex].article_id,
               articles[currentNewsIndex].title,
               currentNewsIndex,
               progress,
@@ -304,7 +304,7 @@ export default function Player() {
             );
             trackEvent(
               "error",
-              articles[currentNewsIndex]?.id,
+              articles[currentNewsIndex]?.article_id,
               articles[currentNewsIndex]?.title,
               currentNewsIndex,
               0,
@@ -320,7 +320,7 @@ export default function Player() {
               clearInterval(tryToPlay);
               trackEvent(
                 "play",
-                articles[currentNewsIndex].id,
+                articles[currentNewsIndex].article_id,
                 articles[currentNewsIndex].title,
                 currentNewsIndex,
                 progress,
@@ -342,7 +342,7 @@ export default function Player() {
               else {
                 trackEvent(
                   "error",
-                  articles[currentNewsIndex]?.id,
+                  articles[currentNewsIndex]?.article_id,
                   articles[currentNewsIndex]?.title,
                   currentNewsIndex,
                   0,
@@ -361,7 +361,7 @@ export default function Player() {
     setIsPlaying(false);
     trackEvent(
       "pause",
-      articles[currentNewsIndex].id,
+      articles[currentNewsIndex].article_id,
       articles[currentNewsIndex].title,
       currentNewsIndex,
       progress,
@@ -370,7 +370,7 @@ export default function Player() {
 
   const createSoundObject = async (
     uri: string,
-    id = "",
+    article_id = "",
     title = "",
     index = -1,
   ) => {
@@ -390,7 +390,7 @@ export default function Player() {
       { staysActiveInBackground: true },
     ).catch((error) => {
       console.error("Create Async failed:", error, uri);
-      trackEvent("error", id, title, index, 0, {
+      trackEvent("error", article_id, title, index, 0, {
         errorType: "autoplay-create",
         message: error.message,
       });
@@ -425,7 +425,7 @@ export default function Player() {
               });
               const sound = await createSoundObject(
                 articles[backIndex].audio_summary,
-                articles[backIndex].id,
+                articles[backIndex].article_id,
                 articles[backIndex].title,
                 backIndex,
               );
@@ -449,7 +449,7 @@ export default function Player() {
               });
               const sound = await createSoundObject(
                 articles[frontIndex].audio_summary,
-                articles[frontIndex].id,
+                articles[frontIndex].article_id,
                 articles[frontIndex].title,
                 frontIndex,
               );
@@ -735,7 +735,7 @@ export default function Player() {
     }
     trackEvent(
       "next",
-      articles[currentNewsIndex].id,
+      articles[currentNewsIndex].article_id,
       articles[currentNewsIndex].title,
       currentNewsIndex,
       progress,
@@ -751,7 +751,7 @@ export default function Player() {
     const newIndex = currentNewsIndex - 1;
     trackEvent(
       "previous",
-      articles[currentNewsIndex].id,
+      articles[currentNewsIndex].article_id,
       articles[currentNewsIndex].title,
       currentNewsIndex,
       progress,
@@ -775,7 +775,7 @@ export default function Player() {
       try {
         trackEvent(
           rating === "positive" ? "like" : "dislike",
-          currentItem.id,
+          currentItem.article_id,
           currentItem.title,
           currentNewsIndex,
           progress,
@@ -847,8 +847,8 @@ export default function Player() {
                   ? require("@/assets/cliparts/podcast.jpg")
                   : articles.length > 0 && currentNewsIndex < articles.length
                     ? {
-                        uri: articles[currentNewsIndex].image,
-                      }
+                      uri: articles[currentNewsIndex].image,
+                    }
                     : require("@/assets/cliparts/ecommerce.jpg")
               }
               resizeMode="cover"
