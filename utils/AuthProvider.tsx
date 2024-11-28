@@ -4,21 +4,34 @@ import {
   useContext,
   useEffect,
   ReactNode,
+  useRef,
 } from "react";
 import { signIn, verifyEmail, verifyToken, refreshToken } from "./api";
 import { toCamelCase } from "./stringUtils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
+import { Sound } from "expo-av/build/Audio";
+import { createSoundObject } from "./commonUtils";
+import { ActivityIndicator } from "react-native";
+import theme from "@/constants/theme";
 
 export type Auth = {
   user?: User;
+  initialWelcomeSound: {
+    sound: Sound | null;
+    uri: string;
+  };
   login: (
     email: string,
     inputFirstName: string,
     country: string,
     language: string,
   ) => Promise<{ token?: string }>;
-  verify: (email: string, verificationCode: string) => Promise<boolean>;
+  verify: (
+    email: string,
+    verificationCode: string,
+    firstName: string,
+  ) => Promise<boolean>;
   logout: () => void;
   ensureTokenValidity: () => Promise<User | undefined>;
 };
@@ -33,6 +46,10 @@ const initialState = {
   login: () => Promise.resolve({ token: "" }),
   logout: () => console.log("logout"),
   verify: () => Promise.resolve(true),
+  initialWelcomeSound: {
+    sound: null,
+    uri: "",
+  },
   ensureTokenValidity: () => Promise.resolve(undefined),
 };
 
@@ -43,9 +60,14 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | undefined>(undefined);
   const [loading, setLoading] = useState(false);
+  const initialWelcomeSound = useRef<{
+    sound: Sound | null;
+    uri: string;
+  } | null>(null);
 
   // New function to update firstName in localStorage and state
   const updateFirstName = async (newFirstName: string) => {
+    console.log("will update first name", newFirstName);
     if (newFirstName) {
       await AsyncStorage.setItem("firstName", toCamelCase(newFirstName));
       setUser((prevUser) => ({
@@ -89,14 +111,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     setUser(undefined);
     router.push("/sign-in");
+    initialWelcomeSound.current = null;
   };
 
   // New method to check token expiration
   const ensureTokenValidity = async () => {
-    setLoading(true);
-    const token = await AsyncStorage.getItem("userToken");
-    if (token) {
-      try {
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem("userToken");
+      if (token) {
         // Check if the token is valid
         await verifyToken();
         // Get the user's login status - to update the login time, etc
@@ -108,35 +131,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           isFirstTimeEver,
           isFirstTimeToday,
         };
+        const welcomeSoundURI = await AsyncStorage.getItem(
+          "initial_welcome_sound_uri",
+        );
+        if (welcomeSoundURI) {
+          const welcomeSound = await createSoundObject(welcomeSoundURI);
+          initialWelcomeSound.current = {
+            sound: welcomeSound,
+            uri: welcomeSoundURI,
+          };
+        }
+        console.log("Setting", { userObj });
         setUser(userObj);
         return userObj;
-      } catch (error) {
-        console.error("Token verification failed:", error);
-        // If the token is invalid, try to refresh it
-        try {
-          const newToken = await refreshToken();
-          await AsyncStorage.setItem("userToken", newToken);
-          const { firstName, isFirstTimeEver, isFirstTimeToday } =
-            await getLoginStatus();
-          const userObj = {
-            token,
-            firstName,
-            isFirstTimeEver,
-            isFirstTimeToday,
-          };
-          setUser(userObj);
-          return userObj;
-        } catch (refreshError) {
-          console.error("Token refresh failed:", refreshError);
-          // If the token refresh fails, log the user out
-          logout();
-        }
+      } else {
+        // If there's no token, just set user to null without attempting verification
+        setUser(undefined);
       }
-    } else {
-      // If there's no token, just set user to null without attempting verification
-      setUser(undefined);
+    } catch (error) {
+      console.error("Token verification failed:", error);
+      // If the token is invalid, try to refresh it
+      try {
+        const newToken = await refreshToken();
+        await AsyncStorage.setItem("userToken", newToken);
+        const { firstName, isFirstTimeEver, isFirstTimeToday } =
+          await getLoginStatus();
+        const userObj = {
+          token,
+          firstName,
+          isFirstTimeEver,
+          isFirstTimeToday,
+        };
+        setUser(userObj);
+        return userObj;
+      } catch (refreshError) {
+        console.error("Token refresh failed:", refreshError);
+        // If the token refresh fails, log the user out
+        logout();
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Modified login method
@@ -148,20 +183,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   ) => {
     try {
       const result = await signIn(email, inputFirstName, country, language);
-      if (result.token) {
-        await AsyncStorage.setItem("userToken", result.token);
-        updateFirstName(inputFirstName);
+      const welcomeSound = await createSoundObject(result.welcomeSound);
+      await AsyncStorage.setItem(
+        "initial_welcome_sound_uri",
+        result.welcomeSound,
+      );
 
-        const { firstName, isFirstTimeEver, isFirstTimeToday } =
-          await getLoginStatus();
+      initialWelcomeSound.current = {
+        sound: welcomeSound,
+        uri: result.welcomeSound,
+      };
+      console.log("Result welcome sound", { w: result.welcomeSound });
+      // if (result.token) {
+      //   await AsyncStorage.setItem("userToken", result.token);
+      //   updateFirstName(inputFirstName);
 
-        setUser({
-          token: result.token,
-          firstName,
-          isFirstTimeEver,
-          isFirstTimeToday,
-        });
-      }
+      //   const { firstName, isFirstTimeEver, isFirstTimeToday } =
+      //     await getLoginStatus();
+
+      //   setUser({
+      //     token: result.token,
+      //     firstName: firstName || inputFirstName,
+      //     isFirstTimeEver,
+      //     isFirstTimeToday,
+      //   });
+      // }
       return result;
     } catch (error) {
       console.error("Login error:", error);
@@ -170,22 +216,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Modified verify method
-  const verify = async (email: string, verificationCode: string) => {
+  const verify = async (
+    email: string,
+    verificationCode: string,
+    inputFirstName: string,
+  ) => {
     try {
       setLoading(true);
       const userData = await verifyEmail(email, verificationCode);
       if (userData.token) {
         await AsyncStorage.setItem("userToken", userData.token);
-        updateFirstName(userData.firstName);
         await AsyncStorage.setItem("isFirstTimeEver", "true");
         await AsyncStorage.setItem("lastLoginTime", "" + new Date().getTime());
+        await AsyncStorage.setItem("emailID", email);
+        const { isFirstTimeEver, isFirstTimeToday } = await getLoginStatus();
+        console.log("verify", inputFirstName);
+        await updateFirstName(inputFirstName);
 
-        const { firstName, isFirstTimeEver, isFirstTimeToday } =
-          await getLoginStatus();
-
+        await AsyncStorage.setItem("emailID", email);
         setUser({
           token: userData.token,
-          firstName,
+          firstName: inputFirstName,
           isFirstTimeEver,
           isFirstTimeToday,
         });
@@ -220,7 +271,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading,
     ensureTokenValidity,
     updateFirstName,
+    initialWelcomeSound: initialWelcomeSound.current,
   };
+  console.log({ loading });
+  if (loading)
+    return (
+      <ActivityIndicator
+        style={{ flex: 1, justifyContent: "center" }}
+        size="large"
+        color={theme.colors.primary}
+      />
+    );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

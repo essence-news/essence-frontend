@@ -6,6 +6,7 @@ import {
   AppState,
   View,
   ImageBackground,
+  Pressable,
 } from "react-native";
 import GestureRecognizer from "react-native-swipe-gestures";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -47,6 +48,7 @@ import { mockNewsData } from "@/constants/mock";
 import { flushQueue, trackEvent } from "@/utils/trackingUtil";
 import styled from "styled-components/native";
 import { LinearGradient } from "expo-linear-gradient";
+import { createSoundObject } from "@/utils/commonUtils";
 
 export const CircularButton = styled.Pressable`
   justify-content: center;
@@ -98,7 +100,7 @@ const getTimeOfDay = () => {
 
 export default function Player() {
   const [currentNewsIndex, setCurrentNewsIndex] = useState<number>(-1);
-  const { user, ensureTokenValidity } = useAuth();
+  const { user, ensureTokenValidity, initialWelcomeSound } = useAuth();
   const mounted = useRef(false);
   const userRef = useRef(user);
   const theme = useTheme();
@@ -368,37 +370,7 @@ export default function Player() {
     );
   }
 
-  const createSoundObject = async (
-    uri: string,
-    id = "",
-    title = "",
-    index = -1,
-  ) => {
-    await Audio.setAudioModeAsync({
-      staysActiveInBackground: true,
-      interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
-      shouldDuckAndroid: true,
-      playThroughEarpieceAndroid: false,
-      allowsRecordingIOS: false,
-      interruptionModeIOS: InterruptionModeIOS.DoNotMix,
-      playsInSilentModeIOS: true,
-    });
-    const audio = await Audio.Sound.createAsync(
-      {
-        uri,
-      },
-      { staysActiveInBackground: true },
-    ).catch((error) => {
-      console.error("Create Async failed:", error, uri);
-      trackEvent("error", id, title, index, 0, {
-        errorType: "autoplay-create",
-        message: error.message,
-      });
-    });
-    return audio.sound;
-  };
-
-  const prepareSounds = async () => {
+  const prepareSounds = async (index: number) => {
     if (articles?.length > 0) {
       // console.log("prepareSound", {
       //   currentNewsIndex,
@@ -406,8 +378,8 @@ export default function Player() {
       //   soundRefs: soundRefs.current,
       // });
       for (let i = 0; i < 5; i++) {
-        const backIndex = currentNewsIndex - i;
-        const frontIndex = currentNewsIndex + i;
+        const backIndex = index - i;
+        const frontIndex = index + i;
         console.log("prepareSound", { i, backIndex, frontIndex });
         if (backIndex >= 0) {
           if (i === 4) {
@@ -483,10 +455,25 @@ export default function Player() {
     return new Date(lastTime).getDate() === new Date().getDate();
   };
 
-  const setAndPlayWelcomeSound = async (welcomeSoundUri: string) => {
-    const sound = await createSoundObject(welcomeSoundUri);
+  const setAndPlayWelcomeSound = async () => {
+    console.log("setandplayWelcomesound", initialWelcomeSound);
+    let sound = initialWelcomeSound.sound;
+    if (!sound) {
+      console.info(
+        "cound not find welcome sound - will initialize from uri",
+        initialWelcomeSound,
+      );
+      sound = await createSoundObject(initialWelcomeSound.uri);
+    }
+    if (!sound) {
+      console.error(
+        "failed to initialize welcome sound - missing URI",
+        initialWelcomeSound,
+      );
+      setWelcomeSoundStatus("ignored");
+    }
     welcomeSoundRef.current = sound;
-    console.log("Playing welcomeSound", welcomeSoundUri);
+    console.log("Playing welcomeSound", initialWelcomeSound.uri);
     if (sound) {
       const tryToPlay = setInterval(async () => {
         await sound
@@ -511,7 +498,7 @@ export default function Player() {
                 "Welcome message Auto-play failed:",
                 error,
                 error.message,
-                welcomeSoundUri,
+                initialWelcomeSound.uri,
               );
               clearInterval(tryToPlay);
               setWelcomeSoundStatus("completed");
@@ -527,13 +514,24 @@ export default function Player() {
     const inactiveSince = await AsyncStorage.getItem("inactiveSince");
     const currentNewsIndex = await AsyncStorage.getItem("currentNewsIndex");
 
+    const parsed: News = newsData ? JSON.parse(newsData) : null;
     console.log("Loading Sound", {
       currentNewsIndex,
       articles: articles.length,
       append,
       inactiveSince,
+      parsed,
+      user,
     });
-    const parsed: News = newsData ? JSON.parse(newsData) : null;
+
+    if (!append && (!inactiveSince || !isLessThan2Hours(+inactiveSince))) {
+      console.log("will play welcome sound");
+      // handle when we get data after last entry
+      setAndPlayWelcomeSound();
+    } else {
+      console.log("welcome sound  ignored");
+      setWelcomeSoundStatus("ignored");
+    }
 
     if (
       !append &&
@@ -551,15 +549,15 @@ export default function Player() {
       setCurrentNewsIndex(+currentNewsIndex);
       setWelcomeSoundStatus("ignored");
     } else {
-      console.log("before", { user });
-
-      if (!user) {
-        userRef.current = await ensureTokenValidity();
-      }
-      console.log("not within 2 hrs", {
+      // if (!user) {
+      //   userRef.current = await ensureTokenValidity();
+      // }
+      console.log("load() else block", {
         inactiveSince,
         user,
         userRef: userRef.current,
+        currentNewsIndex,
+        append,
       });
       try {
         if (
@@ -581,13 +579,14 @@ export default function Player() {
         // If first time or coming back on next day
         let articlesToSet;
         if (parsed && currentNewsIndex !== null) {
-          if (inactiveSince && isSameDay(+inactiveSince)) {
+          if (!inactiveSince || isSameDay(+inactiveSince)) {
             // if coming back within current day
             console.log("same day", {
               append,
-              inactiveSince: new Date(+inactiveSince),
+              inactiveSince,
               parsed,
               currentNewsIndex,
+              articlesResponse,
             });
             if (append) {
               // If reached end of list, add new items
@@ -601,20 +600,25 @@ export default function Player() {
                 ...articlesResponse.articles,
                 ...parsed.articles.splice(+currentNewsIndex),
               ];
+              console.log("not append", { articlesToSet });
               soundRefs.current = []; // reset objects
-              setCurrentNewsIndex(0);
-              await AsyncStorage.setItem("currentNewsIndex", "0");
+              if (articlesToSet.length > 0) {
+                setCurrentNewsIndex(0);
+                await AsyncStorage.setItem("currentNewsIndex", "0");
+              }
             }
           } else {
             // on next day
             soundRefs.current = []; // reset objects
             articlesToSet = articlesResponse.articles;
             setCurrentNewsIndex(0);
+            await AsyncStorage.setItem("currentNewsIndex", "0");
           }
         } else {
           articlesToSet = articlesResponse.articles;
           soundRefs.current = []; // reset objects
           setCurrentNewsIndex(0);
+          await AsyncStorage.setItem("currentNewsIndex", "0");
         }
 
         setArticles(articlesToSet);
@@ -633,16 +637,6 @@ export default function Player() {
           inactiveSince,
           lessThan: inactiveSince ? isLessThan2Hours(+inactiveSince) : "no",
         });
-        if (
-          articlesResponse.intro_audio &&
-          !append &&
-          (!inactiveSince || !isLessThan2Hours(+inactiveSince))
-        ) {
-          // handle when we get data after last entry
-          setAndPlayWelcomeSound(articlesResponse.intro_audio);
-        } else {
-          setWelcomeSoundStatus("ignored");
-        }
       } catch (err) {
         if (err.message >= 400) {
           logout();
@@ -685,7 +679,7 @@ export default function Player() {
         appState.current.match(/active/) &&
         nextAppState.match(/inactive|background/)
       ) {
-        console.log("App has come to the background!");
+        // console.log("App has come to the background!");
         setLastInactive();
         flushQueue();
       }
@@ -699,7 +693,7 @@ export default function Player() {
         subscription.remove();
       }
     };
-  }, [welcomeSoundStatus, currentlyPlaying.current, isPlaying]);
+  }, [welcomeSoundStatus, currentlyPlaying.current]);
 
   useEffect(() => {
     console.log("***********callling load");
@@ -713,9 +707,12 @@ export default function Player() {
   }, []);
 
   useEffect(() => {
+    console.log("will call play sound with currentNewsIndex", {
+      currentNewsIndex,
+    });
     if (mounted.current && currentNewsIndex < articles.length) {
       playSound();
-      prepareSounds();
+      prepareSounds(currentNewsIndex);
     }
     if (currentNewsIndex >= articles.length) {
       setWelcomeSoundStatus("ignored");
@@ -730,7 +727,14 @@ export default function Player() {
       currentlyPlaying.current = null;
     }
     const newIndex = currentNewsIndex + 1;
-    if (newIndex >= articles.length - 2) {
+    console.log("handleNext", {
+      newIndex,
+      currentNewsIndex,
+      articles: articles.length,
+    });
+    await AsyncStorage.setItem("currentNewsIndex", "" + newIndex);
+    setCurrentNewsIndex(newIndex);
+    if (newIndex === articles.length - 1) {
       await load(true);
     }
     trackEvent(
@@ -740,8 +744,6 @@ export default function Player() {
       currentNewsIndex,
       progress,
     );
-    AsyncStorage.setItem("currentNewsIndex", "" + newIndex);
-    setCurrentNewsIndex(newIndex);
   };
 
   const handlePrev = async () => {
@@ -756,7 +758,7 @@ export default function Player() {
       currentNewsIndex,
       progress,
     );
-    AsyncStorage.setItem("currentNewsIndex", "" + newIndex);
+    await AsyncStorage.setItem("currentNewsIndex", "" + newIndex);
     setCurrentNewsIndex(newIndex);
   };
 
@@ -805,19 +807,22 @@ export default function Player() {
     directionalOffsetThreshold: 80,
   };
   // console.log({ progress, showPlayerControls });
-  // console.log({
-  //   welcomeSoundStatus,
-  //   isPlaying,
-  //   isLoading,
-  //   needsUserInput,
-  //   articles: articles.length,
-  //   currentNewsIndex,
-  //   u: userRef.current,
-  //   user,
-  // });
+  console.log({
+    welcomeSoundStatus,
+    isPlaying,
+    isLoading,
+    needsUserInput,
+    articles: articles.length,
+    currentNewsIndex,
+    u: userRef.current,
+    user,
+  });
   return (
     <SafeAreaView style={styles.container}>
       <BrandHeader />
+      <Pressable>
+        <AntDesign name="setting" color={theme.colors.primary} size={16} />
+      </Pressable>
       <GestureRecognizer
         onSwipeLeft={handleLeftSwipe}
         onSwipeRight={handleRightSwipe}
@@ -830,8 +835,7 @@ export default function Player() {
             width: "100%",
             maxWidth: 500,
             justifyContent: "flex-end",
-            marginTop: "0px",
-            border: "none",
+            marginTop: 0,
           }}
         >
           <ScrollView
@@ -878,15 +882,14 @@ export default function Player() {
               )}
               <View style={styles.container}>
                 <TopSection>
-                  {showWelcomeScreen && welcomeSoundStatus !== "loading" && (
+                  {showWelcomeScreen && welcomeSoundStatus !== "loading" ? (
                     <PlaylistInfo>
-                      <Title>
-                        Hello {userRef.current?.firstName ?? user?.firstName}
-                      </Title>
+                      <Title>Hello {user?.firstName}</Title>
                       <Subtitle>Your {getTimeOfDay()} newscast</Subtitle>
                     </PlaylistInfo>
+                  ) : (
+                    <NewsInfo>{renderContent()}</NewsInfo>
                   )}
-                  <NewsInfo>{renderContent()}</NewsInfo>
                 </TopSection>
               </View>
               {showPlayerControls && (

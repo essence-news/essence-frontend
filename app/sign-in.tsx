@@ -63,7 +63,11 @@ export default function Login() {
     setError("");
     setIsLoading(true);
     try {
-      const success = await verify(email, verificationCode);
+      const success = await verify(
+        email,
+        verificationCode,
+        userFirstName || firstName,
+      );
       if (success) {
         router.replace("/player");
       } else {

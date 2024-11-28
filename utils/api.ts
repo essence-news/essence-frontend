@@ -70,12 +70,16 @@ export const signIn = async (
     return {
       isNewUser: true,
       message: data.message,
+      welcomeSound: data.intro_audio,
+      // "https://essence-news.s3.amazonaws.com/live/175c5a0f-4230-424a-b836-2c3f52eeaa94/intro/False_False_morning.mp3?AWSAccessKeyId=AKIAUWF6I5PZFWK4M3PL&Signature=SkMi%2B7U7otk44YcHDpV4JP6zLTg%3D&Expires=1733214812",
     };
   } else {
     return {
       isNewUser: false,
       verificationRequired: data.verificationRequired,
       token: data.token,
+      welcomeSound: data.intro_audio,
+      // "https://essence-news.s3.amazonaws.com/live/175c5a0f-4230-424a-b836-2c3f52eeaa94/intro/False_False_morning.mp3?AWSAccessKeyId=AKIAUWF6I5PZFWK4M3PL&Signature=SkMi%2B7U7otk44YcHDpV4JP6zLTg%3D&Expires=1733214812",
     };
   }
 };
@@ -111,12 +115,18 @@ export const fetchNews = async (user: {
   }).toString();
 
   console.log(`Fetching news with query params: ${queryParams}`);
-  const response = await apiCall(`/public/latest_news?${queryParams}`, "GET");
-  console.log({ response });
-  if (!response.ok) {
-    throw new Error("" + response.status);
+  try {
+    const response = await apiCall(`/public/latest_news?${queryParams}`, "GET");
+    console.log({ response });
+    if (!response.ok) {
+      throw new Error("" + response.status);
+    }
+    return await response.json();
+  } catch (err) {
+    if (err.message === "Unauthorized") {
+      throw new Error("401");
+    }
   }
-  return await response.json();
   // i++;
   // return Promise.resolve(i > 1 ? { articles: [] } : mockNewsData);
 };
@@ -160,6 +170,28 @@ export const trackEvents = async (events: unknown) => {
       throw new Error("Failed to send events");
     }
     return await response.json();
+  } catch (error) {
+    console.error("Error tracking events:", error);
+    throw error;
+  }
+};
+
+export const getPreferences = async () => {
+  try {
+    return {
+      industries: "fashion, electronics",
+      geographies: "UK,US,India",
+      news_sources: "retail-week.com,businessoffashion.com",
+      functions: "ecommerce, Merchandising",
+      topics: "marketing,branding",
+      brands: "levis,puma,adidas",
+    };
+
+    // const response = await apiCall("/user/preferences", "POST", { events });
+    // if (!response.ok) {
+    //   throw new Error("Failed to send events");
+    // }
+    // return await response.json();
   } catch (error) {
     console.error("Error tracking events:", error);
     throw error;

@@ -20,7 +20,9 @@ const theme = {
   },
   fonts: {
     body: "Inter_400Regular",
+    bodyBold: "Inter_700Bold",
     heading: "Nunito_400Regular",
+    headingBold: "Nunito_700Bold",
     brand: "Comfortaa_400Regular",
   },
   sizes: {

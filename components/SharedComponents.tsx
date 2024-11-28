@@ -38,6 +38,7 @@ export const ContentContainer = styled.View`
   height: 100%;
   max-width: 500px;
   margin: 0 auto;
+  margin-top: 50px;
   position: relative;
   background-color: ${({ theme }) => theme.colors.background};
 `;
@@ -73,7 +74,7 @@ export const Header = styled.View`
 export const Title = styled.Text`
   font-size: 24px;
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-block: 5px;
   text-transform: capitalize;
   color: ${({ theme }) => theme.colors.brand};
   font-family: "${({ theme }) => theme.fonts.heading}";
