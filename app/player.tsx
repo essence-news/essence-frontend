@@ -74,7 +74,7 @@ export interface Article {
   categories: string[];
   date_published: string;
   full_text: any;
-  id: string;
+  article_id: string;
   image: string | null;
   importance_score: number;
   processing_status: string;
@@ -143,10 +143,11 @@ export default function Player() {
     ) {
       return (
         <InfoMessage>
-          Great job on listening!
-          <br />
-          <br /> All caught up!
-          <br /> Please check back later for more news
+          <Text>
+            Great job on listening!{"\n\n"}
+            All caught up!{"\n"}
+            Please check back later for more news
+          </Text>
           <View
             style={{
               marginTop: 30,
@@ -199,7 +200,7 @@ export default function Player() {
       handleNext();
       trackEvent(
         "audioCompleted",
-        articles[currentNewsIndex].id,
+        articles[currentNewsIndex].article_id,
         articles[currentNewsIndex].title,
         currentNewsIndex,
       );
@@ -211,7 +212,7 @@ export default function Player() {
     setIsPlaying(true);
     trackEvent(
       "pause",
-      articles[currentNewsIndex].id,
+      articles[currentNewsIndex].article_id,
       articles[currentNewsIndex].title,
       currentNewsIndex,
       progress,
@@ -219,6 +220,7 @@ export default function Player() {
   };
 
   async function playSound() {
+    console.log("playSound called");
     console.log({ welcomeSoundStatus, articles: articles.length });
     const localCurrentNewsIndex = currentNewsIndex;
 
@@ -257,7 +259,7 @@ export default function Player() {
       );
       sound = await createSoundObject(
         articles[currentNewsIndex].audio_summary,
-        articles[currentNewsIndex].id,
+        articles[currentNewsIndex].article_id,
         articles[currentNewsIndex].title,
         currentNewsIndex,
       );
@@ -288,7 +290,7 @@ export default function Player() {
           .then(() => {
             trackEvent(
               "play",
-              articles[currentNewsIndex].id,
+              articles[currentNewsIndex].article_id,
               articles[currentNewsIndex].title,
               currentNewsIndex,
               progress,
@@ -306,7 +308,7 @@ export default function Player() {
             );
             trackEvent(
               "error",
-              articles[currentNewsIndex]?.id,
+              articles[currentNewsIndex]?.article_id,
               articles[currentNewsIndex]?.title,
               currentNewsIndex,
               0,
@@ -322,7 +324,7 @@ export default function Player() {
               clearInterval(tryToPlay);
               trackEvent(
                 "play",
-                articles[currentNewsIndex].id,
+                articles[currentNewsIndex].article_id,
                 articles[currentNewsIndex].title,
                 currentNewsIndex,
                 progress,
@@ -344,7 +346,7 @@ export default function Player() {
               else {
                 trackEvent(
                   "error",
-                  articles[currentNewsIndex]?.id,
+                  articles[currentNewsIndex]?.article_id,
                   articles[currentNewsIndex]?.title,
                   currentNewsIndex,
                   0,
@@ -359,11 +361,12 @@ export default function Player() {
   }
 
   async function pauseSound() {
+    console.log("pausing sound");
     await currentlyPlaying.current?.pauseAsync();
     setIsPlaying(false);
     trackEvent(
       "pause",
-      articles[currentNewsIndex].id,
+      articles[currentNewsIndex].article_id,
       articles[currentNewsIndex].title,
       currentNewsIndex,
       progress,
@@ -397,7 +400,7 @@ export default function Player() {
               });
               const sound = await createSoundObject(
                 articles[backIndex].audio_summary,
-                articles[backIndex].id,
+                articles[backIndex].article_id,
                 articles[backIndex].title,
                 backIndex,
               );
@@ -421,7 +424,7 @@ export default function Player() {
               });
               const sound = await createSoundObject(
                 articles[frontIndex].audio_summary,
-                articles[frontIndex].id,
+                articles[frontIndex].article_id,
                 articles[frontIndex].title,
                 frontIndex,
               );
@@ -739,7 +742,7 @@ export default function Player() {
     }
     trackEvent(
       "next",
-      articles[currentNewsIndex].id,
+      articles[currentNewsIndex].article_id,
       articles[currentNewsIndex].title,
       currentNewsIndex,
       progress,
@@ -753,7 +756,7 @@ export default function Player() {
     const newIndex = currentNewsIndex - 1;
     trackEvent(
       "previous",
-      articles[currentNewsIndex].id,
+      articles[currentNewsIndex].article_id,
       articles[currentNewsIndex].title,
       currentNewsIndex,
       progress,
@@ -777,7 +780,7 @@ export default function Player() {
       try {
         trackEvent(
           rating === "positive" ? "like" : "dislike",
-          currentItem.id,
+          currentItem.article_id,
           currentItem.title,
           currentNewsIndex,
           progress,
@@ -834,8 +837,9 @@ export default function Player() {
             flex: 1,
             width: "100%",
             maxWidth: 500,
-            justifyContent: "flex-end",
-            marginTop: 0,
+            justifyContent: "flex-start",
+            marginTop: "0px",
+            border: "none",
           }}
         >
           <ScrollView

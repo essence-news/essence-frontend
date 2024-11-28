@@ -17,9 +17,8 @@ import podcastPic from "@/assets/cliparts/podcast.jpg";
 
 // Keep the existing styled components that are specific to Home
 const HomeContainer = styled.View`
-  display: flex;
+  flex: 1;
   flex-direction: column;
-  min-height: 100%;
   color: #fff;
   padding: 32px;
   background: #333;
@@ -244,7 +243,9 @@ const Home = () => {
   };
 
   return (
-    <ScrollView style={{ flex: 1 }}>
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+    >
       <HomeContainer>
         <MainContent smallScreen={isTabletOrMobileDevice}>
           <LeftSection smallScreen={isTabletOrMobileDevice}>
@@ -255,11 +256,13 @@ const Home = () => {
               professionals. Get informed on your commute, no reading required.
             </Subheadline>
             <ButtonSection smallScreen={isTabletOrMobileDevice}>
-              <BetaPressable onPress={handleJoinBeta}>Join the Beta</BetaPressable>
+              <BetaPressable onPress={handleJoinBeta}>
+                <ButtonText>Join the Beta</ButtonText>
+              </BetaPressable>
               <StyledPressable
                 onPress={() => (user ? handleGotoNews() : handleSignin())}
               >
-                {user ? "Go to News" : "Sign in"}
+                {user ? <ButtonText>Go to News</ButtonText> : <ButtonText>Sign in</ButtonText>}
               </StyledPressable>
             </ButtonSection>
           </LeftSection>
@@ -327,11 +330,13 @@ const Home = () => {
         <Footer>
           <Brand>essence</Brand>
           <ButtonSection smallScreen={isTabletOrMobileDevice}>
-            <BetaPressable>Join the Beta</BetaPressable>
+            <BetaPressable onPress={handleJoinBeta}>
+              <ButtonText>Join the Beta</ButtonText>
+            </BetaPressable>
             <StyledPressable
               onPress={() => (user ? handleGotoNews() : handleSignin())}
             >
-              {user ? "Go to News" : "Sign in"}
+              {user ? <ButtonText>Go to News</ButtonText> : <ButtonText>Sign in</ButtonText>}
             </StyledPressable>
           </ButtonSection>
           <FooterLinks>
