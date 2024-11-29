@@ -48,7 +48,8 @@ import { mockNewsData } from "@/constants/mock";
 import { flushQueue, trackEvent } from "@/utils/trackingUtil";
 import styled from "styled-components/native";
 import { LinearGradient } from "expo-linear-gradient";
-import { createSoundObject } from "@/utils/commonUtils";
+import { createSoundObject, getTimeOfDay } from "@/utils/commonUtils";
+import { router } from "expo-router";
 
 export const CircularButton = styled.Pressable`
   justify-content: center;
@@ -91,16 +92,9 @@ export interface Article {
   sound?: Audio.Sound;
 }
 
-const getTimeOfDay = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return "morning";
-  if (hour < 17) return "afternoon";
-  return "evening";
-};
-
 export default function Player() {
   const [currentNewsIndex, setCurrentNewsIndex] = useState<number>(-1);
-  const { user, ensureTokenValidity, initialWelcomeSound } = useAuth();
+  const { user, prepareWelcomeSound, initialWelcomeSound } = useAuth();
   const mounted = useRef(false);
   const userRef = useRef(user);
   const theme = useTheme();
@@ -529,6 +523,8 @@ export default function Player() {
 
     if (!append && (!inactiveSince || !isLessThan2Hours(+inactiveSince))) {
       console.log("will play welcome sound");
+      if (inactiveSince && !isLessThan2Hours(+inactiveSince))
+        await prepareWelcomeSound();
       // handle when we get data after last entry
       setAndPlayWelcomeSound();
     } else {
@@ -698,26 +694,33 @@ export default function Player() {
     };
   }, [welcomeSoundStatus, currentlyPlaying.current]);
 
-  useEffect(() => {
-    console.log("***********callling load");
-    load();
-    return async () => {
-      await currentlyPlaying.current?.stopAsync();
-      await currentlyPlaying.current?.unloadAsync();
-      await welcomeSoundRef.current?.stopAsync();
-      await welcomeSoundRef.current?.unloadAsync();
-    };
-  }, []);
+  // useEffect(() => {
+  //   console.log("***********callling load");
+  //   load();
+  //   return async () => {
+  //     await currentlyPlaying.current?.stopAsync();
+  //     await currentlyPlaying.current?.unloadAsync();
+  //     await welcomeSoundRef.current?.stopAsync();
+  //     await welcomeSoundRef.current?.unloadAsync();
+  //   };
+  // }, []);
 
   useEffect(() => {
     console.log("will call play sound with currentNewsIndex", {
       currentNewsIndex,
     });
+    if (!mounted.current) {
+      console.log("***********callling load");
+      load();
+    }
     if (mounted.current && currentNewsIndex < articles.length) {
       playSound();
       prepareSounds(currentNewsIndex);
     }
-    if (currentNewsIndex >= articles.length) {
+    if (
+      currentNewsIndex >= articles.length &&
+      welcomeSoundStatus !== "playing"
+    ) {
       setWelcomeSoundStatus("ignored");
     }
     mounted.current = true;
@@ -812,6 +815,7 @@ export default function Player() {
   // console.log({ progress, showPlayerControls });
   console.log({
     welcomeSoundStatus,
+    showWelcomeScreen,
     isPlaying,
     isLoading,
     needsUserInput,
@@ -823,8 +827,11 @@ export default function Player() {
   return (
     <SafeAreaView style={styles.container}>
       <BrandHeader />
-      <Pressable>
-        <AntDesign name="setting" color={theme.colors.primary} size={16} />
+      <Pressable
+        style={{ zIndex: 11, position: "absolute", right: 20, top: 14 }}
+        onPress={() => router.push("/preferences")}
+      >
+        <AntDesign name="setting" color={theme.colors.brand} size={24} />
       </Pressable>
       <GestureRecognizer
         onSwipeLeft={handleLeftSwipe}
@@ -888,7 +895,7 @@ export default function Player() {
                 <TopSection>
                   {showWelcomeScreen && welcomeSoundStatus !== "loading" ? (
                     <PlaylistInfo>
-                      <Title>Hello {user?.firstName}</Title>
+                      <Title>Hello {user?.first_name}</Title>
                       <Subtitle>Your {getTimeOfDay()} newscast</Subtitle>
                     </PlaylistInfo>
                   ) : (

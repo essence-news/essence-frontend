@@ -6,10 +6,12 @@ import theme from "@/constants/theme";
 import { getPreferences } from "@/utils/api";
 import { useAuth } from "@/utils/AuthProvider";
 import { OptionType, preferencesFormConfig } from "@/utils/preferencesData";
+import { capitalize } from "@/utils/stringUtils";
 import { AntDesign } from "@expo/vector-icons";
 import AsyncStorage, {
   useAsyncStorage,
 } from "@react-native-async-storage/async-storage";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Pressable,
@@ -58,6 +60,8 @@ type PreferencesType = {
 
 export default function Preferences() {
   const [isFocus, setIsFocus] = useState("");
+  const { fromSignIn } = useLocalSearchParams();
+
   const { user } = useAuth();
   const [showAddModal, setShowAddModal] = useState<any>(null);
   const [initialPreferences, setInitialPreferences] = useState<
@@ -69,11 +73,10 @@ export default function Preferences() {
   useEffect(() => {
     async function init() {
       const preferencesData = await getPreferences();
-      const emailID = await AsyncStorage.getItem("emailID");
       setInitialPreferences({
         ...preferencesData,
         firstName: user?.firstName || "",
-        emailID: emailID || "",
+        emailID: user?.email || "",
       });
     }
     init();
@@ -89,6 +92,10 @@ export default function Preferences() {
     handleCheckboxToggle(option.id, addValue, true);
     onCancel();
   }
+
+  const handleSave = () => {
+    router.push("/player");
+  };
   const handleCheckboxToggle = (
     id: string,
     value: string,
@@ -171,9 +178,11 @@ export default function Preferences() {
               justifyContent: "space-between",
             }}
           >
-            <Pressable>
-              <AntDesign name="left" size={20} color={theme.colors.primary} />
-            </Pressable>
+            {!fromSignIn && (
+              <Pressable onPress={() => router.push("/player")}>
+                <AntDesign name="left" size={20} color={theme.colors.primary} />
+              </Pressable>
+            )}
             <Text
               style={{
                 fontSize: 16,
@@ -258,19 +267,19 @@ export default function Preferences() {
                     )
                   ) {
                     data.push({
-                      label: `${f.charAt(0).toUpperCase()}${f.slice(1)}`,
+                      label: capitalize(f),
                       value: f,
                       selected: true,
                     });
                   }
                 });
               }
-              console.log("multiselect", p.id, {
-                p,
-                data,
-                payload,
-                initialPreferences,
-              });
+              // console.log("multiselect", p.id, {
+              //   p,
+              //   data,
+              //   payload,
+              //   initialPreferences,
+              // });
               return (
                 <View
                   key={p.id}

@@ -7,11 +7,11 @@ import {
   useRef,
 } from "react";
 import { signIn, verifyEmail, verifyToken, refreshToken } from "./api";
-import { toCamelCase } from "./stringUtils";
+import { capitalize, toCamelCase } from "./stringUtils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { Sound } from "expo-av/build/Audio";
-import { createSoundObject } from "./commonUtils";
+import { createSoundObject, getTimeOfDay } from "./commonUtils";
 import { ActivityIndicator } from "react-native";
 import theme from "@/constants/theme";
 
@@ -59,63 +59,95 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const initialWelcomeSound = useRef<{
     sound: Sound | null;
     uri: string;
   } | null>(null);
 
-  // New function to update firstName in localStorage and state
-  const updateFirstName = async (newFirstName: string) => {
-    console.log("will update first name", newFirstName);
-    if (newFirstName) {
-      await AsyncStorage.setItem("firstName", toCamelCase(newFirstName));
-      setUser((prevUser) => ({
-        ...prevUser,
-        firstName: toCamelCase(newFirstName),
-      }));
-    }
-  };
-
   // Modified getLoginStatus method
   const getLoginStatus = async () => {
     const today = new Date().toDateString();
-    const firstName = (await AsyncStorage.getItem("firstName")) ?? "";
+    const user = (await AsyncStorage.getItem("user")) ?? "";
     const lastLoginDate = await AsyncStorage.getItem("lastLoginDate");
-    const isFirstTimeEver =
-      (await AsyncStorage.getItem("isFirstTimeEver")) || "true";
     const isFirstTimeToday = lastLoginDate !== today;
-
+    const inactiveSince = await AsyncStorage.getItem("inactiveSince");
     await AsyncStorage.setItem("lastLoginDate", today);
-    if (isFirstTimeEver === "true") {
-      await AsyncStorage.setItem("isFirstTimeEver", "false");
+    let isFirstTimeEver = true;
+    if (inactiveSince) {
+      isFirstTimeEver = false;
     }
 
     console.log("last login status", {
-      firstName,
+      firstName: user?.first_name,
       isFirstTimeEver,
       isFirstTimeToday,
       today,
       lastLoginDate,
     });
 
-    return { firstName, isFirstTimeEver, isFirstTimeToday };
+    return {
+      firstName: user?.first_name,
+      isFirstTimeEver,
+      isFirstTimeToday,
+    };
   };
 
   // Modified logout method
   const logout = async () => {
-    const firstName = await AsyncStorage.getItem("firstName");
+    const user = await AsyncStorage.getItem("user");
     await AsyncStorage.clear();
-    if (firstName) {
-      await AsyncStorage.setItem("firstName", firstName);
+    if (user) {
+      await AsyncStorage.setItem("user", user);
     }
     setUser(undefined);
     router.push("/sign-in");
     initialWelcomeSound.current = null;
   };
 
+  const prepareWelcomeSound = async () => {
+    const user = await AsyncStorage.getItem("user");
+    console.log("prepareWelcomeSound", { user });
+
+    const initialWelcomeSoundURI = await AsyncStorage.getItem(
+      "initial_welcome_sound_uri",
+    );
+    if (user) {
+      const userObj = JSON.parse(user);
+      const { intro_audio_urls } = userObj;
+      const introFileName =
+        capitalize(userObj.isFirstTimeEver.toString()) +
+        "_" +
+        capitalize(userObj.isFirstTimeToday.toString()) +
+        "_" +
+        getTimeOfDay();
+
+      console.log("ensureTokenValidity", {
+        intro_audio_urls,
+        introFileName,
+      });
+      const welcomeSoundURI = intro_audio_urls[introFileName];
+      const welcomeSound = await createSoundObject(welcomeSoundURI);
+      initialWelcomeSound.current = {
+        sound: welcomeSound,
+        uri: welcomeSoundURI,
+      };
+    } else if (initialWelcomeSoundURI) {
+      const welcomeSound = await createSoundObject(initialWelcomeSoundURI);
+      initialWelcomeSound.current = {
+        sound: welcomeSound,
+        uri: initialWelcomeSoundURI,
+      };
+    }
+  };
+
   // New method to check token expiration
   const ensureTokenValidity = async () => {
+    const user = await AsyncStorage.getItem("user");
+    console.log("ensure token validity", { user });
+    if (!user) {
+      logout();
+    }
     try {
       setLoading(true);
       const token = await AsyncStorage.getItem("userToken");
@@ -123,27 +155,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Check if the token is valid
         await verifyToken();
         // Get the user's login status - to update the login time, etc
-        const { firstName, isFirstTimeEver, isFirstTimeToday } =
-          await getLoginStatus();
-        const userObj = {
-          token,
-          firstName,
-          isFirstTimeEver,
-          isFirstTimeToday,
-        };
-        const welcomeSoundURI = await AsyncStorage.getItem(
-          "initial_welcome_sound_uri",
-        );
-        if (welcomeSoundURI) {
-          const welcomeSound = await createSoundObject(welcomeSoundURI);
-          initialWelcomeSound.current = {
-            sound: welcomeSound,
-            uri: welcomeSoundURI,
-          };
+        const { isFirstTimeEver, isFirstTimeToday } = await getLoginStatus();
+        //  {
+        //   token,
+        //   firstName,
+        //   isFirstTimeEver,
+        //   isFirstTimeToday,
+        // };
+        await prepareWelcomeSound();
+        if (user) {
+          const userObj = JSON.parse(user);
+
+          console.log("Setting", { userObj });
+          const userPayload = { ...userObj, isFirstTimeToday, isFirstTimeEver };
+          await AsyncStorage.setItem("user", JSON.stringify(userPayload));
+          if (userObj) setUser(userPayload);
+          return userObj;
         }
-        console.log("Setting", { userObj });
-        setUser(userObj);
-        return userObj;
       } else {
         // If there's no token, just set user to null without attempting verification
         setUser(undefined);
@@ -154,16 +182,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const newToken = await refreshToken();
         await AsyncStorage.setItem("userToken", newToken);
-        const { firstName, isFirstTimeEver, isFirstTimeToday } =
-          await getLoginStatus();
-        const userObj = {
-          token,
-          firstName,
-          isFirstTimeEver,
-          isFirstTimeToday,
-        };
-        setUser(userObj);
-        return userObj;
+        const { isFirstTimeEver, isFirstTimeToday } = await getLoginStatus();
+        if (user) {
+          const userObj = JSON.parse(user);
+
+          const userPayload = { ...userObj, isFirstTimeToday, isFirstTimeEver };
+          await AsyncStorage.setItem("user", JSON.stringify(userPayload));
+          if (userObj) setUser(userPayload);
+          return userObj;
+        }
+        return undefined;
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
         // If the token refresh fails, log the user out
@@ -183,31 +211,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   ) => {
     try {
       const result = await signIn(email, inputFirstName, country, language);
-      const welcomeSound = await createSoundObject(result.welcomeSound);
+      // const welcomeSound = await createSoundObject(result.welcomeSound);
       await AsyncStorage.setItem(
         "initial_welcome_sound_uri",
         result.welcomeSound,
       );
-
-      initialWelcomeSound.current = {
-        sound: welcomeSound,
-        uri: result.welcomeSound,
-      };
+      await prepareWelcomeSound();
+      // initialWelcomeSound.current = {
+      //   sound: welcomeSound,
+      //   uri: result.welcomeSound,
+      // };
       console.log("Result welcome sound", { w: result.welcomeSound });
-      // if (result.token) {
-      //   await AsyncStorage.setItem("userToken", result.token);
-      //   updateFirstName(inputFirstName);
-
-      //   const { firstName, isFirstTimeEver, isFirstTimeToday } =
-      //     await getLoginStatus();
-
-      //   setUser({
-      //     token: result.token,
-      //     firstName: firstName || inputFirstName,
-      //     isFirstTimeEver,
-      //     isFirstTimeToday,
-      //   });
-      // }
       return result;
     } catch (error) {
       console.error("Login error:", error);
@@ -223,23 +237,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   ) => {
     try {
       setLoading(true);
-      const userData = await verifyEmail(email, verificationCode);
-      if (userData.token) {
-        await AsyncStorage.setItem("userToken", userData.token);
-        await AsyncStorage.setItem("isFirstTimeEver", "true");
-        await AsyncStorage.setItem("lastLoginTime", "" + new Date().getTime());
-        await AsyncStorage.setItem("emailID", email);
-        const { isFirstTimeEver, isFirstTimeToday } = await getLoginStatus();
-        console.log("verify", inputFirstName);
-        await updateFirstName(inputFirstName);
+      const response = await verifyEmail(email, verificationCode);
+      if (response.token) {
+        await AsyncStorage.setItem("userToken", response.token);
 
-        await AsyncStorage.setItem("emailID", email);
-        setUser({
-          token: userData.token,
-          firstName: inputFirstName,
-          isFirstTimeEver,
-          isFirstTimeToday,
-        });
+        const user = await AsyncStorage.getItem("user");
+        let userObj;
+        let isFirstTimeEver = false;
+        if (user) {
+          isFirstTimeEver = false;
+        } else {
+          isFirstTimeEver = true;
+        }
+        userObj = response.user;
+        const { isFirstTimeToday } = await getLoginStatus();
+        const userPayload = { ...userObj, isFirstTimeToday, isFirstTimeEver };
+        console.log("verify will set user", { userPayload });
+        await AsyncStorage.setItem("user", JSON.stringify(userPayload));
+        setUser(userPayload);
       }
       return true;
     } catch (error) {
@@ -270,7 +285,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loading,
     setLoading,
     ensureTokenValidity,
-    updateFirstName,
+    prepareWelcomeSound,
     initialWelcomeSound: initialWelcomeSound.current,
   };
   console.log({ loading });

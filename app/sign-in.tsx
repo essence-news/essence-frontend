@@ -30,11 +30,10 @@ export default function Login() {
   const [userFirstName, setUserFirstName] = useState("");
   useEffect(() => {
     async function init() {
-      const storageFirstName = await AsyncStorage.getItem("firstName");
+      const user = await AsyncStorage.getItem("user");
       await AsyncStorage.clear();
-      if (storageFirstName) {
-        await AsyncStorage.setItem("firstName", storageFirstName);
-        setUserFirstName(storageFirstName);
+      if (user) {
+        setUserFirstName(user.first_name);
       }
     }
     init();
@@ -69,7 +68,15 @@ export default function Login() {
         userFirstName || firstName,
       );
       if (success) {
-        router.replace("/player");
+        console.log("userFirstName", userFirstName);
+        if (userFirstName) router.replace("/player");
+        else
+          router.replace({
+            pathname: "/preferences",
+            params: {
+              fromSignIn: "yes",
+            },
+          });
       } else {
         throw new Error(
           "Verification failed. Please check your code and try again.",

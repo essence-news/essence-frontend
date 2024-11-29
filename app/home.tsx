@@ -208,7 +208,6 @@ const BetaPressable = styled.Pressable`
   text-align: center;
 `;
 
-
 const Home = () => {
   const { user } = useAuth();
   const isTabletOrMobileDevice = useMediaQuery({
@@ -224,11 +223,11 @@ const Home = () => {
 
   const init = async () => {
     const token = await AsyncStorage.getItem("userToken");
-    const firstName = await AsyncStorage.getItem("firstName");
+    console.log("home", { token });
     if (token) {
       router.push("/player");
     } else {
-      if (firstName) router.push("/sign-in");
+      router.push("/sign-in");
     }
   };
 
@@ -243,9 +242,7 @@ const Home = () => {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1 }}
-    >
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <HomeContainer>
         <MainContent smallScreen={isTabletOrMobileDevice}>
           <LeftSection smallScreen={isTabletOrMobileDevice}>
@@ -262,7 +259,11 @@ const Home = () => {
               <StyledPressable
                 onPress={() => (user ? handleGotoNews() : handleSignin())}
               >
-                {user ? <ButtonText>Go to News</ButtonText> : <ButtonText>Sign in</ButtonText>}
+                {user ? (
+                  <ButtonText>Go to News</ButtonText>
+                ) : (
+                  <ButtonText>Sign in</ButtonText>
+                )}
               </StyledPressable>
             </ButtonSection>
           </LeftSection>
@@ -336,7 +337,11 @@ const Home = () => {
             <StyledPressable
               onPress={() => (user ? handleGotoNews() : handleSignin())}
             >
-              {user ? <ButtonText>Go to News</ButtonText> : <ButtonText>Sign in</ButtonText>}
+              {user ? (
+                <ButtonText>Go to News</ButtonText>
+              ) : (
+                <ButtonText>Sign in</ButtonText>
+              )}
             </StyledPressable>
           </ButtonSection>
           <FooterLinks>
