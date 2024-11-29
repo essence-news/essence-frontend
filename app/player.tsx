@@ -444,6 +444,7 @@ export default function Player() {
       current: new Date().getTime(),
       diff: new Date().getTime() - lastTime,
       Twohrs: 2 * 60 * 60 * 1000,
+      res: new Date().getTime() - lastTime <= 2 * 60 * 60 * 1000,
     });
     return new Date().getTime() - lastTime <= 2 * 60 * 60 * 1000;
   };

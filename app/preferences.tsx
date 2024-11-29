@@ -14,12 +14,14 @@ import AsyncStorage, {
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  Platform,
   Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { CollapsibleHeaderScrollView } from "react-native-collapsible-header-views";
 import { MultiSelect } from "react-native-element-dropdown";
 import styled from "styled-components/native";
 
@@ -27,7 +29,6 @@ export const PreferencesContainer = styled.View`
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
-  margin-top: 50px;
   background-color: ${({ theme }) => theme.colors.background};
 
   position: relative;
@@ -57,6 +58,18 @@ type PreferencesType = {
   topics: string;
   brands: string;
 };
+
+const StyledCollapsibleHeaderScrollView = styled(CollapsibleHeaderScrollView)`
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+`;
+const StyledContainer = styled.View`
+  flex: 1;
+  justify-content: space-between;
+`;
 
 export default function Preferences() {
   const [isFocus, setIsFocus] = useState("");
@@ -152,255 +165,265 @@ export default function Preferences() {
   };
   // console.log("render", { payload });
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "space-between",
-        // backgroundColor: "rgba(0, 0, 0, 0.7)",
-      }}
-    >
+    <StyledContainer>
       <ScrollView
         contentContainerStyle={{
-          marginBottom: 80,
           flex: 1,
         }}
       >
         <BrandHeader />
 
-        <PreferencesContainer style={{ paddingInline: 20 }}>
-          <View
-            style={{
-              flex: 1,
-              marginBlock: 25,
-              flexDirection: "row",
-              alignItems: "center",
-              width: "100%",
-              justifyContent: "space-between",
-            }}
-          >
-            {!fromSignIn && (
-              <Pressable onPress={() => router.push("/player")}>
-                <AntDesign name="left" size={20} color={theme.colors.primary} />
-              </Pressable>
-            )}
-            <Text
+        <StyledCollapsibleHeaderScrollView
+          CollapsibleHeaderComponent={
+            <View
               style={{
-                fontSize: 16,
-                padding: 10,
-                margin: 0,
-                textAlign: "left",
-                borderTopStartRadius: 5,
-                borderTopEndRadius: 5,
-                color: theme.colors.primary,
-                fontFamily: theme.fonts.headingBold,
-                flex: 1,
+                // flex: 1,
+                padding: 20,
+                marginTop: 40,
+                flexDirection: "row",
+                alignItems: "center",
+                width: "100%",
+                justifyContent: "space-between",
               }}
             >
-              Preferences
-            </Text>
-            <Button
-              onPress={() => console.log("will send", payload)}
-              style={{
-                backgroundColor: theme.colors.primary,
-                color: theme.colors.secondary,
-                fontSize: 14,
-              }}
-            >
-              Save
-            </Button>
-          </View>
-          {preferencesFormConfig
-            .filter((f) => f.type === "text")
-            .map((f) => (
-              <View key={f.id} style={{ marginTop: 20 }}>
-                <PreferencesLabel>
-                  {f.label}
-                  {f.mandatory && (
-                    <Text style={{ color: theme.colors.error }}>*</Text>
-                  )}
-                </PreferencesLabel>
-                {f.footnote && (
-                  <Text style={{ fontSize: 10 }}>{f.footnote}</Text>
-                )}
-                <Input
-                  id={f.id}
-                  // placeholder="Verification Code"
-                  value={payload?.[f.id]}
-                  defaultValue={initialPreferences?.[f.id] || ""}
-                  onChangeText={(v) => {
-                    // console.log({ f, v });
-                    setPayload((p) => ({
-                      ...p,
-                      [f.id]: v,
-                    }));
-                  }}
-                  // disabled={isLoading}
-                  style={{
-                    marginTop: 10,
-                    backgroundColor: f.disabled
-                      ? "rgba(0, 0, 0, 0.1)"
-                      : "initial",
-                  }}
-                  focusable={!f.disabled}
-                  editable={!f.disabled}
-                />
-              </View>
-            ))}
-          {preferencesFormConfig
-            .filter((f) => f.type === "multiselect")
-            .map((p) => {
-              const data = [...(p.defaultValues || [])];
-              if (payload?.[p.id] !== "") {
-                const definedValues =
-                  payload?.[p.id] !== undefined
-                    ? payload?.[p.id]?.split(",")
-                    : initialPreferences?.[p.id]
-                        ?.split(",")
-                        .map((e) => e.trim()) || [];
-
-                definedValues.forEach((f) => {
-                  if (
-                    !data.find(
-                      (val) =>
-                        val.value.trim().toLowerCase() ===
-                        f.trim().toLowerCase(),
-                    )
-                  ) {
-                    data.push({
-                      label: capitalize(f),
-                      value: f,
-                      selected: true,
-                    });
-                  }
-                });
-              }
-              // console.log("multiselect", p.id, {
-              //   p,
-              //   data,
-              //   payload,
-              //   initialPreferences,
-              // });
-              return (
-                <View
-                  key={p.id}
-                  style={{
-                    gap: 10,
-                    marginBlock: 25,
-                  }}
-                >
-                  <View>
-                    <PreferencesLabel>
-                      {p.label}
-                      {p.mandatory && (
-                        <Text style={{ color: theme.colors.error }}>*</Text>
-                      )}
-                    </PreferencesLabel>
-                    {p.footnote && (
-                      <Text style={{ fontSize: 10 }}>{p.footnote}</Text>
+              {!fromSignIn && (
+                <Pressable onPress={() => router.push("/player")}>
+                  <AntDesign
+                    name="left"
+                    size={20}
+                    color={theme.colors.primary}
+                  />
+                </Pressable>
+              )}
+              <Text
+                style={{
+                  fontSize: 16,
+                  padding: 10,
+                  margin: 0,
+                  textAlign: "left",
+                  borderTopStartRadius: 5,
+                  borderTopEndRadius: 5,
+                  color: theme.colors.primary,
+                  fontFamily: theme.fonts.headingBold,
+                  flex: 1,
+                }}
+              >
+                Preferences
+              </Text>
+              <Button
+                onPress={() => console.log("will send", payload)}
+                style={{
+                  backgroundColor: theme.colors.primary,
+                  color: theme.colors.secondary,
+                  fontSize: 14,
+                }}
+              >
+                Save
+              </Button>
+            </View>
+          }
+          headerHeight={110}
+          headerContainerBackgroundColor={theme.colors.secondary}
+          statusBarHeight={Platform.OS === "ios" ? 20 : 0}
+        >
+          <PreferencesContainer style={{ paddingInline: 20 }}>
+            {preferencesFormConfig
+              .filter((f) => f.type === "text")
+              .map((f) => (
+                <View key={f.id} style={{ marginTop: 20 }}>
+                  <PreferencesLabel>
+                    {f.label}
+                    {f.mandatory && (
+                      <Text style={{ color: theme.colors.error }}>*</Text>
                     )}
-                  </View>
-                  <View
+                  </PreferencesLabel>
+                  {f.footnote && (
+                    <Text style={{ fontSize: 10 }}>{f.footnote}</Text>
+                  )}
+                  <Input
+                    id={f.id}
+                    // placeholder="Verification Code"
+                    value={payload?.[f.id]}
+                    defaultValue={initialPreferences?.[f.id] || ""}
+                    onChangeText={(v) => {
+                      // console.log({ f, v });
+                      setPayload((p) => ({
+                        ...p,
+                        [f.id]: v,
+                      }));
+                    }}
+                    // disabled={isLoading}
                     style={{
-                      flexDirection: "row",
-                      flex: 1,
-                      alignItems:
-                        // (data?.filter((d) => d.selected) || []).length > 0
-                        //   ? "start"
-                        // :
-                        "start",
+                      marginTop: 10,
+                      backgroundColor: f.disabled
+                        ? "rgba(0, 0, 0, 0.1)"
+                        : "initial",
+                    }}
+                    focusable={!f.disabled}
+                    editable={!f.disabled}
+                  />
+                </View>
+              ))}
+            {preferencesFormConfig
+              .filter((f) => f.type === "multiselect")
+              .map((p) => {
+                const data = [...(p.defaultValues || [])];
+                if (payload?.[p.id] !== "") {
+                  const definedValues =
+                    payload?.[p.id] !== undefined
+                      ? payload?.[p.id]?.split(",")
+                      : initialPreferences?.[p.id]
+                          ?.split(",")
+                          .map((e) => e.trim()) || [];
+
+                  definedValues.forEach((f) => {
+                    if (
+                      !data.find(
+                        (val) =>
+                          val.value.trim().toLowerCase() ===
+                          f.trim().toLowerCase(),
+                      )
+                    ) {
+                      data.push({
+                        label: capitalize(f),
+                        value: f,
+                        selected: true,
+                      });
+                    }
+                  });
+                }
+                // console.log("multiselect", p.id, {
+                //   p,
+                //   data,
+                //   payload,
+                //   initialPreferences,
+                // });
+                return (
+                  <View
+                    key={p.id}
+                    style={{
                       gap: 10,
+                      marginBlock: 25,
                     }}
                   >
-                    <View style={{ flex: 1 }}>
-                      <MultiSelect
-                        style={[
-                          styles.dropdown,
-                          isFocus && { borderColor: theme.colors.primaryLight },
-                        ]}
-                        placeholderStyle={styles.placeholderStyle}
-                        // selectedTextStyle={styles.selectedTextStyle}
-                        // inputSearchStyle={styles.inputSearchStyle}
-                        // iconStyle={styles.iconStyle}
-                        data={data}
-                        // search
-                        // in
-                        value={
-                          payload?.[p.id]?.split(",") ||
-                          initialPreferences?.[p.id]
-                            ?.split(",")
-                            .map((e) => e.trim()) ||
-                          []
-                        }
-                        maxHeight={300}
-                        labelField="label"
-                        valueField="value"
-                        placeholder={!isFocus ? "" : ""}
-                        searchPlaceholder="Search..."
-                        onFocus={() => setIsFocus(p.id)}
-                        onBlur={() => setIsFocus("")}
-                        onChange={(item) => {
-                          // console.log({ item, p });
-                          setPayload((pload) => ({
-                            ...pload,
-                            [p.id]: item.join(","),
-                          }));
-                          setIsFocus("");
-                        }}
-                        renderSelectedItem={(item, unSelect) => {
-                          // console.log("renderSelectedItem", { item });
-                          return (
-                            <TouchableOpacity
-                              onPress={() => unSelect && unSelect(item)}
-                            >
-                              <View style={styles.selectedStyle}>
-                                <Text style={styles.textSelectedStyle}>
-                                  {item.label}
-                                </Text>
-                                <AntDesign
-                                  color={theme.colors.primary}
-                                  name="close"
-                                  size={12}
-                                />
-                              </View>
-                            </TouchableOpacity>
-                          );
-                        }}
-                        renderItem={(...params) => renderItem(p.id, ...params)}
-                      />
+                    <View>
+                      <PreferencesLabel>
+                        {p.label}
+                        {p.mandatory && (
+                          <Text style={{ color: theme.colors.error }}>*</Text>
+                        )}
+                      </PreferencesLabel>
+                      {p.footnote && (
+                        <Text style={{ fontSize: 10 }}>{p.footnote}</Text>
+                      )}
                     </View>
-                    <Pressable
-                      onPress={() => setShowAddModal(p)}
+                    <View
                       style={{
                         flexDirection: "row",
-                        gap: 5,
-                        paddingTop: 8,
-                        alignItems: "center",
+                        flex: 1,
+                        alignItems:
+                          // (data?.filter((d) => d.selected) || []).length > 0
+                          //   ? "start"
+                          // :
+                          "start",
+                        gap: 10,
                       }}
                     >
-                      <StyledAction name="pluscircleo" size={14} />
-                      <StyledActionText>Add new</StyledActionText>
-                    </Pressable>
+                      <View style={{ flex: 1 }}>
+                        <MultiSelect
+                          style={[
+                            styles.dropdown,
+                            isFocus && {
+                              borderColor: theme.colors.primaryLight,
+                            },
+                          ]}
+                          placeholderStyle={styles.placeholderStyle}
+                          // selectedTextStyle={styles.selectedTextStyle}
+                          // inputSearchStyle={styles.inputSearchStyle}
+                          // iconStyle={styles.iconStyle}
+                          data={data}
+                          // search
+                          // in
+                          value={
+                            payload?.[p.id]?.split(",") ||
+                            initialPreferences?.[p.id]
+                              ?.split(",")
+                              .map((e) => e.trim()) ||
+                            []
+                          }
+                          maxHeight={300}
+                          labelField="label"
+                          valueField="value"
+                          placeholder={!isFocus ? "" : ""}
+                          searchPlaceholder="Search..."
+                          onFocus={() => setIsFocus(p.id)}
+                          onBlur={() => setIsFocus("")}
+                          onChange={(item) => {
+                            // console.log({ item, p });
+                            setPayload((pload) => ({
+                              ...pload,
+                              [p.id]: item.join(","),
+                            }));
+                            setIsFocus("");
+                          }}
+                          renderSelectedItem={(item, unSelect) => {
+                            // console.log("renderSelectedItem", { item });
+                            return (
+                              <TouchableOpacity
+                                onPress={() => unSelect && unSelect(item)}
+                              >
+                                <View style={styles.selectedStyle}>
+                                  <Text style={styles.textSelectedStyle}>
+                                    {item.label}
+                                  </Text>
+                                  <AntDesign
+                                    color={theme.colors.primary}
+                                    name="close"
+                                    size={12}
+                                  />
+                                </View>
+                              </TouchableOpacity>
+                            );
+                          }}
+                          renderItem={(...params) =>
+                            renderItem(p.id, ...params)
+                          }
+                        />
+                      </View>
+                      <Pressable
+                        onPress={() => setShowAddModal(p)}
+                        style={{
+                          flexDirection: "row",
+                          gap: 5,
+                          paddingTop: 8,
+                          alignItems: "center",
+                        }}
+                      >
+                        <StyledAction name="pluscircleo" size={14} />
+                        <StyledActionText>Add new</StyledActionText>
+                      </Pressable>
+                    </View>
                   </View>
-                </View>
-              );
-            })}
-          {!!showAddModal && (
-            <OkCancelModal
-              onCancel={onCancel}
-              onOk={onOkInAddModal}
-              label={"Add Custom " + showAddModal.label}
-            >
-              <Input
-                onChangeText={setAddValue}
-                value={addValue}
-                style={styles.textInput}
-                placeholder=""
-              />
-            </OkCancelModal>
-          )}
-        </PreferencesContainer>
+                );
+              })}
+            {!!showAddModal && (
+              <OkCancelModal
+                onCancel={onCancel}
+                onOk={onOkInAddModal}
+                label={"Add Custom " + showAddModal.label}
+              >
+                <Input
+                  onChangeText={setAddValue}
+                  value={addValue}
+                  style={styles.textInput}
+                  placeholder=""
+                />
+              </OkCancelModal>
+            )}
+          </PreferencesContainer>
+        </StyledCollapsibleHeaderScrollView>
       </ScrollView>
-    </View>
+    </StyledContainer>
   );
 }
 
