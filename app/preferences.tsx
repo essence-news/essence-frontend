@@ -1,16 +1,13 @@
 import BrandHeader from "@/components/BrandHeader";
 import { CheckBox } from "@/components/Checkbox";
 import { OkCancelModal } from "@/components/Modal";
-import { Button, Input, Title } from "@/components/SharedComponents";
+import { Button, Input } from "@/components/SharedComponents";
 import theme from "@/constants/theme";
 import { getPreferences } from "@/utils/api";
 import { useAuth } from "@/utils/AuthProvider";
 import { OptionType, preferencesFormConfig } from "@/utils/preferencesData";
 import { capitalize } from "@/utils/stringUtils";
 import { AntDesign } from "@expo/vector-icons";
-import AsyncStorage, {
-  useAsyncStorage,
-} from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -179,7 +176,7 @@ export default function Preferences() {
               style={{
                 // flex: 1,
                 padding: 20,
-                marginTop: 40,
+                marginTop: 50,
                 flexDirection: "row",
                 alignItems: "center",
                 width: "100%",
@@ -218,11 +215,19 @@ export default function Preferences() {
                   fontSize: 14,
                 }}
               >
-                Save
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontFamily: theme.fonts.body,
+                    color: theme.colors.secondary,
+                  }}
+                >
+                  Save
+                </Text>
               </Button>
             </View>
           }
-          headerHeight={110}
+          headerHeight={130}
           headerContainerBackgroundColor={theme.colors.secondary}
           statusBarHeight={Platform.OS === "ios" ? 20 : 0}
         >

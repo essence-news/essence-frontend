@@ -193,7 +193,6 @@ export const MainContent = styled.View`
   flex-direction: column;
   justify-content: space-between;
   padding: 20px;
-  padding-top: 100px;
 `;
 
 export const SigninMainContent = styled.View`
@@ -206,14 +205,12 @@ export const SigninMainContent = styled.View`
 `;
 
 export const TopSection = styled.View`
-  padding-top: 90px;
   width: 100%;
   position: relative;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  transition: padding-top 1s ease-out;
 `;
 
 export const CenterButton = styled.Pressable`
