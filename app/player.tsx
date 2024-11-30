@@ -8,6 +8,8 @@ import {
   ImageBackground,
   Pressable,
   Platform,
+  Linking,
+  ActivityIndicator,
 } from "react-native";
 import GestureRecognizer from "react-native-swipe-gestures";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -66,6 +68,7 @@ const StyledCollapsibleHeaderScrollView = styled(CollapsibleHeaderScrollView)`
 `;
 
 const WebViewContainer = styled.View`
+  flex: 1;
   margin-top: 0px;
 `;
 
@@ -244,7 +247,8 @@ export default function Player() {
     if (
       (welcomeSoundStatus !== "completed" &&
         welcomeSoundStatus !== "ignored") ||
-      articles.length === 0
+      articles.length === 0 ||
+      isPlaying
     ) {
       return;
     }
@@ -736,7 +740,6 @@ export default function Player() {
     if (!mounted.current) {
       console.log("***********callling load");
       load();
-      WebView;
     }
     if (mounted.current && currentNewsIndex < articles.length) {
       playSound();
@@ -843,13 +846,29 @@ export default function Player() {
       val,
       url: articles[currentNewsIndex].url,
     });
-    setShowWebView(val);
     if (val) {
       pauseSound();
+      if (Platform.OS === "web")
+        Linking.openURL(articles[currentNewsIndex].url);
+      else {
+        setIsLoading(true);
+        setShowWebView(true);
+      }
     } else {
       playSound();
+      setIsLoading(false);
+      setShowWebView(false);
     }
   };
+  const [webViewHeight, setWebViewHeight] = useState(null);
+  const onMessage = (event) => {
+    console.log(event.nativeEvent.data);
+    setWebViewHeight(Number(event.nativeEvent.data));
+  };
+  const injectedJavaScript = `
+  window.ReactNativeWebView.postMessage(
+    Math.max(document.body.offsetHeight, document.body.scrollHeight)
+  );`;
   // console.log({ progress, showPlayerControls });
   console.log({
     welcomeSoundStatus,
@@ -859,8 +878,8 @@ export default function Player() {
     needsUserInput,
     articles: articles.length,
     currentNewsIndex,
-    u: userRef.current,
-    user,
+    // u: userRef.current,
+    // user,
     OS: Platform.OS,
   });
   return (
@@ -872,12 +891,7 @@ export default function Player() {
       >
         <AntDesign name="setting" color={theme.colors.brand} size={24} />
       </Pressable>
-      <GestureRecognizer
-        onSwipeLeft={handleLeftSwipe}
-        onSwipeRight={handleRightSwipe}
-        config={config}
-        style={styles.container}
-      >
+      {showWebView ? (
         <View
           style={{
             flex: 1,
@@ -888,57 +902,90 @@ export default function Player() {
             border: "none",
           }}
         >
-          <ScrollView
-            contentContainerStyle={{
-              flex: 1,
-              justifyContent: "space-between",
-              // backgroundColor: "rgba(0, 0, 0, 0.7)",
-            }}
-          >
-            {showWebView ? (
-              <StyledCollapsibleHeaderScrollView
-                CollapsibleHeaderComponent={
-                  <View
-                    style={{
-                      // flex: 1,
-                      padding: 20,
-                      marginTop: 50,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      width: "100%",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Pressable onPress={() => toggleShowArticleDetails(false)}>
-                      <AntDesign
-                        name="left"
-                        size={20}
-                        color={theme.colors.primary}
-                      />
-                    </Pressable>
-                  </View>
-                }
-                headerHeight={110}
-                headerContainerBackgroundColor={theme.colors.secondary}
-                statusBarHeight={Platform.OS === "ios" ? 20 : 0}
+          <StyledCollapsibleHeaderScrollView
+            CollapsibleHeaderComponent={
+              <View
+                style={{
+                  // flex: 1,
+                  padding: 20,
+                  marginTop: 50,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  width: "100%",
+                  justifyContent: "space-between",
+                }}
               >
-                <WebViewContainer>
-                  {Platform.OS === "web" ? (
-                    <iframe
-                      src={articles[currentNewsIndex].url}
-                      style={styles.webview}
-                    />
-                  ) : (
-                    <WebView
-                      source={{
-                        uri: articles[currentNewsIndex].url,
-                      }}
-                      style={styles.webview}
+                <Pressable onPress={() => toggleShowArticleDetails(false)}>
+                  <AntDesign
+                    name="left"
+                    size={20}
+                    color={theme.colors.primary}
+                  />
+                </Pressable>
+              </View>
+            }
+            headerHeight={110}
+            headerContainerBackgroundColor={theme.colors.secondary}
+            statusBarHeight={Platform.OS === "ios" ? 20 : 0}
+          >
+            <WebViewContainer>
+              {Platform.OS === "web" ? (
+                <iframe
+                  src={articles[currentNewsIndex].url}
+                  style={styles.webview}
+                />
+              ) : (
+                <>
+                  {isLoading && (
+                    <ActivityIndicator
+                      style={{ flex: 1, justifyContent: "center" }}
+                      size="large"
+                      color={theme.colors.primary}
                     />
                   )}
-                </WebViewContainer>
-              </StyledCollapsibleHeaderScrollView>
-            ) : (
+                  <WebView
+                    onMessage={onMessage}
+                    injectedJavaScript={injectedJavaScript}
+                    originWhitelist={["*"]}
+                    onNavigationStateChange={(p) => {
+                      console.log("state change", p);
+                      setIsLoading(p.loading);
+                    }}
+                    // nestedScrollEnabled
+                    source={{
+                      uri: articles[currentNewsIndex].url,
+                    }}
+                    style={{ ...styles.webview, height: webViewHeight }}
+                  />
+                </>
+              )}
+            </WebViewContainer>
+          </StyledCollapsibleHeaderScrollView>
+        </View>
+      ) : (
+        <GestureRecognizer
+          onSwipeLeft={handleLeftSwipe}
+          onSwipeRight={handleRightSwipe}
+          config={config}
+          style={styles.container}
+        >
+          <View
+            style={{
+              flex: 1,
+              width: "100%",
+              maxWidth: 500,
+              justifyContent: "flex-start",
+              marginTop: "0px",
+              border: "none",
+            }}
+          >
+            <ScrollView
+              contentContainerStyle={{
+                flex: 1,
+                justifyContent: "space-between",
+                // backgroundColor: "rgba(0, 0, 0, 0.7)",
+              }}
+            >
               <ImageBackground
                 source={
                   showWelcomeScreen
@@ -1106,10 +1153,10 @@ export default function Player() {
                   </MainContent>
                 </ContentWrapper>
               </ImageBackground>
-            )}
-          </ScrollView>
-        </View>
-      </GestureRecognizer>
+            </ScrollView>
+          </View>
+        </GestureRecognizer>
+      )}
     </SafeAreaView>
   );
 }
@@ -1117,7 +1164,7 @@ export default function Player() {
 const styles = StyleSheet.create({
   webview: {
     flex: 1,
-    minHeight: 500,
+    // minHeight: 800,
   },
   container: {
     flex: 1,

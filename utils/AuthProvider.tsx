@@ -153,7 +153,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const token = await AsyncStorage.getItem("userToken");
       if (token) {
         // Check if the token is valid
-        await verifyToken();
+        // await verifyToken();
         // Get the user's login status - to update the login time, etc
         const { isFirstTimeEver, isFirstTimeToday } = await getLoginStatus();
         //  {
