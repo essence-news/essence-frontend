@@ -33,7 +33,8 @@ export default function Login() {
       const user = await AsyncStorage.getItem("user");
       await AsyncStorage.clear();
       if (user) {
-        setUserFirstName(user.first_name);
+        await AsyncStorage.setItem("user", user);
+        setUserFirstName(JSON.parse(user).first_name);
       }
     }
     init();
