@@ -5,209 +5,46 @@ import { ScrollView, View } from "react-native";
 import { Link, router } from "expo-router";
 import "@expo/match-media";
 import { useMediaQuery } from "react-responsive";
-import { ButtonText } from "@/components/SharedComponents";
+import {
+  ButtonText,
+  VideoContainer,
+  HomeContainer,
+  HeroSection,
+  LeftSection,
+  RightSection,
+  InsightContent,
+  InsightTitle,
+  InsightTitleSmall,
+  InsightSubtitle,
+  Footer,
+  ButtonSection,
+  FooterLinks,
+  FooterLink,
+  Brand,
+  Headline,
+  Subheadline,
+  BetaPressable,
+  StyledPressable,
+  StyledImageBackground,
+  Overlay,
+  Logo,
+  LogoContainer,
+  InsightCardRight,
+  InsightCardLeft
+} from "@/components/SharedComponents";
 import { useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { WebView } from "react-native-web-webview";
 
 import screenshot1 from "@/assets/screenshots/1.jpg";
 import ecommercePic from "@/assets/cliparts/ecommerce.jpg";
 import audioPic from "@/assets/cliparts/audio.jpg";
 import hourglassPic from "@/assets/cliparts/hourglass.jpg";
 import podcastPic from "@/assets/cliparts/podcast.jpg";
+import BrandHeader from "@/components/BrandHeader";
+import theme from "@/constants/theme";
 
 // Keep the existing styled components that are specific to Home
-const HomeContainer = styled.View`
-  flex: 1;
-  flex-direction: column;
-  color: #fff;
-  padding: 32px;
-  background: #333;
-`;
-
-const MainContent = styled.View<{ smallScreen: boolean }>`
-  display: flex;
-  flex-direction: ${(props) => (props.smallScreen ? "column" : "row")};
-`;
-
-const LeftSection = styled.View<{ smallScreen: boolean }>`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  max-width: ${(props) => (props.smallScreen ? "100%" : "50%")};
-  min-height: ${(props) => (props.smallScreen ? "90vh" : "initial")};
-`;
-
-const RightSection = styled.View<{ smallScreen: boolean }>`
-  border-radius: 10px;
-  margin-top: 64px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  max-width: ${(props) => (props.smallScreen ? "100%" : "50%")};
-  min-height: ${(props) => (props.smallScreen ? "90vh" : "initial")};
-  margin-left: ${(props) => (props.smallScreen ? "0" : "20px")};
-  width: 100%;
-`;
-
-const ButtonSection = styled.View<{ smallScreen: boolean }>`
-  display: flex;
-  justify-content: left;
-  flex-direction: ${(props) => (props.smallScreen ? "column" : "row")};
-  gap: 16px;
-  width: ${(props) => (props.smallScreen ? "100%" : "initial")};
-`;
-
-const InsightsSection = styled.View<{ smallScreen: boolean }>`
-  display: flex;
-  flex-direction: column;
-  gap: ${(props) => (props.smallScreen ? "0" : "32px")};
-  flex-direction: ${(props) => (props.smallScreen ? "column" : "row")};
-`;
-
-const InsightCard = styled.View<{ smallScreen: boolean }>`
-  background: ${({ theme }) => theme.colors.primaryDark};
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  align-items: center;
-  min-height: 500px;
-  margin-top: ${(props) => (props.smallScreen ? "32px" : "48px")};
-  padding: ${(props) => (props.smallScreen ? "32px 16px" : "32px")};
-  flex: ${(props) => (props.smallScreen ? "none" : 1)};
-  overflow: hidden;
-`;
-
-const StyledImageBackground = styled.ImageBackground`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-`;
-
-const Overlay = styled.View`
-  background-color: rgba(0, 0, 0, 0.7);
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-`;
-
-const InsightContent = styled.View`
-  position: relative;
-  z-index: 2;
-`;
-
-const Brand = styled.Text`
-  font-family: "${({ theme }) => theme.fonts.brand}";
-  font-size: 68px;
-  font-weight: 300;
-  color: ${({ theme }) => theme.colors.brand};
-  margin-bottom: 32px;
-  margin-top: 0;
-`;
-
-const Headline = styled.Text`
-  font-family: "${({ theme }) => theme.fonts.heading}";
-  font-size: 40px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.text};
-  margin-bottom: 32px;
-`;
-
-const Subheadline = styled.Text`
-  font-family: "${({ theme }) => theme.fonts.body}";
-  font-size: 20px;
-  color: ${({ theme }) => theme.colors.text};
-  margin-bottom: 32px;
-`;
-
-const InsightTitle = styled.Text`
-  font-family: "${({ theme }) => theme.fonts.body}";
-  font-size: 25px;
-  font-weight: 400;
-  margin-top: 0;
-  color: ${({ theme }) => theme.colors.text};
-  margin-bottom: 32px;
-`;
-
-const InsightTitleSmall = styled.Text`
-  font-family: "${({ theme }) => theme.fonts.heading}";
-  font-size: 16px;
-  margin: 0;
-  color: ${({ theme }) => theme.colors.secondaryDark};
-`;
-
-const InsightSubtitle = styled.Text`
-  font-family: "${({ theme }) => theme.fonts.body}";
-  font-size: 16px;
-  color: ${({ theme }) => theme.colors.background};
-  margin-bottom: 32px;
-`;
-
-const AppImage = styled.Image<{ smallScreen: boolean }>`
-  width: 100%;
-  object-fit: cover;
-  border-radius: 8px;
-  height: ${(props) => (props.smallScreen ? "82vh" : "800px")};
-  max-width: ${(props) => (props.smallScreen ? "100%" : "500px")};
-`;
-
-const Footer = styled.View`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-top: 64px;
-  padding: 12px;
-  color: #fff;
-`;
-
-const FooterLinks = styled.View`
-  display: flex;
-  gap: 16px;
-  flex-direction: row;
-  margin-top: 32px;
-  align-items: center;
-  justify-content: center;
-`;
-
-const FooterLink = styled.Text`
-  color: #888;
-  text-decoration: none;
-  &:hover {
-    color: #fff;
-  }
-  font-size: 16px;
-`;
-
-const StyledPressable = styled.Pressable`
-  font-family: "${({ theme }) => theme.fonts.heading}";
-  background: ${({ theme }) => theme.colors.secondary};
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: ${({ theme }) => theme.colors.primary};
-  padding: 10px 40px;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-  text-align: center;
-`;
-
-const BetaPressable = styled.Pressable`
-  font-family: "${({ theme }) => theme.fonts.heading}";
-  background: ${({ theme }) => theme.colors.accent};
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: ${({ theme }) => theme.colors.text};
-  padding: 10px 40px;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-  text-align: center;
-`;
-
 
 const Home = () => {
   const { user } = useAuth();
@@ -245,15 +82,16 @@ const Home = () => {
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
+      style={{ backgroundColor: theme.colors.background }}
     >
-      <HomeContainer>
-        <MainContent smallScreen={isTabletOrMobileDevice}>
+      <HomeContainer smallScreen={isTabletOrMobileDevice}>
+        <HeroSection smallScreen={isTabletOrMobileDevice}>
           <LeftSection smallScreen={isTabletOrMobileDevice}>
             <Brand>essence</Brand>
             <Headline>Retail news in 30-second soundbites</Headline>
             <Subheadline>
-              Essence delivers curated, personalized audio insights for busy
-              professionals. Get informed on your commute, no reading required.
+              Essence delivers curated, personalized audio news and insights for busy
+              professionals.
             </Subheadline>
             <ButtonSection smallScreen={isTabletOrMobileDevice}>
               <BetaPressable onPress={handleJoinBeta}>
@@ -267,15 +105,67 @@ const Home = () => {
             </ButtonSection>
           </LeftSection>
           <RightSection smallScreen={isTabletOrMobileDevice}>
-            <AppImage
+            {/* <AppImage
               smallScreen={isTabletOrMobileDevice}
               source={screenshot1}
               alt="App screenshot"
-            />
+            /> */}
+            <VideoContainer>
+              <WebView
+                source={{
+                  html: `
+                    <!DOCTYPE html>
+                    <html>
+                      <head>
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <style>
+                          * { margin: 0; padding: 0; border: none; }
+                          html, body { 
+                            margin: 0; 
+                            padding: 0; 
+                            height: 100%;
+                            overflow: hidden;
+                          }
+                          .video-container { 
+                            position: relative; 
+                            padding-bottom: 56.25%; 
+                            height: 0; 
+                            overflow: hidden; 
+                          }
+                          iframe { 
+                            position: absolute; 
+                            top: 0;  
+                            left: 0; 
+                            width: 100%; 
+                            height: 100%; 
+                            border: 0; 
+                          }
+                        </style>
+                      </head>
+                      <body>
+                        <div class="video-container">
+                          <iframe 
+                            src="https://player.vimeo.com/video/1034598104?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" 
+                            frameborder="0" 
+                            allow="autoplay; fullscreen; picture-in-picture; clipboard-write" 
+                            style="position:absolute;top:0;left:0;width:100%;height:100%;" 
+                            title="EssenceDemoFashion"
+                          ></iframe>                        
+                        </div>
+                      </body>
+                    </html>
+                  `
+                }}
+                style={{ flex: 1 }}
+                javaScriptEnabled={true}
+                domStorageEnabled={true}
+                allowsFullscreenVideo={true}
+              />
+            </VideoContainer>
           </RightSection>
-        </MainContent>
-        <InsightsSection smallScreen={isTabletOrMobileDevice}>
-          <InsightCard smallScreen={isTabletOrMobileDevice}>
+        </HeroSection>
+        <HeroSection smallScreen={isTabletOrMobileDevice}>
+          <InsightCardLeft smallScreen={isTabletOrMobileDevice}>
             <StyledImageBackground source={ecommercePic} resizeMode="cover" />
             <Overlay />
             <InsightContent>
@@ -286,8 +176,8 @@ const Home = () => {
                 specific industry and role. Stay relevant without the noise
               </InsightSubtitle>
             </InsightContent>
-          </InsightCard>
-          <InsightCard smallScreen={isTabletOrMobileDevice}>
+          </InsightCardLeft>
+          <InsightCardRight smallScreen={isTabletOrMobileDevice}>
             <StyledImageBackground source={audioPic} resizeMode="cover" />
             <Overlay />
             <InsightContent>
@@ -299,10 +189,10 @@ const Home = () => {
                 your day.
               </InsightSubtitle>
             </InsightContent>
-          </InsightCard>
-        </InsightsSection>
-        <InsightsSection smallScreen={isTabletOrMobileDevice}>
-          <InsightCard smallScreen={isTabletOrMobileDevice}>
+          </InsightCardRight>
+        </HeroSection>
+        <HeroSection smallScreen={isTabletOrMobileDevice}>
+          <InsightCardLeft smallScreen={isTabletOrMobileDevice}>
             <StyledImageBackground source={hourglassPic} resizeMode="cover" />
             <Overlay />
             <InsightContent>
@@ -313,8 +203,8 @@ const Home = () => {
                 essentials quickly, without sacrificing depth.
               </InsightSubtitle>
             </InsightContent>
-          </InsightCard>
-          <InsightCard smallScreen={isTabletOrMobileDevice}>
+          </InsightCardLeft>
+          <InsightCardRight smallScreen={isTabletOrMobileDevice}>
             <StyledImageBackground source={podcastPic} resizeMode="cover" />
             <Overlay />
             <InsightContent>
@@ -325,8 +215,8 @@ const Home = () => {
                 It's not just information—it's infotainment.
               </InsightSubtitle>
             </InsightContent>
-          </InsightCard>
-        </InsightsSection>
+          </InsightCardRight>
+        </HeroSection>
         <Footer>
           <Brand>essence</Brand>
           <ButtonSection smallScreen={isTabletOrMobileDevice}>

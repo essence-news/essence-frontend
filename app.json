@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#fcfaf7"
     },
     "ios": {
       "supportsTablet": true,
@@ -25,9 +25,11 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#fcfaf7"
       },
-      "permissions": ["WAKE_LOCK"],
+      "permissions": [
+        "WAKE_LOCK"
+      ],
       "package": "com.essencenews.essenceapp"
     },
     "web": {

@@ -1,5 +1,221 @@
 import styled from "styled-components/native";
 
+export const MainContainer = styled.View`
+  width: 100%;
+  max-width: ${({ theme }) => theme.sizes.maxWidth};
+  margin: 0 auto;
+  flex: 1;
+  align-self: center;
+`;
+
+// Styles for home screen
+export const HomeContainer = styled.View<{ smallScreen: boolean }>`
+  flex: 1;
+  flex-direction: column;
+  background: ${({ theme }) => theme.colors.background};
+`;
+
+export const HeroSection = styled.View<{ smallScreen: boolean }>`
+  display: flex;
+  padding: ${(props) => (props.smallScreen ? "32px 16px" : "64px")};
+  flex-direction: ${(props) => (props.smallScreen ? "column" : "row")};
+`;
+
+export const LeftSection = styled.View<{ smallScreen: boolean }>`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: ${(props) => (props.smallScreen ? "0" : "100px 0")};
+  max-width: ${(props) => (props.smallScreen ? "100%" : "50%")};
+  min-height: ${(props) => (props.smallScreen ? "90vh" : "initial")};
+  border-radius: 10px;
+  overflow: hidden;
+`;
+
+export const RightSection = styled.View<{ smallScreen: boolean }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: ${(props) => (props.smallScreen ? "0" : "100px 0")};
+  max-width: ${(props) => (props.smallScreen ? "100%" : "50%")};
+  min-height: ${(props) => (props.smallScreen ? "30vh" : "initial")};
+  margin: ${(props) => (props.smallScreen ? "32px 0 0 0" : "0 0 0 32px")};
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+`;
+
+export const ButtonSection = styled.View<{ smallScreen: boolean }>`
+  display: flex;
+  justify-content: left;
+  flex-direction: ${(props) => (props.smallScreen ? "column" : "row")};
+  gap: 16px;
+  width: ${(props) => (props.smallScreen ? "100%" : "initial")};
+`;
+
+export const InsightsSection = styled.View<{ smallScreen: boolean }>`
+  display: flex;
+  padding: ${(props) => (props.smallScreen ? "32px 16px" : "64px")};
+  flex-direction: ${(props) => (props.smallScreen ? "column" : "row")};
+`;
+
+export const InsightCardLeft = styled.View<{ smallScreen: boolean }>`
+  background: ${({ theme }) => theme.colors.primaryDark};
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  max-width: ${(props) => (props.smallScreen ? "100%" : "50%")};
+  overflow: hidden;
+`;
+
+export const InsightCardRight = styled.View<{ smallScreen: boolean }>`
+  background: ${({ theme }) => theme.colors.primaryDark};
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  margin: ${(props) => (props.smallScreen ? "32px 0 0 0" : "0 0 0 32px")};
+  max-width: ${(props) => (props.smallScreen ? "100%" : "50%")};
+  overflow: hidden;
+`;
+
+export const StyledImageBackground = styled.ImageBackground`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+`;
+
+export const Overlay = styled.View`
+  background-color: rgba(0, 0, 0, 0.7);
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+`;
+
+export const InsightContent = styled.View`
+  min-height: 400px;
+  display: flex;
+  padding: 60px 20px;
+  flex-direction: column;
+`;
+
+export const Brand = styled.Text`
+  font-family: "${({ theme }) => theme.fonts.brand}";
+  font-size: 68px;
+  font-weight: 300;
+  color: ${({ theme }) => theme.colors.brand};
+  margin-bottom: 40px;
+  margin-top: 0;
+`;
+
+export const Headline = styled.Text`
+  font-family: "${({ theme }) => theme.fonts.body}";
+  font-size: 34px;
+  color: ${({ theme }) => theme.colors.primary};
+  margin-bottom: 20px;
+`;
+
+export const Subheadline = styled.Text`
+  font-family: "${({ theme }) => theme.fonts.bodyLight}";
+  font-size: 20px;
+  font-weight: 300;
+  color: ${({ theme }) => theme.colors.primaryLight};
+  margin-bottom: 40px;
+`;
+
+export const InsightTitle = styled.Text`
+  font-family: "${({ theme }) => theme.fonts.body}";
+  font-size: 25px;
+  font-weight: 400;
+  margin-top: 0;
+  color: ${({ theme }) => theme.colors.text};
+  margin-bottom: 32px;
+`;
+
+export const InsightTitleSmall = styled.Text`
+  font-family: "${({ theme }) => theme.fonts.heading}";
+  font-size: 16px;
+  margin: 0;
+  color: ${({ theme }) => theme.colors.secondaryDark};
+`;
+
+export const InsightSubtitle = styled.Text`
+  font-family: "${({ theme }) => theme.fonts.body}";
+  font-size: 16px;
+  color: ${({ theme }) => theme.colors.background};
+  margin-bottom: 32px;
+`;
+
+export const AppImage = styled.Image<{ smallScreen: boolean }>`
+  width: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  height: ${(props) => (props.smallScreen ? "82vh" : "800px")};
+  max-width: ${(props) => (props.smallScreen ? "100%" : "500px")};
+`;
+
+export const Footer = styled.View`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 64px 0;
+  padding: 32px;
+`;
+
+export const FooterLinks = styled.View`
+  display: flex;
+  gap: 16px;
+  flex-direction: row;
+  margin-top: 32px;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const FooterLink = styled.Text`
+  color: #888;
+  text-decoration: none;
+  &:hover {
+    color: #fff;
+  }
+  font-size: 16px;
+`;
+
+export const StyledPressable = styled.Pressable`
+  font-family: "${({ theme }) => theme.fonts.heading}";
+  background: ${({ theme }) => theme.colors.secondary};
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.primary};
+  padding: 10px 40px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  text-align: center;
+`;
+
+export const BetaPressable = styled.Pressable`
+  font-family: "${({ theme }) => theme.fonts.heading}";
+  background: ${({ theme }) => theme.colors.accent};
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.text};
+  padding: 10px 40px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  text-align: center;
+`;
+
+
+
 export const AppContainer = styled.View<{ width: number; height: number }>`
   width: 100%;
   height: 100%;
@@ -40,6 +256,14 @@ export const ContentContainer = styled.View`
   margin: 0 auto;
   position: relative;
   background-color: ${({ theme }) => theme.colors.background};
+`;
+
+export const VideoContainer = styled.View<{ smallScreen: boolean }>`
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: 0;
+  overflow: hidden;
+  border-radius: 10px;  
 `;
 
 export const Card = styled.View`
@@ -400,4 +624,26 @@ export const CategoryContainer = styled.View`
   justify-content: center;
   align-items: center;
   margin-top: 8px;
+`;
+
+export const BrandName = styled.Text`
+  margin: 0;
+  color: ${({ theme }) => theme.colors.white};
+  font-family: "${({ theme }) => theme.fonts.brand}";
+  font-size: 28px;
+  display: inline;
+  text-align: left;
+`;
+
+export const LogoContainer = styled.View`
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  padding: 10px 20px;
+`;
+
+export const Logo = styled.Image`
+  height: 28px;
+  width: 28px;
+  margin-right: 20px;
 `;
