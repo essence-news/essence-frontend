@@ -80,40 +80,36 @@ const Home = () => {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1 }}
-      style={{ backgroundColor: theme.colors.background }}
-    >
-      <HomeContainer smallScreen={isTabletOrMobileDevice}>
-        <HeroSection smallScreen={isTabletOrMobileDevice}>
-          <LeftSection smallScreen={isTabletOrMobileDevice}>
-            <Brand>essence</Brand>
-            <Headline>Retail news in 30-second soundbites</Headline>
-            <Subheadline>
-              Essence delivers curated, personalized audio news and insights for busy
-              professionals.
-            </Subheadline>
-            <ButtonSection smallScreen={isTabletOrMobileDevice}>
-              <BetaPressable onPress={handleJoinBeta}>
-                <ButtonText>Join the Beta</ButtonText>
-              </BetaPressable>
-              <StyledPressable
-                onPress={() => (user ? handleGotoNews() : handleSignin())}
-              >
-                {user ? <ButtonText>Go to News</ButtonText> : <ButtonText>Sign in</ButtonText>}
-              </StyledPressable>
-            </ButtonSection>
-          </LeftSection>
-          <RightSection smallScreen={isTabletOrMobileDevice}>
-            {/* <AppImage
+    <HomeContainer smallScreen={isTabletOrMobileDevice}>
+      <HeroSection smallScreen={isTabletOrMobileDevice}>
+        <LeftSection smallScreen={isTabletOrMobileDevice}>
+          <Brand>essence</Brand>
+          <Headline>Retail news in 30-second soundbites</Headline>
+          <Subheadline>
+            Essence delivers curated, personalized audio news and insights for busy
+            professionals.
+          </Subheadline>
+          <ButtonSection smallScreen={isTabletOrMobileDevice}>
+            <BetaPressable onPress={handleJoinBeta}>
+              <ButtonText>Join the Beta</ButtonText>
+            </BetaPressable>
+            <StyledPressable
+              onPress={() => (user ? handleGotoNews() : handleSignin())}
+            >
+              {user ? <ButtonText>Go to News</ButtonText> : <ButtonText>Sign in</ButtonText>}
+            </StyledPressable>
+          </ButtonSection>
+        </LeftSection>
+        <RightSection smallScreen={isTabletOrMobileDevice}>
+          {/* <AppImage
               smallScreen={isTabletOrMobileDevice}
               source={screenshot1}
               alt="App screenshot"
             /> */}
-            <VideoContainer>
-              <WebView
-                source={{
-                  html: `
+          <VideoContainer smallScreen={isTabletOrMobileDevice}>
+            <WebView
+              source={{
+                html: `
                     <!DOCTYPE html>
                     <html>
                       <head>
@@ -155,94 +151,93 @@ const Home = () => {
                       </body>
                     </html>
                   `
-                }}
-                style={{ flex: 1 }}
-                javaScriptEnabled={true}
-                domStorageEnabled={true}
-                allowsFullscreenVideo={true}
-              />
-            </VideoContainer>
-          </RightSection>
-        </HeroSection>
-        <HeroSection smallScreen={isTabletOrMobileDevice}>
-          <InsightCardLeft smallScreen={isTabletOrMobileDevice}>
-            <StyledImageBackground source={ecommercePic} resizeMode="cover" />
-            <Overlay />
-            <InsightContent>
-              <InsightTitleSmall>Your Industry. Your News.</InsightTitleSmall>
-              <InsightTitle>Tailored for You</InsightTitle>
-              <InsightSubtitle>
-                Essence curates content from top sources, tailored to your
-                specific industry and role. Stay relevant without the noise
-              </InsightSubtitle>
-            </InsightContent>
-          </InsightCardLeft>
-          <InsightCardRight smallScreen={isTabletOrMobileDevice}>
-            <StyledImageBackground source={audioPic} resizeMode="cover" />
-            <Overlay />
-            <InsightContent>
-              <InsightTitleSmall>Listen, Don't Read</InsightTitleSmall>
-              <InsightTitle>Audio-First Experience</InsightTitle>
-              <InsightSubtitle>
-                Transform your daily routine into a learning opportunity. Catch
-                up on industry trends while you commute, exercise, or prep for
-                your day.
-              </InsightSubtitle>
-            </InsightContent>
-          </InsightCardRight>
-        </HeroSection>
-        <HeroSection smallScreen={isTabletOrMobileDevice}>
-          <InsightCardLeft smallScreen={isTabletOrMobileDevice}>
-            <StyledImageBackground source={hourglassPic} resizeMode="cover" />
-            <Overlay />
-            <InsightContent>
-              <InsightTitleSmall>News in byte size</InsightTitleSmall>
-              <InsightTitle>30 Seconds to Savvy</InsightTitle>
-              <InsightSubtitle>
-                Each news item is distilled into a 30-second audio clip. Get the
-                essentials quickly, without sacrificing depth.
-              </InsightSubtitle>
-            </InsightContent>
-          </InsightCardLeft>
-          <InsightCardRight smallScreen={isTabletOrMobileDevice}>
-            <StyledImageBackground source={podcastPic} resizeMode="cover" />
-            <Overlay />
-            <InsightContent>
-              <InsightTitleSmall>Engaging dialogue</InsightTitleSmall>
-              <InsightTitle>News That Feels Like Conversation</InsightTitle>
-              <InsightSubtitle>
-                Our hosts present insights in a lively, podcast-style format.
-                It's not just information—it's infotainment.
-              </InsightSubtitle>
-            </InsightContent>
-          </InsightCardRight>
-        </HeroSection>
-        <Footer>
-          <Brand>essence</Brand>
-          <ButtonSection smallScreen={isTabletOrMobileDevice}>
-            <BetaPressable onPress={handleJoinBeta}>
-              <ButtonText>Join the Beta</ButtonText>
-            </BetaPressable>
-            <StyledPressable
-              onPress={() => (user ? handleGotoNews() : handleSignin())}
-            >
-              {user ? <ButtonText>Go to News</ButtonText> : <ButtonText>Sign in</ButtonText>}
-            </StyledPressable>
-          </ButtonSection>
-          <FooterLinks>
-            <Link href="/">
-              <FooterLink>Terms</FooterLink>
-            </Link>
-            <Link href="/">
-              <FooterLink>Privacy</FooterLink>
-            </Link>
-            <Link href="/">
-              <FooterLink>Contact</FooterLink>
-            </Link>
-          </FooterLinks>
-        </Footer>
-      </HomeContainer>
-    </ScrollView>
+              }}
+              style={{ flex: 1 }}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              allowsFullscreenVideo={true}
+            />
+          </VideoContainer>
+        </RightSection>
+      </HeroSection>
+      <HeroSection smallScreen={isTabletOrMobileDevice}>
+        <InsightCardLeft smallScreen={isTabletOrMobileDevice}>
+          <StyledImageBackground source={ecommercePic} resizeMode="cover" />
+          <Overlay />
+          <InsightContent>
+            <InsightTitleSmall>Your Industry. Your News.</InsightTitleSmall>
+            <InsightTitle>Tailored for You</InsightTitle>
+            <InsightSubtitle>
+              Essence curates content from top sources, tailored to your
+              specific industry and role. Stay relevant without the noise
+            </InsightSubtitle>
+          </InsightContent>
+        </InsightCardLeft>
+        <InsightCardRight smallScreen={isTabletOrMobileDevice}>
+          <StyledImageBackground source={audioPic} resizeMode="cover" />
+          <Overlay />
+          <InsightContent>
+            <InsightTitleSmall>Listen, Don't Read</InsightTitleSmall>
+            <InsightTitle>Audio-First Experience</InsightTitle>
+            <InsightSubtitle>
+              Transform your daily routine into a learning opportunity. Catch
+              up on industry trends while you commute, exercise, or prep for
+              your day.
+            </InsightSubtitle>
+          </InsightContent>
+        </InsightCardRight>
+      </HeroSection>
+      <HeroSection smallScreen={isTabletOrMobileDevice}>
+        <InsightCardLeft smallScreen={isTabletOrMobileDevice}>
+          <StyledImageBackground source={hourglassPic} resizeMode="cover" />
+          <Overlay />
+          <InsightContent>
+            <InsightTitleSmall>News in byte size</InsightTitleSmall>
+            <InsightTitle>30 Seconds to Savvy</InsightTitle>
+            <InsightSubtitle>
+              Each news item is distilled into a 30-second audio clip. Get the
+              essentials quickly, without sacrificing depth.
+            </InsightSubtitle>
+          </InsightContent>
+        </InsightCardLeft>
+        <InsightCardRight smallScreen={isTabletOrMobileDevice}>
+          <StyledImageBackground source={podcastPic} resizeMode="cover" />
+          <Overlay />
+          <InsightContent>
+            <InsightTitleSmall>Engaging dialogue</InsightTitleSmall>
+            <InsightTitle>News That Feels Like Conversation</InsightTitle>
+            <InsightSubtitle>
+              Our hosts present insights in a lively, podcast-style format.
+              It's not just information—it's infotainment.
+            </InsightSubtitle>
+          </InsightContent>
+        </InsightCardRight>
+      </HeroSection>
+      <Footer>
+        <Brand>essence</Brand>
+        <ButtonSection smallScreen={isTabletOrMobileDevice}>
+          <BetaPressable onPress={handleJoinBeta}>
+            <ButtonText>Join the Beta</ButtonText>
+          </BetaPressable>
+          <StyledPressable
+            onPress={() => (user ? handleGotoNews() : handleSignin())}
+          >
+            {user ? <ButtonText>Go to News</ButtonText> : <ButtonText>Sign in</ButtonText>}
+          </StyledPressable>
+        </ButtonSection>
+        <FooterLinks>
+          <Link href="/">
+            <FooterLink>Terms</FooterLink>
+          </Link>
+          <Link href="/">
+            <FooterLink>Privacy</FooterLink>
+          </Link>
+          <Link href="/">
+            <FooterLink>Contact</FooterLink>
+          </Link>
+        </FooterLinks>
+      </Footer>
+    </HomeContainer>
   );
 };
 

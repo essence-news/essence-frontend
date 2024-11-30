@@ -6,6 +6,16 @@ export const MainContainer = styled.View`
   margin: 0 auto;
   flex: 1;
   align-self: center;
+  overflow: auto; 
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+
 `;
 
 // Styles for home screen
@@ -60,7 +70,6 @@ export const InsightsSection = styled.View<{ smallScreen: boolean }>`
 `;
 
 export const InsightCardLeft = styled.View<{ smallScreen: boolean }>`
-  background: ${({ theme }) => theme.colors.primaryDark};
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -72,7 +81,6 @@ export const InsightCardLeft = styled.View<{ smallScreen: boolean }>`
 `;
 
 export const InsightCardRight = styled.View<{ smallScreen: boolean }>`
-  background: ${({ theme }) => theme.colors.primaryDark};
   border-radius: 10px;
   display: flex;
   flex-direction: column;
