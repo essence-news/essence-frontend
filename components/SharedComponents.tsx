@@ -190,6 +190,7 @@ export const ContentWrapper = styled.View<{ width: number }>`
 export const MainContent = styled.View`
   flex: 1;
   display: flex;
+  width: 100%;
   flex-direction: column;
   justify-content: space-between;
   padding: 20px;

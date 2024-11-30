@@ -115,20 +115,20 @@ export const fetchNews = async (user: {
   }).toString();
 
   console.log(`Fetching news with query params: ${queryParams}`);
-  try {
-    const response = await apiCall(`/public/latest_news?${queryParams}`, "GET");
-    console.log({ response });
-    if (!response.ok) {
-      throw new Error("" + response.status);
-    }
-    return await response.json();
-  } catch (err) {
-    if (err.message === "Unauthorized") {
-      throw new Error("401");
-    }
-  }
-  // i++;
-  // return Promise.resolve(i > 1 ? { articles: [] } : mockNewsData);
+  // try {
+  //   const response = await apiCall(`/public/latest_news?${queryParams}`, "GET");
+  //   console.log({ response });
+  //   if (!response.ok) {
+  //     throw new Error("" + response.status);
+  //   }
+  //   return await response.json();
+  // } catch (err) {
+  //   if (err.message === "Unauthorized") {
+  //     throw new Error("401");
+  //   }
+  // }
+  i++;
+  return Promise.resolve(i > 1 ? { articles: [] } : mockNewsData);
 };
 
 export const verifyToken = async () => {
