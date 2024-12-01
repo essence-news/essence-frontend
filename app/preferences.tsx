@@ -33,7 +33,7 @@ export const PreferencesContainer = styled.View`
   position: relative;
 `;
 
-const LoadMoreButton = styled.Pressable`
+const LoadMoreButtonText = styled.Text`
   font-size: 12px;
   font-family: "${({ theme }) => theme.fonts.bodyBold}";
   border: none;
@@ -524,11 +524,9 @@ export default function Preferences() {
                 );
               })}
               {sliceIndex < multiSelectFields.length ? (
-                <LoadMoreButton
-                  onPress={() => setSliceIndex((s) => s + PAGE_SIZE)}
-                >
-                  Load more preferences
-                </LoadMoreButton>
+                <Pressable onPress={() => setSliceIndex((s) => s + PAGE_SIZE)}>
+                  <LoadMoreButtonText>Load more preferences</LoadMoreButtonText>
+                </Pressable>
               ) : (
                 <Text></Text>
               )}
