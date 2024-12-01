@@ -21,12 +21,13 @@ const theme = {
   fonts: {
     body: "Inter_400Regular",
     bodyBold: "Inter_700Bold",
+    bodyLight: "Inter_300Light",
     heading: "Nunito_400Regular",
     headingBold: "Nunito_700Bold",
     brand: "Comfortaa_400Regular",
   },
   sizes: {
-    maxWidth: "400px",
+    maxWidth: "1400px",
     maxHeight: "800px",
   },
   borderRadius: "10px",
