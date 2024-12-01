@@ -176,24 +176,28 @@ export const trackEvents = async (events: unknown) => {
   }
 };
 
-export const getPreferences = async () => {
+export const savePreferences = async (payload) => {
   try {
-    return {
-      industries: "fashion, electronics",
-      geographies: "UK,US,India",
-      news_sources: "retail-week.com,businessoffashion.com",
-      functions: "ecommerce, Merchandising",
-      topics: "marketing,branding",
-      brands: "levis,puma,adidas",
-    };
-
-    // const response = await apiCall("/user/preferences", "POST", { events });
-    // if (!response.ok) {
-    //   throw new Error("Failed to send events");
-    // }
-    // return await response.json();
+    const response = await apiCall("/user/update_preferences", "POST", payload);
+    if (!response.ok) {
+      throw new Error("Failed to update preferences");
+    }
+    return await response.json();
   } catch (error) {
-    console.error("Error tracking events:", error);
+    console.error("Error updating user preferences:", error);
+    throw error;
+  }
+};
+
+export const getUserData = async () => {
+  try {
+    const response = await apiCall("/user/get_user", "GET");
+    if (!response.ok) {
+      throw new Error("Failed to get user preferences");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error get user preferences:", error);
     throw error;
   }
 };

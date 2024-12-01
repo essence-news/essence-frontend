@@ -869,25 +869,31 @@ export default function Player() {
   window.ReactNativeWebView.postMessage(
     Math.max(document.body.offsetHeight, document.body.scrollHeight)
   );`;
+
+  const handleGoToPreferences = async () => {
+    if (currentlyPlaying.current) {
+      await currentlyPlaying.current.stopAsync();
+      await currentlyPlaying.current.unloadAsync();
+    }
+    router.push("/preferences");
+  };
   // console.log({ progress, showPlayerControls });
-  console.log({
-    welcomeSoundStatus,
-    showWelcomeScreen,
-    isPlaying,
-    isLoading,
-    needsUserInput,
-    articles: articles.length,
-    currentNewsIndex,
-    // u: userRef.current,
-    // user,
-    OS: Platform.OS,
-  });
+  // console.log({
+  //   welcomeSoundStatus,
+  //   showWelcomeScreen,
+  //   isPlaying,
+  //   isLoading,
+  //   needsUserInput,
+  //   articles: articles.length,
+  //   currentNewsIndex,
+  //   OS: Platform.OS,
+  // });
   return (
     <SafeAreaView style={styles.container}>
       <BrandHeader />
       <Pressable
         style={{ zIndex: 11, position: "absolute", right: 20, top: 14 }}
-        onPress={() => router.push("/preferences")}
+        onPress={handleGoToPreferences}
       >
         <AntDesign name="setting" color={theme.colors.brand} size={24} />
       </Pressable>
@@ -921,6 +927,21 @@ export default function Player() {
                     size={20}
                     color={theme.colors.primary}
                   />
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      padding: 10,
+                      margin: 0,
+                      textAlign: "left",
+                      borderTopStartRadius: 5,
+                      borderTopEndRadius: 5,
+                      color: theme.colors.primary,
+                      fontFamily: theme.fonts.headingBold,
+                      flex: 1,
+                    }}
+                  >
+                    Back to player
+                  </Text>
                 </Pressable>
               </View>
             }
@@ -1181,6 +1202,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   image: {
+    marginTop: 50,
     width: "100%",
     flex: 1,
     justifyContent: "center",

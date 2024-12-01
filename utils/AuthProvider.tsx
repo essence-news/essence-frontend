@@ -126,7 +126,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         intro_audio_urls,
         introFileName,
       });
-      const welcomeSoundURI = intro_audio_urls[introFileName];
+      const welcomeSoundURI =
+        intro_audio_urls[introFileName] || intro_audio_urls["False_False_day"];
       const welcomeSound = await createSoundObject(welcomeSoundURI);
       initialWelcomeSound.current = {
         sound: welcomeSound,

@@ -1,16 +1,18 @@
 import BrandHeader from "@/components/BrandHeader";
 import { CheckBox } from "@/components/Checkbox";
 import { OkCancelModal } from "@/components/Modal";
-import { Button, Input } from "@/components/SharedComponents";
+import { Button, FormErrorMessage, Input } from "@/components/SharedComponents";
 import theme from "@/constants/theme";
-import { getPreferences } from "@/utils/api";
+import { getUserData, savePreferences } from "@/utils/api";
 import { useAuth } from "@/utils/AuthProvider";
 import { OptionType, preferencesFormConfig } from "@/utils/preferencesData";
 import { capitalize } from "@/utils/stringUtils";
 import { AntDesign } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Platform,
   Pressable,
   ScrollView,
@@ -31,6 +33,16 @@ export const PreferencesContainer = styled.View`
   position: relative;
 `;
 
+const LoadMoreButton = styled.Pressable`
+  font-size: 12px;
+  font-family: "${({ theme }) => theme.fonts.bodyBold}";
+  border: none;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.accent};
+  padding: 10px;
+  border-radius: 5px;
+`;
+
 const PreferencesLabel = styled.Text`
   font-size: 12px;
   color: ${({ theme }) => theme.colors.primary};
@@ -46,8 +58,8 @@ const StyledActionText = styled.Text`
 `;
 
 type PreferencesType = {
-  firstName: string;
-  emailID: string;
+  first_name: string;
+  email: string;
   industries: string;
   geographies: string;
   news_sources: string;
@@ -62,32 +74,60 @@ const StyledCollapsibleHeaderScrollView = styled(CollapsibleHeaderScrollView)`
   }
   -ms-overflow-style: none;
   scrollbar-width: none;
+  max-width: 500px;
 `;
 const StyledContainer = styled.View`
   flex: 1;
   justify-content: space-between;
 `;
 
+const PAGE_SIZE = 3;
+
 export default function Preferences() {
   const [isFocus, setIsFocus] = useState("");
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { fromSignIn } = useLocalSearchParams();
-
-  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState<any>(null);
-  const [initialPreferences, setInitialPreferences] = useState<
-    { [key: string]: string } | undefined
-  >();
-  const [payload, setPayload] = useState<{ [key: string]: string }>({});
+  const [sliceIndex, setSliceIndex] = useState(0);
+  const elementRefs = useRef({});
+  const [payload, setPayload] = useState<{ [key: string]: string | string[] }>(
+    {},
+  );
+  const { user, logout } = useAuth();
   const [addValue, setAddValue] = useState("");
-
+  const [userData, setUserData] = useState();
   useEffect(() => {
     async function init() {
-      const preferencesData = await getPreferences();
-      setInitialPreferences({
-        ...preferencesData,
-        firstName: user?.firstName || "",
-        emailID: user?.email || "",
-      });
+      setLoading(true);
+      try {
+        const userDataResponse = await getUserData();
+        // setInitialPreferences({
+        //   ...userDataResponse.preferences.json,
+        // });
+        const payloadObj: { [key: string]: string } = {
+          ...userDataResponse.preferences.json,
+        };
+        preferencesFormConfig
+          .filter((p) => !p.dynamic)
+          .forEach((p) => {
+            payloadObj[p.id] = userDataResponse[p.id];
+          });
+        setLoading(false);
+
+        setPayload(payloadObj);
+        console.log({ payloadObj });
+        setUserData(userDataResponse);
+      } catch (err) {
+        if (err.message === "Unauthorized") {
+          logout();
+        }
+        console.error(err);
+        // setArticles(mockNewsData.articles);
+        // await AsyncStorage.setItem("newsData", JSON.stringify(mockNewsData));
+      } finally {
+        setLoading(false);
+      }
     }
     init();
   }, []);
@@ -103,7 +143,47 @@ export default function Preferences() {
     onCancel();
   }
 
-  const handleSave = () => {
+  const validateFields = () => {
+    const mandatoryFields = preferencesFormConfig.filter(
+      (p) => p.mandatory && !p.disabled,
+    );
+    const errorObj: { [key: string]: string } = {};
+    let valid = true;
+    mandatoryFields.forEach((m) => {
+      if (!payload[m.id]) {
+        errorObj[m.id] = "Please provide a value";
+        valid = false;
+      }
+    });
+    setErrors(errorObj);
+    if (!valid) {
+      elementRefs.current?.[Object.keys(errorObj)[0]]?.focus();
+    }
+    return valid;
+  };
+
+  const handleSave = async () => {
+    if (loading) return;
+    if (!validateFields()) return;
+    setLoading(true);
+    console.log("will send", payload);
+    const saveResponse = await savePreferences({
+      ...payload,
+      country: "GB",
+      language: "EN",
+    });
+    console.log({ saveResponse });
+    setLoading(false);
+    const userClone = {
+      ...user,
+    };
+    preferencesFormConfig
+      .filter((p) => p.mandatory)
+      .forEach((p) => {
+        if (userClone) userClone[p.id] = payload[p.id];
+      });
+    await AsyncStorage.setItem("user", JSON.stringify(userClone));
+
     router.push("/player");
   };
   const handleCheckboxToggle = (
@@ -115,18 +195,15 @@ export default function Preferences() {
 
     if (selected) {
       setPayload((p) => {
-        // console.log({ p, initialPreferences });
-        if (!initialPreferences) return p;
         const existingValues =
-          p[id] === undefined
-            ? initialPreferences[id].split(",").map((e) => e.trim())
-            : p[id] === ""
-              ? []
-              : p[id].split(",");
+          p[id] === undefined ? [] : p[id] === "" ? [] : p[id];
 
         return {
           ...p,
-          [id]: [...existingValues.map((e) => e.trim()), value].join(","),
+          [id]: [
+            ...(existingValues as string[])?.map((e) => e.trim() || []),
+            value.toLowerCase(),
+          ],
         };
       });
     } else {
@@ -135,10 +212,9 @@ export default function Preferences() {
 
         return {
           ...p,
-          [id]: (p[id] ?? initialPreferences?.[id] ?? "")
-            .split(",")
+          [id]: ((p[id] ?? []) as string[])
             .map((e) => e.trim())
-            .filter((f) => f.trim() !== value.trim())
+            .filter((f) => f.trim() !== value.toLowerCase().trim())
             .join(","),
         };
       });
@@ -149,7 +225,7 @@ export default function Preferences() {
     item: OptionType,
     selected: boolean | undefined,
   ) => {
-    // console.log({ item, selected });
+    // console.log({ fieldId, item, selected });
     return (
       <View style={styles.item}>
         <CheckBox
@@ -160,128 +236,160 @@ export default function Preferences() {
       </View>
     );
   };
-  // console.log("render", { payload });
+
+  const textFields = preferencesFormConfig.filter((f) => f.type === "text");
+  const multiSelectFields = preferencesFormConfig.filter(
+    (f) => f.type === "multiselect",
+  );
+  // console.log("render", {
+  //   first_name: payload?.first_name,
+  //   payload,
+  //   userData,
+  //   loading,
+  //   preferencesFormConfig,
+  // });
   return (
     <StyledContainer>
       <ScrollView
         contentContainerStyle={{
           flex: 1,
+          alignItems: "center",
         }}
       >
         <BrandHeader />
-
-        <StyledCollapsibleHeaderScrollView
-          CollapsibleHeaderComponent={
-            <View
-              style={{
-                // flex: 1,
-                padding: 20,
-                marginTop: 50,
-                flexDirection: "row",
-                alignItems: "center",
-                width: "100%",
-                justifyContent: "space-between",
-              }}
-            >
-              {!fromSignIn && (
-                <Pressable onPress={() => router.push("/player")}>
-                  <AntDesign
-                    name="left"
-                    size={20}
-                    color={theme.colors.primary}
-                  />
-                </Pressable>
-              )}
-              <Text
+        {Object.keys(payload).length === 0 && loading ? (
+          <ActivityIndicator
+            style={{ flex: 1, justifyContent: "center" }}
+            size="large"
+            color={theme.colors.primary}
+          />
+        ) : (
+          <StyledCollapsibleHeaderScrollView
+            CollapsibleHeaderComponent={
+              <View
                 style={{
-                  fontSize: 16,
-                  padding: 10,
-                  margin: 0,
-                  textAlign: "left",
-                  borderTopStartRadius: 5,
-                  borderTopEndRadius: 5,
-                  color: theme.colors.primary,
-                  fontFamily: theme.fonts.headingBold,
-                  flex: 1,
+                  padding: 20,
+                  marginTop: 50,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  width: "100%",
+                  justifyContent: "space-between",
                 }}
               >
-                Preferences
-              </Text>
-              <Button
-                onPress={() => console.log("will send", payload)}
-                style={{
-                  backgroundColor: theme.colors.primary,
-                  color: theme.colors.secondary,
-                  fontSize: 14,
-                }}
-              >
+                {!fromSignIn && (
+                  <Pressable onPress={() => router.push("/player")}>
+                    <AntDesign
+                      name="left"
+                      size={20}
+                      color={theme.colors.primary}
+                    />
+                  </Pressable>
+                )}
                 <Text
                   style={{
-                    fontSize: 14,
-                    fontFamily: theme.fonts.body,
-                    color: theme.colors.secondary,
+                    fontSize: 16,
+                    padding: 10,
+                    margin: 0,
+                    textAlign: "left",
+                    borderTopStartRadius: 5,
+                    borderTopEndRadius: 5,
+                    color: theme.colors.primary,
+                    fontFamily: theme.fonts.headingBold,
+                    flex: 1,
                   }}
                 >
-                  Save
+                  Preferences
                 </Text>
-              </Button>
-            </View>
-          }
-          headerHeight={130}
-          headerContainerBackgroundColor={theme.colors.secondary}
-          statusBarHeight={Platform.OS === "ios" ? 20 : 0}
-        >
-          <PreferencesContainer style={{ paddingInline: 20 }}>
-            {preferencesFormConfig
-              .filter((f) => f.type === "text")
-              .map((f) => (
-                <View key={f.id} style={{ marginTop: 20 }}>
-                  <PreferencesLabel>
-                    {f.label}
-                    {f.mandatory && (
-                      <Text style={{ color: theme.colors.error }}>*</Text>
-                    )}
-                  </PreferencesLabel>
-                  {f.footnote && (
-                    <Text style={{ fontSize: 10 }}>{f.footnote}</Text>
+                <Button
+                  onPress={handleSave}
+                  style={{
+                    backgroundColor: theme.colors.primary,
+                    color: theme.colors.secondary,
+                    fontSize: 14,
+                  }}
+                >
+                  {loading ? (
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontFamily: theme.fonts.body,
+                        color: theme.colors.secondary,
+                      }}
+                    >
+                      Saving
+                    </Text>
+                  ) : (
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontFamily: theme.fonts.body,
+                        color: theme.colors.secondary,
+                      }}
+                    >
+                      Save
+                    </Text>
                   )}
-                  <Input
-                    id={f.id}
-                    // placeholder="Verification Code"
-                    value={payload?.[f.id]}
-                    defaultValue={initialPreferences?.[f.id] || ""}
-                    onChangeText={(v) => {
-                      // console.log({ f, v });
-                      setPayload((p) => ({
-                        ...p,
-                        [f.id]: v,
-                      }));
-                    }}
-                    // disabled={isLoading}
-                    style={{
-                      marginTop: 10,
-                      backgroundColor: f.disabled
-                        ? "rgba(0, 0, 0, 0.1)"
-                        : "initial",
-                    }}
-                    focusable={!f.disabled}
-                    editable={!f.disabled}
-                  />
-                </View>
-              ))}
-            {preferencesFormConfig
-              .filter((f) => f.type === "multiselect")
-              .map((p) => {
+                </Button>
+              </View>
+            }
+            headerHeight={130}
+            headerContainerBackgroundColor={theme.colors.secondary}
+            statusBarHeight={Platform.OS === "ios" ? 20 : 0}
+          >
+            <PreferencesContainer style={{ paddingInline: 20 }}>
+              {textFields.map((f) => {
+                // console.log({
+                //   value: payload?.[f.id] || "",
+                //   id: f.id,
+                // });
+                return (
+                  <View key={f.id} style={{ marginTop: 20 }}>
+                    <PreferencesLabel>
+                      {f.label}
+                      {f.mandatory && (
+                        <Text style={{ color: theme.colors.error }}>*</Text>
+                      )}
+                    </PreferencesLabel>
+                    {f.footnote && (
+                      <Text style={{ fontSize: 10 }}>{f.footnote}</Text>
+                    )}
+                    <Input
+                      id={f.id}
+                      ref={(element) => (elementRefs.current[f.id] = element)}
+                      // placeholder="Verification Code"
+                      value={payload?.[f.id] ?? userData?.[f.id] ?? ""}
+                      onChangeText={(v) => {
+                        // console.log({ f, v });
+                        setPayload((p) => ({
+                          ...p,
+                          [f.id]: v,
+                        }));
+                      }}
+                      // disabled={isLoading}
+                      style={{
+                        marginTop: 10,
+                        backgroundColor: f.disabled
+                          ? "rgba(0, 0, 0, 0.1)"
+                          : "initial",
+                      }}
+                      focusable={!f.disabled}
+                      editable={!f.disabled}
+                    />
+                    {errors[f.id] ? (
+                      <FormErrorMessage>{errors[f.id]}</FormErrorMessage>
+                    ) : (
+                      <Text></Text>
+                    )}
+                  </View>
+                );
+              })}
+              {multiSelectFields.slice(0, sliceIndex).map((p) => {
                 const data = [...(p.defaultValues || [])];
                 if (payload?.[p.id] !== "") {
                   const definedValues =
-                    payload?.[p.id] !== undefined
-                      ? payload?.[p.id]?.split(",")
-                      : initialPreferences?.[p.id]
-                          ?.split(",")
-                          .map((e) => e.trim()) || [];
+                    payload?.[p.id] !== undefined ? payload?.[p.id] : [];
 
-                  definedValues.forEach((f) => {
+                  (definedValues as string[]).forEach((f) => {
                     if (
                       !data.find(
                         (val) =>
@@ -291,7 +399,7 @@ export default function Preferences() {
                     ) {
                       data.push({
                         label: capitalize(f),
-                        value: f,
+                        value: f.toLowerCase(),
                         selected: true,
                       });
                     }
@@ -302,6 +410,12 @@ export default function Preferences() {
                 //   data,
                 //   payload,
                 //   initialPreferences,
+                //   value:
+                //     payload?.[p.id] ||
+                //     initialPreferences?.[p.id]?.map((e) =>
+                //       e.trim().toLowerCase(),
+                //     ) ||
+                //     [],
                 // });
                 return (
                   <View
@@ -350,11 +464,9 @@ export default function Preferences() {
                           // search
                           // in
                           value={
-                            payload?.[p.id]?.split(",") ||
-                            initialPreferences?.[p.id]
-                              ?.split(",")
-                              .map((e) => e.trim()) ||
-                            []
+                            (payload?.[p.id] ||
+                              userData?.[p.id] ||
+                              []) as string[]
                           }
                           maxHeight={300}
                           labelField="label"
@@ -411,22 +523,32 @@ export default function Preferences() {
                   </View>
                 );
               })}
-            {!!showAddModal && (
-              <OkCancelModal
-                onCancel={onCancel}
-                onOk={onOkInAddModal}
-                label={"Add Custom " + showAddModal.label}
-              >
-                <Input
-                  onChangeText={setAddValue}
-                  value={addValue}
-                  style={styles.textInput}
-                  placeholder=""
-                />
-              </OkCancelModal>
-            )}
-          </PreferencesContainer>
-        </StyledCollapsibleHeaderScrollView>
+              {sliceIndex < multiSelectFields.length ? (
+                <LoadMoreButton
+                  onPress={() => setSliceIndex((s) => s + PAGE_SIZE)}
+                >
+                  Load more preferences
+                </LoadMoreButton>
+              ) : (
+                <Text></Text>
+              )}
+              {!!showAddModal && (
+                <OkCancelModal
+                  onCancel={onCancel}
+                  onOk={onOkInAddModal}
+                  label={"Add Custom " + showAddModal.label}
+                >
+                  <Input
+                    onChangeText={setAddValue}
+                    value={addValue}
+                    style={styles.textInput}
+                    placeholder=""
+                  />
+                </OkCancelModal>
+              )}
+            </PreferencesContainer>
+          </StyledCollapsibleHeaderScrollView>
+        )}
       </ScrollView>
     </StyledContainer>
   );

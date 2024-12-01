@@ -221,20 +221,6 @@ const Home = () => {
     router.push("/player");
   };
 
-  const init = async () => {
-    const token = await AsyncStorage.getItem("userToken");
-    console.log("home", { token });
-    if (token) {
-      router.push("/player");
-    } else {
-      router.push("/sign-in");
-    }
-  };
-
-  useEffect(() => {
-    init();
-  }, []);
-
   console.log("Home page");
 
   const handleJoinBeta = () => {

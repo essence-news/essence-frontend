@@ -134,6 +134,12 @@ export const ErrorMessage = styled.Text`
   padding: 10px;
 `;
 
+export const FormErrorMessage = styled.Text`
+  font-family: "${({ theme }) => theme.fonts.body}";
+  color: ${({ theme }) => theme.colors.error};
+  font-size: 12px;
+`;
+
 export const InfoMessage = styled.Text`
   font-family: "${({ theme }) => theme.fonts.body}";
   color: ${({ theme }) => theme.colors.secondary};

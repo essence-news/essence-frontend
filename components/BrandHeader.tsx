@@ -1,7 +1,8 @@
 import React from "react";
-import { Dimensions } from "react-native";
+import { Dimensions, Pressable } from "react-native";
 import styled, { ThemeProvider } from "styled-components/native";
 import { HeaderContainer } from "./SharedComponents";
+import { router } from "expo-router";
 
 const BrandName = styled.Text`
   margin: 0;
@@ -20,8 +21,17 @@ const Logo = styled.Image`
 
 const BrandHeader = () => (
   <HeaderContainer width={Dimensions.get("window").width}>
-    <Logo source={require("../assets/logo.png")} alt="Brand Logo" />
-    <BrandName>essence</BrandName>
+    <Pressable
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+      onPress={() => router.push("/home")}
+    >
+      <Logo source={require("../assets/logo.png")} alt="Brand Logo" />
+      <BrandName>essence</BrandName>
+    </Pressable>
   </HeaderContainer>
 );
 

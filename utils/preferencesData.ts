@@ -16,11 +16,11 @@ export const industries: OptionType[] = [
 ];
 export const geographies: OptionType[] = [
   {
-    value: "UK",
+    value: "uk",
     label: "UK",
   },
   {
-    value: "US",
+    value: "us",
     label: "US",
   },
 ];
@@ -66,11 +66,12 @@ export const brands: OptionType[] = [
 ];
 export const preferencesFormConfig = [
   {
-    id: "firstName",
+    id: "first_name",
     label: "First Name",
     defaultValue: "",
     mandatory: true,
     type: "text",
+    dynamic: false,
   },
   {
     id: "email",
@@ -79,15 +80,7 @@ export const preferencesFormConfig = [
     mandatory: true,
     type: "text",
     disabled: true,
-  },
-  {
-    id: "company",
-    label: "Company Name",
-    footnote:
-      "We will use this info to prioritise news articles related to your company",
-    defaultValue: "",
-    mandatory: false,
-    type: "text",
+    dynamic: true,
   },
   {
     id: "industry",
@@ -97,6 +90,17 @@ export const preferencesFormConfig = [
     defaultValue: "",
     mandatory: false,
     type: "text",
+    dynamic: false,
+  },
+  {
+    id: "company",
+    label: "Company Name",
+    footnote:
+      "We will use this info to prioritise news articles related to your company",
+    defaultValue: "",
+    mandatory: false,
+    type: "text",
+    dynamic: true,
   },
   {
     id: "city",
@@ -104,6 +108,7 @@ export const preferencesFormConfig = [
     defaultValue: "",
     mandatory: false,
     type: "text",
+    dynamic: true,
   },
   {
     id: "industries",
@@ -111,8 +116,9 @@ export const preferencesFormConfig = [
     defaultValues: industries,
     footnote: "We will try to summarise news related to these industries",
     // selectedValues: ["fashion", "electronics"],
-    mandatory: true,
+    mandatory: false,
     type: "multiselect",
+    dynamic: true,
   },
   {
     id: "geographies",
@@ -120,32 +126,36 @@ export const preferencesFormConfig = [
     defaultValues: geographies,
     footnote:
       "Latest news from your choice of geographical coverage will be summarised for you",
-    mandatory: true,
+    mandatory: false,
     type: "multiselect",
+    dynamic: true,
   },
   {
     id: "news_sources",
     label: "News Sources",
     defaultValues: newsSources,
     footnote: "Please choose/add new options that might be relevant to you",
-    mandatory: true,
+    mandatory: false,
     type: "multiselect",
+    dynamic: false,
   },
   {
     id: "functions",
     label: "Functions",
     defaultValues: functions,
     footnote: "Please choose/add new options that might be relevant to you",
-    mandatory: true,
+    mandatory: false,
     type: "multiselect",
+    dynamic: true,
   },
   {
     id: "topics",
     label: "Topics",
     defaultValues: topics,
     footnote: "Please choose all topics that might be relevant to you",
-    mandatory: true,
+    mandatory: false,
     type: "multiselect",
+    dynamic: true,
   },
   {
     id: "brands",
@@ -153,7 +163,8 @@ export const preferencesFormConfig = [
     footnote:
       "Please choose a few sample brands / retailers that are of interest to you",
     defaultValues: brands,
-    mandatory: true,
+    mandatory: false,
     type: "multiselect",
+    dynamic: true,
   },
 ];
