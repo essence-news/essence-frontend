@@ -660,3 +660,36 @@ export const Logo = styled.Image`
   width: 28px;
   margin-right: 20px;
 `;
+
+export const PrivacyContainer = styled.View`
+  padding: 60px 20px;
+  width: 90%;
+  margin: 0 auto;
+`;
+
+export const PrivacyHeading = styled.Text`
+  font-family: "${({ theme }) => theme.fonts.body}";
+  font-size: 34px;
+  color: ${({ theme }) => theme.colors.primary};
+  margin-bottom: 32px;
+`;
+
+export const PrivacySubheading = styled.Text`
+  font-family: "${({ theme }) => theme.fonts.body}";
+  font-size: 20px;
+  color: ${({ theme }) => theme.colors.primaryLight};
+  margin-top: 16px;
+  margin-bottom: 8px;
+`;
+
+export const PrivacyText = styled.Text`
+  font-family: "${({ theme }) => theme.fonts.body}";
+  font-size: 15px;
+  color: ${({ theme }) => theme.colors.primaryLighter};
+  margin-bottom: 16px;
+`;
+
+export const PrivacyLink = styled.Text`
+  color: ${({ theme }) => theme.colors.accent};
+  text-decoration: none;
+`;
