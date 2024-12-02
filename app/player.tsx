@@ -670,6 +670,11 @@ export default function Player() {
     setIsLoading(false);
   }
 
+  const handleLeavePlayer = () => {
+    setLastInactive();
+    flushQueue();
+  };
+
   useEffect(() => {
     if (welcomeSoundStatus === "completed") {
       playSound();
@@ -701,8 +706,7 @@ export default function Player() {
         nextAppState.match(/inactive|background/)
       ) {
         // console.log("App has come to the background!");
-        setLastInactive();
-        flushQueue();
+        handleLeavePlayer();
       }
       trackEvent("visibilityChange", null, null, null, null, { nextAppState });
 
@@ -720,10 +724,15 @@ export default function Player() {
     // console.log("***********callling load");
     // load();
     return async () => {
-      await currentlyPlaying.current?.stopAsync();
-      await currentlyPlaying.current?.unloadAsync();
-      await welcomeSoundRef.current?.stopAsync();
-      await welcomeSoundRef.current?.unloadAsync();
+      handleLeavePlayer();
+      if (currentlyPlaying.current?._loaded) {
+        await currentlyPlaying.current?.stopAsync();
+        await currentlyPlaying.current?.unloadAsync();
+      }
+      if (welcomeSoundRef.current?._loaded) {
+        await welcomeSoundRef.current?.stopAsync();
+        await welcomeSoundRef.current?.unloadAsync();
+      }
     };
   }, []);
 

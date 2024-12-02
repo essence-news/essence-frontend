@@ -195,9 +195,14 @@ export default function Preferences() {
 
     if (selected) {
       setPayload((p) => {
-        const existingValues =
-          p[id] === undefined ? [] : p[id] === "" ? [] : p[id];
-
+        const existingValues = p[id] === undefined ? [] : p[id];
+        // console.log({
+        //   existingValues,
+        //   val: [
+        //     ...(existingValues as string[])?.map((e) => e.trim() || []),
+        //     value.toLowerCase(),
+        //   ],
+        // });
         return {
           ...p,
           [id]: [
@@ -385,11 +390,12 @@ export default function Preferences() {
               })}
               {multiSelectFields.slice(0, sliceIndex).map((p) => {
                 const data = [...(p.defaultValues || [])];
-                if (payload?.[p.id] !== "") {
+                // console.log({ payload });
+                if (payload?.[p.id].length > 0) {
                   const definedValues =
                     payload?.[p.id] !== undefined ? payload?.[p.id] : [];
 
-                  (definedValues as string[]).forEach((f) => {
+                  (definedValues as string[])?.forEach((f) => {
                     if (
                       !data.find(
                         (val) =>
@@ -409,13 +415,7 @@ export default function Preferences() {
                 //   p,
                 //   data,
                 //   payload,
-                //   initialPreferences,
-                //   value:
-                //     payload?.[p.id] ||
-                //     initialPreferences?.[p.id]?.map((e) =>
-                //       e.trim().toLowerCase(),
-                //     ) ||
-                //     [],
+                //   value: payload?.[p.id] || [],
                 // });
                 return (
                   <View
@@ -479,7 +479,7 @@ export default function Preferences() {
                             // console.log({ item, p });
                             setPayload((pload) => ({
                               ...pload,
-                              [p.id]: item.join(","),
+                              [p.id]: [...item],
                             }));
                             setIsFocus("");
                           }}

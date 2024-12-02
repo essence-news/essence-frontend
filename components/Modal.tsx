@@ -66,8 +66,6 @@ export function OkCancelModal({ children, onCancel, onOk, label = "" }: Props) {
   );
 }
 
-const screenWidth = Dimensions.get("window").width;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -77,7 +75,6 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 5,
-    width: screenWidth - 40,
     backgroundColor: "#fff",
   },
   actionsContainer: {

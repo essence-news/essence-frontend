@@ -63,29 +63,22 @@ export default function Login() {
     setError("");
     setIsLoading(true);
     try {
-      const success = await verify(
+      const userObj = await verify(
         email.toLowerCase(),
         verificationCode,
         userFirstName || firstName,
       );
-      if (success) {
-        console.log("userFirstName", userFirstName);
-        if (userFirstName) {
-          console.log("will go to player");
-          router.replace("/player");
-        } else {
-          console.log("will go to preferences");
-          router.replace({
-            pathname: "/preferences",
-            params: {
-              fromSignIn: "yes",
-            },
-          });
-        }
+      if (userObj?.preferences && Object.keys(userObj.preferences).length > 0) {
+        console.log("will go to player");
+        router.replace("/player");
       } else {
-        throw new Error(
-          "Verification failed. Please check your code and try again.",
-        );
+        console.log("will go to preferences");
+        router.replace({
+          pathname: "/preferences",
+          params: {
+            fromSignIn: "yes",
+          },
+        });
       }
     } catch (error) {
       console.error("Verify token error:", error);

@@ -31,12 +31,13 @@ export type Auth = {
     email: string,
     verificationCode: string,
     firstName: string,
-  ) => Promise<boolean>;
+  ) => Promise<User>;
   logout: () => void;
   ensureTokenValidity: () => Promise<User | undefined>;
 };
 type User = {
   token?: string;
+  preferences: unknown;
   firstName: string;
   isFirstTimeEver?: string;
   isFirstTimeToday?: boolean;
@@ -258,8 +259,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.log("verify will set user", { userPayload });
         await AsyncStorage.setItem("user", JSON.stringify(userPayload));
         setUser(userPayload);
+        return userObj;
       }
-      return true;
     } catch (error) {
       console.error("Verification error in Authprovider:", error);
       throw error;
