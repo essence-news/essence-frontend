@@ -1,0 +1,7 @@
+>> Troubleshooting instructions:
+
+First understand the problem thoroughly
+Question basic assumptions before suggesting changes
+Start with the simplest and most elegant possible solution
+Consider platform-native behaviors first
+Only suggest complexity when necessary
