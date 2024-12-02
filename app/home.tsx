@@ -226,13 +226,13 @@ const Home = () => {
           </StyledPressable>
         </ButtonSection>
         <FooterLinks>
-          <Link href="/">
+          <Link href="/terms">
             <FooterLink>Terms</FooterLink>
           </Link>
-          <Link href="/">
+          <Link href="/privacy">
             <FooterLink>Privacy</FooterLink>
           </Link>
-          <Link href="/">
+          <Link href="mailto:hi@getessence.app">
             <FooterLink>Contact</FooterLink>
           </Link>
         </FooterLinks>
