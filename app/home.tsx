@@ -84,10 +84,9 @@ const Home = () => {
       <HeroSection smallScreen={isTabletOrMobileDevice}>
         <LeftSection smallScreen={isTabletOrMobileDevice}>
           <Brand>essence</Brand>
-          <Headline>Retail news in 30-second soundbites</Headline>
+          <Headline>Business News That Speaks to You</Headline>
           <Subheadline>
-            Essence delivers curated, personalized audio news and insights for busy
-            professionals.
+            Purpose-built for Retail Leaders—concise 30-second audio news, expertly curated for your role and industry
           </Subheadline>
           <ButtonSection smallScreen={isTabletOrMobileDevice}>
             <BetaPressable onPress={handleJoinBeta}>
@@ -168,8 +167,8 @@ const Home = () => {
             <InsightTitleSmall>Your Industry. Your News.</InsightTitleSmall>
             <InsightTitle>Tailored for You</InsightTitle>
             <InsightSubtitle>
-              Essence curates content from top sources, tailored to your
-              specific industry and role. Stay relevant without the noise
+              Essence curates content from top sources, even from behind paywalls, tailored to your
+              specific industry and role. Stay relevant without the noise and hassle.
             </InsightSubtitle>
           </InsightContent>
         </InsightCardLeft>
