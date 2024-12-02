@@ -90,7 +90,7 @@ export const preferencesFormConfig = [
     defaultValue: "",
     mandatory: false,
     type: "text",
-    dynamic: false,
+    dynamic: true,
   },
   {
     id: "company",
