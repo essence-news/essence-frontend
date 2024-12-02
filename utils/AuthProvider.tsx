@@ -122,7 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         "_" +
         getTimeOfDay();
 
-      console.log("ensureTokenValidity", {
+      console.log("prepareWelcomeSound", {
         intro_audio_urls,
         introFileName,
       });
@@ -134,6 +134,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         uri: welcomeSoundURI,
       };
     } else if (initialWelcomeSoundURI) {
+      console.log("prepareWelcomeSound going with initialWelcomeSoundURI", {
+        initialWelcomeSoundURI,
+      });
       const welcomeSound = await createSoundObject(initialWelcomeSoundURI);
       initialWelcomeSound.current = {
         sound: welcomeSound,
@@ -237,11 +240,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     inputFirstName: string,
   ) => {
     try {
-      setLoading(true);
       const response = await verifyEmail(email, verificationCode);
       if (response.token) {
         await AsyncStorage.setItem("userToken", response.token);
-
+        await prepareWelcomeSound();
         const user = await AsyncStorage.getItem("user");
         let userObj;
         let isFirstTimeEver = false;
@@ -259,10 +261,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       return true;
     } catch (error) {
-      console.error("Verification error:", error);
+      console.error("Verification error in Authprovider:", error);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 

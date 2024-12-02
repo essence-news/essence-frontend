@@ -70,21 +70,25 @@ export default function Login() {
       );
       if (success) {
         console.log("userFirstName", userFirstName);
-        if (userFirstName) router.replace("/player");
-        else
+        if (userFirstName) {
+          console.log("will go to player");
+          router.replace("/player");
+        } else {
+          console.log("will go to preferences");
           router.replace({
             pathname: "/preferences",
             params: {
               fromSignIn: "yes",
             },
           });
+        }
       } else {
         throw new Error(
           "Verification failed. Please check your code and try again.",
         );
       }
     } catch (error) {
-      console.error("Verification error:", error);
+      console.error("Verify token error:", error);
       setError("An error occurred during verification.");
     } finally {
       setIsLoading(false);

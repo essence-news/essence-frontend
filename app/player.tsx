@@ -482,20 +482,14 @@ export default function Player() {
 
   const setAndPlayWelcomeSound = async () => {
     console.log("setandplayWelcomesound", initialWelcomeSound);
-    let sound = initialWelcomeSound.sound;
-    if (!sound) {
-      console.info(
-        "cound not find welcome sound - will initialize from uri",
-        initialWelcomeSound,
-      );
-      sound = await createSoundObject(initialWelcomeSound.uri);
-    }
+    let sound = initialWelcomeSound?.sound;
     if (!sound) {
       console.error(
         "failed to initialize welcome sound - missing URI",
         initialWelcomeSound,
       );
       setWelcomeSoundStatus("ignored");
+      return;
     }
     welcomeSoundRef.current = sound;
     console.log("Playing welcomeSound", initialWelcomeSound.uri);
@@ -722,16 +716,16 @@ export default function Player() {
     };
   }, [welcomeSoundStatus, currentlyPlaying.current]);
 
-  // useEffect(() => {
-  //   console.log("***********callling load");
-  //   load();
-  //   return async () => {
-  //     await currentlyPlaying.current?.stopAsync();
-  //     await currentlyPlaying.current?.unloadAsync();
-  //     await welcomeSoundRef.current?.stopAsync();
-  //     await welcomeSoundRef.current?.unloadAsync();
-  //   };
-  // }, []);
+  useEffect(() => {
+    // console.log("***********callling load");
+    // load();
+    return async () => {
+      await currentlyPlaying.current?.stopAsync();
+      await currentlyPlaying.current?.unloadAsync();
+      await welcomeSoundRef.current?.stopAsync();
+      await welcomeSoundRef.current?.unloadAsync();
+    };
+  }, []);
 
   useEffect(() => {
     console.log("will call play sound with currentNewsIndex", {
