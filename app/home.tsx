@@ -1,7 +1,4 @@
-import styled from "styled-components/native";
-
 import { useAuth } from "../utils/AuthProvider";
-import { ScrollView, View } from "react-native";
 import { Link, router } from "expo-router";
 import "@expo/match-media";
 import { useMediaQuery } from "react-responsive";
@@ -27,14 +24,11 @@ import {
   StyledPressable,
   StyledImageBackground,
   Overlay,
-  Logo,
-  LogoContainer,
   InsightCardRight,
   InsightCardLeft,
+  commonStyles,
 } from "@/components/SharedComponents";
-import { useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { WebView } from "react-native-web-webview";
+import { WebView } from "react-native-webview";
 
 import screenshot1 from "@/assets/screenshots/1.jpg";
 import ecommercePic from "@/assets/cliparts/ecommerce.jpg";
@@ -142,7 +136,7 @@ const Home = () => {
                     </html>
                   `,
               }}
-              style={{ flex: 1 }}
+              style={commonStyles.flex_1}
               javaScriptEnabled={true}
               domStorageEnabled={true}
               allowsFullscreenVideo={true}

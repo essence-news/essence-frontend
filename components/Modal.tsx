@@ -1,15 +1,68 @@
 import React from "react";
-import {
-  Dimensions,
-  Modal,
-  Text,
-  TouchableOpacity,
-  View,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
-import { Title } from "./SharedComponents";
-import theme from "@/constants/theme";
+import { Modal } from "react-native";
+import { H5 } from "./SharedComponents";
+import styled from "styled-components/native";
+
+const ModalTitle = styled(H5)`
+  padding: 10px;
+  margin: 0;
+  text-align: left;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  color: ${({ theme }) => theme.colors.primary};
+  font-family: ${({ theme }) => theme.fonts.headingBold};
+  background-color: ${({ theme }) => theme.colors.secondary};
+`;
+
+const StyledScrollView = styled.ScrollView`
+  padding: 10px;
+`;
+
+const StyledContainer = styled.View`
+  background-color: #0004;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+`;
+
+const StyledCard = styled.View`
+  width: 90%;
+  border-radius: 5px;
+  background-color: #fff;
+`;
+
+const ActionsContainer = styled.View`
+  flex-direction: row;
+  border-top-width: 1px;
+  gap: 5px;
+  border-color: #eee;
+`;
+
+const CancelButton = styled.TouchableOpacity`
+  flex: 1;
+  padding: 10px;
+  align-items: center;
+  border-width: 1px;
+  border-radius: 5px;
+  bordercolor: ${({ theme }) => theme.colors.primaryDark};
+  backgroundcolor: ${({ theme }) => theme.colors.primary};
+`;
+
+const OkButton = styled.TouchableOpacity`
+  flex: 1;
+  padding: 10px;
+  align-items: center;
+  border-width: 1px;
+  border-radius: 5px;
+  border-color: ${({ theme }) => theme.colors.secondaryDark};
+  background-color: ${({ theme }) => theme.colors.secondary};
+`;
+export const CancelButtonText = styled.Text`
+  color: ${({ theme }) => theme.colors.primary};
+`;
+export const OkButtonText = styled.Text`
+  color: ${({ theme }) => theme.colors.primary};
+`;
 
 export type ModalInputProps = {
   onCancel: () => void;
@@ -29,76 +82,22 @@ export function OkCancelModal({ children, onCancel, onOk, label = "" }: Props) {
       visible={true}
       onRequestClose={() => null}
     >
-      <View style={styles.container}>
-        <View style={styles.card}>
-          <Text
-            style={{
-              fontSize: 16,
-              padding: 10,
-              margin: 0,
-              textAlign: "left",
-              borderTopStartRadius: 5,
-              borderTopEndRadius: 5,
-              color: theme.colors.primary,
-              fontFamily: theme.fonts.headingBold,
-              backgroundColor: theme.colors.secondary,
-            }}
-          >
-            {label}
-          </Text>
-          <ScrollView
-            style={{ padding: 10 }}
-            keyboardShouldPersistTaps="always"
-          >
+      <StyledContainer>
+        <StyledCard>
+          <ModalTitle>{label}</ModalTitle>
+          <StyledScrollView keyboardShouldPersistTaps="always">
             {children}
-            <View style={styles.actionsContainer}>
-              <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-                <Text style={{ color: theme.colors.primary }}>CANCEL</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.okButton} onPress={onOk}>
-                <Text style={{ color: theme.colors.secondary }}>OK</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-        </View>
-      </View>
+            <ActionsContainer>
+              <CancelButton onPress={onCancel}>
+                <CancelButtonText>CANCEL</CancelButtonText>
+              </CancelButton>
+              <OkButton onPress={onOk}>
+                <OkButtonText>OK</OkButtonText>
+              </OkButton>
+            </ActionsContainer>
+          </StyledScrollView>
+        </StyledCard>
+      </StyledContainer>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0004",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  card: {
-    borderRadius: 5,
-    backgroundColor: "#fff",
-  },
-  actionsContainer: {
-    flexDirection: "row",
-    borderTopWidth: 1,
-    gap: 5,
-    borderColor: "#eee",
-  },
-  cancelButton: {
-    flex: 1,
-    padding: 10,
-    alignItems: "center",
-    borderWidth: 1,
-    borderRadius: 5,
-    borderColor: theme.colors.secondaryDark,
-    backgroundColor: theme.colors.secondary,
-  },
-  okButton: {
-    flex: 1,
-    padding: 10,
-    alignItems: "center",
-    borderWidth: 1,
-    borderRadius: 5,
-    borderColor: theme.colors.primaryDark,
-    backgroundColor: theme.colors.primary,
-  },
-});

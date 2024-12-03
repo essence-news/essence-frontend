@@ -44,7 +44,7 @@ import {
 } from "@expo-google-fonts/comfortaa";
 import { useFonts } from "expo-font";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { MainContainer } from "@/components/SharedComponents";
+import { commonStyles, MainContainer } from "@/components/SharedComponents";
 
 export default function Root() {
   const [loaded, error] = useFonts({
@@ -101,7 +101,7 @@ export default function Root() {
     <ThemeProvider theme={theme}>
       <AuthProvider>
         <SafeAreaProvider>
-          <SafeAreaView style={styles.container} edges={["top"]}>
+          <SafeAreaView style={commonStyles.flex_1} edges={["top"]}>
             <MainContainer>
               {/* <ScrollView> */}
               <Slot />
@@ -113,9 +113,3 @@ export default function Root() {
     </ThemeProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

@@ -12,8 +12,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { Sound } from "expo-av/build/Audio";
 import { createSoundObject, getTimeOfDay } from "./commonUtils";
-import { ActivityIndicator } from "react-native";
 import theme from "@/constants/theme";
+import { StyledActivityIndicator } from "@/components/SharedComponents";
 
 export type Auth = {
   user?: User;
@@ -61,6 +61,8 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | undefined>(undefined);
   const [loading, setLoading] = useState(true);
+  const [requestLoading, setRequestLoading] = useState(false);
+
   const initialWelcomeSound = useRef<{
     sound: Sound | null;
     uri: string;
@@ -135,14 +137,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         uri: welcomeSoundURI,
       };
     } else if (initialWelcomeSoundURI) {
-      console.log("prepareWelcomeSound going with initialWelcomeSoundURI", {
-        initialWelcomeSoundURI,
-      });
       const welcomeSound = await createSoundObject(initialWelcomeSoundURI);
       initialWelcomeSound.current = {
         sound: welcomeSound,
         uri: initialWelcomeSoundURI,
       };
+      console.log("prepareWelcomeSound going with initialWelcomeSoundURI", {
+        initialWelcomeSound: initialWelcomeSound.current,
+      });
     }
   };
 
@@ -215,6 +217,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     language: string,
   ) => {
     try {
+      setRequestLoading(true);
       const result = await signIn(email, inputFirstName, country, language);
       // const welcomeSound = await createSoundObject(result.welcomeSound);
       await AsyncStorage.setItem(
@@ -231,6 +234,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Login error:", error);
       throw error;
+    } finally {
+      setRequestLoading(false);
     }
   };
 
@@ -290,14 +295,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     prepareWelcomeSound,
     initialWelcomeSound: initialWelcomeSound.current,
   };
-  console.log({ loading });
+  console.log({ loading, initialWelcomeSound: initialWelcomeSound.current });
   if (loading)
     return (
-      <ActivityIndicator
-        style={{ flex: 1, justifyContent: "center" }}
-        size="large"
-        color={theme.colors.primary}
-      />
+      <StyledActivityIndicator size="large" color={theme.colors.primary} />
     );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
