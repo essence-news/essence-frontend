@@ -118,7 +118,7 @@ export const Brand = styled.Text`
   font-family: "${({ theme }) => theme.fonts.brand}";
   font-size: 68px;
   font-weight: 300;
-  color: ${({ theme }) => theme.colors.brand};
+  color: ${({ theme }) => theme.colors.primary};
   margin-bottom: 40px;
   margin-top: 0;
 `;
@@ -126,7 +126,7 @@ export const Brand = styled.Text`
 export const Headline = styled.Text`
   font-family: "${({ theme }) => theme.fonts.body}";
   font-size: 34px;
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primaryLight};
   margin-bottom: 20px;
 `;
 
@@ -134,7 +134,7 @@ export const Subheadline = styled.Text`
   font-family: "${({ theme }) => theme.fonts.bodyLight}";
   font-size: 20px;
   font-weight: 300;
-  color: ${({ theme }) => theme.colors.primaryLight};
+  color: ${({ theme }) => theme.colors.primaryLighter};
   margin-bottom: 40px;
 `;
 

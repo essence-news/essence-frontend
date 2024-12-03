@@ -35,6 +35,7 @@ import {
 import { useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { WebView } from "react-native-web-webview";
+import { Analytics } from 'aws-amplify';
 
 import screenshot1 from "@/assets/screenshots/1.jpg";
 import ecommercePic from "@/assets/cliparts/ecommerce.jpg";
@@ -84,7 +85,7 @@ const Home = () => {
       <HeroSection smallScreen={isTabletOrMobileDevice}>
         <LeftSection smallScreen={isTabletOrMobileDevice}>
           <Brand>essence</Brand>
-          <Headline>Business News That Speaks to You</Headline>
+          <Headline>Business news that speaks to you</Headline>
           <Subheadline>
             Purpose-built for Retail Leaders—concise 30-second audio news, expertly curated for your role and industry
           </Subheadline>
