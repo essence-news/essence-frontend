@@ -822,6 +822,7 @@ export default function Player() {
       // await currentlyPlaying.current?.unloadAsync();
       currentlyPlaying.current = null;
     }
+    setIsPlaying(false);
     const newIndex = currentNewsIndex + 1;
     console.log("handleNext", {
       newIndex,
