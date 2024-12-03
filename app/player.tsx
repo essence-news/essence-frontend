@@ -841,6 +841,8 @@ export default function Player() {
 
   const handlePrev = async () => {
     await currentlyPlaying.current?.stopAsync();
+    setIsPlaying(false);
+
     // await currentlyPlaying.current?.unloadAsync();
     currentlyPlaying.current = null;
     const newIndex = currentNewsIndex - 1;
