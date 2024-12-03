@@ -440,7 +440,7 @@ export default function Preferences() {
                 {multiSelectFields.slice(0, sliceIndex).map((p) => {
                   const data = [...(p.defaultValues || [])];
                   console.log({ payload });
-                  if (payload?.[p.id].length > 0) {
+                  if (payload?.[p.id]?.length > 0) {
                     const definedValues =
                       payload?.[p.id] !== undefined ? payload?.[p.id] : [];
                     console.log({ definedValues });
