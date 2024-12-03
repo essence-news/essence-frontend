@@ -44,6 +44,7 @@ import {
   MainContent,
   H5,
   StyledActivityIndicator,
+  StyledText,
 } from "@/components/SharedComponents";
 import { useTheme } from "styled-components/native";
 import BrandHeader from "@/components/BrandHeader";
@@ -105,26 +106,21 @@ const CollapsibleHeaderScrollViewContainer = styled.View`
   max-width: 500px;
   justify-content: flex-start;
   margin-top: 0px;
+  padding-top: 10px;
   border: none;
 `;
 
-const HeaderContainer = styled.View`
+const BackButton = styled.Pressable`
   padding: 20px;
   margin-top: 50px;
   flex-direction: row;
   align-items: center;
   width: 100%;
-  justify-content: space-between;
+  justify-content: flex-start;
 `;
+
 const BackToPlayerText = styled(H5)`
-  padding: 10px;
-  margin: 0px;
-  text-align: left;
-  border-top-start-radius: 5px;
-  border-top-end-radius: 5px;
-  color: theme.colors.primary;
-  fontfamily: theme.fonts.headingBold;
-  flex: 1;
+  color: black;
 `;
 
 const StyledLinearGradient = styled(LinearGradient)`
@@ -964,17 +960,10 @@ export default function Player() {
         <CollapsibleHeaderScrollViewContainer>
           <StyledCollapsibleHeaderScrollView
             CollapsibleHeaderComponent={
-              <HeaderContainer>
-                <Pressable onPress={() => toggleShowArticleDetails(false)}>
-                  <AntDesign
-                    name="left"
-                    size={20}
-                    color={theme.colors.primary}
-                  />
-
-                  <BackToPlayerText>Back to player</BackToPlayerText>
-                </Pressable>
-              </HeaderContainer>
+              <BackButton onPress={() => toggleShowArticleDetails(false)}>
+                <AntDesign name="left" size={20} color={theme.colors.primary} />
+                <BackToPlayerText>Back to player</BackToPlayerText>
+              </BackButton>
             }
             headerHeight={110}
             headerContainerBackgroundColor={theme.colors.secondary}
