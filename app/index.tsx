@@ -1,9 +1,13 @@
 import { Redirect } from "expo-router";
 import { Amplify } from 'aws-amplify';
 
-// Configure Amplify using the auto-generated configuration
 Amplify.configure({
-  // Configuration will be automatically picked up from your Amplify setup
+  Analytics: {
+    Pinpoint: {
+      appId: '6b4a7558e1c044109085f007534b134d',
+      region: 'us-east-1'
+    }
+  }
 });
 
 export default function RootLayout() {

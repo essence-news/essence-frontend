@@ -35,7 +35,7 @@ import {
 import { useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { WebView } from "react-native-web-webview";
-import { Analytics } from 'aws-amplify';
+import { record } from 'aws-amplify/analytics';
 
 import screenshot1 from "@/assets/screenshots/1.jpg";
 import ecommercePic from "@/assets/cliparts/ecommerce.jpg";
@@ -71,6 +71,7 @@ const Home = () => {
   };
 
   useEffect(() => {
+    record({ name: 'PAGE_VIEW' });
     init();
   }, []);
 
