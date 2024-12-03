@@ -249,7 +249,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const response = await verifyEmail(email, verificationCode);
       if (response.token) {
         await AsyncStorage.setItem("userToken", response.token);
-        await prepareWelcomeSound();
         const user = await AsyncStorage.getItem("user");
         let userObj;
         let isFirstTimeEver = false;
@@ -263,6 +262,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const userPayload = { ...userObj, isFirstTimeToday, isFirstTimeEver };
         console.log("verify will set user", { userPayload });
         await AsyncStorage.setItem("user", JSON.stringify(userPayload));
+        await prepareWelcomeSound();
         setUser(userPayload);
         return userObj;
       }
