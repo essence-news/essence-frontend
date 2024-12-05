@@ -1,16 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   StyleSheet,
-  ScrollView,
   Text,
   AppState,
   View,
   ImageBackground,
+  Pressable,
+  Platform,
+  Linking,
+  Share,
+  Alert,
 } from "react-native";
 import GestureRecognizer from "react-native-swipe-gestures";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { WebView } from "react-native-webview";
 
-import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import { Sound } from "expo-av/build/Audio";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,7 +25,6 @@ import {
   CategoryContainer,
   ControlButton,
   Controls,
-  ErrorMessage,
   InfoMessage,
   NewsHeadline,
   NewsInfo,
@@ -39,6 +42,12 @@ import {
   Title,
   TopSection,
   ReplayButton,
+  ContentWrapper,
+  MainContent,
+  H5,
+  StyledActivityIndicator,
+  StyledText,
+  FinerText,
 } from "@/components/SharedComponents";
 import { useTheme } from "styled-components/native";
 import BrandHeader from "@/components/BrandHeader";
@@ -47,6 +56,30 @@ import { mockNewsData } from "@/constants/mock";
 import { flushQueue, trackEvent } from "@/utils/trackingUtil";
 import styled from "styled-components/native";
 import { LinearGradient } from "expo-linear-gradient";
+import { createSoundObject, getTimeOfDay } from "@/utils/commonUtils";
+import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { CollapsibleHeaderScrollView } from "react-native-collapsible-header-views";
+import { Article, News } from "@/utils/types";
+import OutsidePressHandler from "react-native-outside-press";
+
+const StyledCollapsibleHeaderScrollView = styled(CollapsibleHeaderScrollView)`
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+`;
+
+const WebViewContainer = styled.View`
+  flex: 1;
+  margin-top: 0px;
+`;
+
+const SummaryTitleContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+`;
 
 export const CircularButton = styled.Pressable`
   justify-content: center;
@@ -60,45 +93,117 @@ export const CircularButton = styled.Pressable`
   left: 50%;
 `;
 
-export interface News {
-  articles: Article[];
-  count: number;
-  intro_audio: string;
-}
+const ReplayButtonContainer = styled.View`
+  margintop: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
-export interface Article {
-  audio_summary: string;
-  audio_summary_url: any;
-  categories: string[];
-  date_published: string;
-  full_text: any;
-  article_id: string;
-  image: string | null;
-  importance_score: number;
-  processing_status: string;
-  region: string;
-  rss_summary: string;
-  single_news_item: boolean;
-  source_name: string;
-  summary_200: string;
-  summary_50: string;
-  summary_vector: any;
-  title: string;
-  type: string;
-  url: string;
-  sound?: Audio.Sound;
-}
+const ReplayText = styled.Text`
+  color: #fff;
+`;
 
-const getTimeOfDay = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return "morning";
-  if (hour < 17) return "afternoon";
-  return "evening";
-};
+const CollapsibleHeaderScrollViewContainer = styled.View`
+  flex: 1;
+  width: 100%;
+  max-width: 500px;
+  justify-content: flex-start;
+  margin-top: 0px;
+  padding-top: 10px;
+  border: none;
+`;
 
-export default function Player() {
+const BackButton = styled.Pressable`
+  padding: 20px;
+  margin-top: 50px;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-start;
+`;
+
+const BackToPlayerText = styled(H5)`
+  color: black;
+`;
+
+const StyledLinearGradient = styled(LinearGradient)`
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 100%;
+`;
+
+const PlayerContainer = styled.View`
+  flex: 1;
+  width: 100%;
+  max-width: 500px;
+  justify-content: flex-start;
+  margin-top: 20px;
+  border: none;
+`;
+
+const styles = StyleSheet.create({
+  webview: {
+    flex: 1,
+    // minHeight: 800,
+  },
+  container: {
+    flex: 1,
+    width: "100%",
+    alignItems: "center",
+  },
+  playerControls: {
+    width: "100%",
+    marginTop: "auto",
+    justifyContent: "space-around",
+    alignItems: "center",
+  },
+  flex: {
+    flex: 1,
+  },
+  image: {
+    marginTop: 50,
+    width: "100%",
+    flex: 1,
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  text: {
+    color: "white",
+    fontSize: 42,
+    lineHeight: 84,
+    fontWeight: "bold",
+    textAlign: "center",
+    backgroundColor: "#000000c0",
+  },
+});
+
+const SpeedOptionsContainer = styled.View`
+  position: absolute;
+  top: -250px;
+  right: -75px;
+`;
+
+const SpeedText = styled(H5)<{ selected: boolean }>`
+  background: white;
+  color: ${({ selected, theme }) =>
+    selected ? theme.colors.accent : "inherit"};
+  border: 1px solid black;
+  padding: 10px 30px;
+  font-family: "${({ theme }) => theme.fonts.bodyBold}";
+`;
+
+export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
   const [currentNewsIndex, setCurrentNewsIndex] = useState<number>(-1);
-  const { user, ensureTokenValidity } = useAuth();
+  const { user, prepareWelcomeSound, initialWelcomeSound } = useAuth();
+  const [showSpeedOptions, setShowSpeedOptions] = useState(false);
+  const [rate, setRate] = useState(1.0);
   const mounted = useRef(false);
   const userRef = useRef(user);
   const theme = useTheme();
@@ -117,11 +222,9 @@ export default function Player() {
   const welcomeSoundRef = useRef<Sound | null>(null);
   const appState = useRef(AppState.currentState);
   const { logout } = useAuth();
-
+  const [showWebView, setShowWebView] = useState(false);
   const showWelcomeScreen =
-    welcomeSoundStatus === "playing" ||
-    welcomeSoundStatus === "loading" ||
-    needsUserInput;
+    welcomeSoundStatus === "playing" || welcomeSoundStatus === "loading";
 
   const showPlayerControls = useMemo(() => {
     return (
@@ -142,18 +245,11 @@ export default function Player() {
       return (
         <InfoMessage>
           <Text>
-            Great job on listening!{'\n\n'}
-            All caught up!{'\n'}
+            Great job on listening!{"\n\n"}
+            All caught up!{"\n"}
             Please check back later for more news
           </Text>
-          <View
-            style={{
-              marginTop: 30,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <ReplayButtonContainer>
             <ReplayButton
               onPress={async () => {
                 await AsyncStorage.setItem("currentNewsIndex", "0");
@@ -167,8 +263,8 @@ export default function Player() {
                 color="black"
               />
             </ReplayButton>
-            <Text style={{ color: "#fff" }}>Replay</Text>
-          </View>
+            <ReplayText>Replay</ReplayText>
+          </ReplayButtonContainer>
         </InfoMessage>
       );
     }
@@ -225,7 +321,8 @@ export default function Player() {
     if (
       (welcomeSoundStatus !== "completed" &&
         welcomeSoundStatus !== "ignored") ||
-      articles.length === 0
+      articles.length === 0 ||
+      isPlaying
     ) {
       return;
     }
@@ -277,6 +374,7 @@ export default function Player() {
       index: currentNewsIndex,
       ref: soundRefs.current[currentNewsIndex],
       file: articles[currentNewsIndex].audio_summary,
+      publicKey: articles[currentNewsIndex].public_key,
       sound,
     });
     setIsLoading(false);
@@ -355,6 +453,7 @@ export default function Player() {
             });
         }, 500);
       }
+      sound.setStatusAsync({ rate, shouldCorrectPitch: true });
     }
   }
 
@@ -371,37 +470,7 @@ export default function Player() {
     );
   }
 
-  const createSoundObject = async (
-    uri: string,
-    article_id = "",
-    title = "",
-    index = -1,
-  ) => {
-    await Audio.setAudioModeAsync({
-      staysActiveInBackground: true,
-      interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
-      shouldDuckAndroid: true,
-      playThroughEarpieceAndroid: false,
-      allowsRecordingIOS: false,
-      interruptionModeIOS: InterruptionModeIOS.DoNotMix,
-      playsInSilentModeIOS: true,
-    });
-    const audio = await Audio.Sound.createAsync(
-      {
-        uri,
-      },
-      { staysActiveInBackground: true },
-    ).catch((error) => {
-      console.error("Create Async failed:", error, uri);
-      trackEvent("error", article_id, title, index, 0, {
-        errorType: "autoplay-create",
-        message: error.message,
-      });
-    });
-    return audio.sound;
-  };
-
-  const prepareSounds = async () => {
+  const prepareSounds = async (index: number) => {
     if (articles?.length > 0) {
       // console.log("prepareSound", {
       //   currentNewsIndex,
@@ -409,8 +478,8 @@ export default function Player() {
       //   soundRefs: soundRefs.current,
       // });
       for (let i = 0; i < 5; i++) {
-        const backIndex = currentNewsIndex - i;
-        const frontIndex = currentNewsIndex + i;
+        const backIndex = index - i;
+        const frontIndex = index + i;
         console.log("prepareSound", { i, backIndex, frontIndex });
         if (backIndex >= 0) {
           if (i === 4) {
@@ -478,6 +547,7 @@ export default function Player() {
       current: new Date().getTime(),
       diff: new Date().getTime() - lastTime,
       Twohrs: 2 * 60 * 60 * 1000,
+      res: new Date().getTime() - lastTime <= 2 * 60 * 60 * 1000,
     });
     return new Date().getTime() - lastTime <= 2 * 60 * 60 * 1000;
   };
@@ -486,10 +556,19 @@ export default function Player() {
     return new Date(lastTime).getDate() === new Date().getDate();
   };
 
-  const setAndPlayWelcomeSound = async (welcomeSoundUri: string) => {
-    const sound = await createSoundObject(welcomeSoundUri);
+  const setAndPlayWelcomeSound = async () => {
+    console.log("setandplayWelcomesound", initialWelcomeSound);
+    let sound = initialWelcomeSound?.sound;
+    if (!sound) {
+      console.error(
+        "failed to initialize welcome sound - missing URI",
+        initialWelcomeSound,
+      );
+      setWelcomeSoundStatus("ignored");
+      return;
+    }
     welcomeSoundRef.current = sound;
-    console.log("Playing welcomeSound", welcomeSoundUri);
+    console.log("Playing welcomeSound", initialWelcomeSound.uri);
     if (sound) {
       const tryToPlay = setInterval(async () => {
         await sound
@@ -514,7 +593,7 @@ export default function Player() {
                 "Welcome message Auto-play failed:",
                 error,
                 error.message,
-                welcomeSoundUri,
+                initialWelcomeSound.uri,
               );
               clearInterval(tryToPlay);
               setWelcomeSoundStatus("completed");
@@ -530,13 +609,26 @@ export default function Player() {
     const inactiveSince = await AsyncStorage.getItem("inactiveSince");
     const currentNewsIndex = await AsyncStorage.getItem("currentNewsIndex");
 
+    const parsed: News = newsData ? JSON.parse(newsData) : null;
     console.log("Loading Sound", {
       currentNewsIndex,
       articles: articles.length,
       append,
       inactiveSince,
+      parsed,
+      user,
     });
-    const parsed: News = newsData ? JSON.parse(newsData) : null;
+
+    if (!append && (!inactiveSince || !isLessThan2Hours(+inactiveSince))) {
+      console.log("will play welcome sound");
+      if (inactiveSince && !isLessThan2Hours(+inactiveSince))
+        await prepareWelcomeSound();
+      // handle when we get data after last entry
+      setAndPlayWelcomeSound();
+    } else {
+      console.log("welcome sound  ignored");
+      setWelcomeSoundStatus("ignored");
+    }
 
     if (
       !append &&
@@ -554,15 +646,15 @@ export default function Player() {
       setCurrentNewsIndex(+currentNewsIndex);
       setWelcomeSoundStatus("ignored");
     } else {
-      console.log("before", { user });
-
-      if (!user) {
-        userRef.current = await ensureTokenValidity();
-      }
-      console.log("not within 2 hrs", {
+      // if (!user) {
+      //   userRef.current = await ensureTokenValidity();
+      // }
+      console.log("load() else block", {
         inactiveSince,
         user,
         userRef: userRef.current,
+        currentNewsIndex,
+        append,
       });
       try {
         if (
@@ -584,13 +676,14 @@ export default function Player() {
         // If first time or coming back on next day
         let articlesToSet;
         if (parsed && currentNewsIndex !== null) {
-          if (inactiveSince && isSameDay(+inactiveSince)) {
+          if (!inactiveSince || isSameDay(+inactiveSince)) {
             // if coming back within current day
             console.log("same day", {
               append,
-              inactiveSince: new Date(+inactiveSince),
+              inactiveSince,
               parsed,
               currentNewsIndex,
+              articlesResponse,
             });
             if (append) {
               // If reached end of list, add new items
@@ -604,20 +697,25 @@ export default function Player() {
                 ...articlesResponse.articles,
                 ...parsed.articles.splice(+currentNewsIndex),
               ];
+              console.log("not append", { articlesToSet });
               soundRefs.current = []; // reset objects
-              setCurrentNewsIndex(0);
-              await AsyncStorage.setItem("currentNewsIndex", "0");
+              if (articlesToSet.length > 0) {
+                setCurrentNewsIndex(0);
+                await AsyncStorage.setItem("currentNewsIndex", "0");
+              }
             }
           } else {
             // on next day
             soundRefs.current = []; // reset objects
             articlesToSet = articlesResponse.articles;
             setCurrentNewsIndex(0);
+            await AsyncStorage.setItem("currentNewsIndex", "0");
           }
         } else {
           articlesToSet = articlesResponse.articles;
           soundRefs.current = []; // reset objects
           setCurrentNewsIndex(0);
+          await AsyncStorage.setItem("currentNewsIndex", "0");
         }
 
         setArticles(articlesToSet);
@@ -636,16 +734,6 @@ export default function Player() {
           inactiveSince,
           lessThan: inactiveSince ? isLessThan2Hours(+inactiveSince) : "no",
         });
-        if (
-          articlesResponse.intro_audio &&
-          !append &&
-          (!inactiveSince || !isLessThan2Hours(+inactiveSince))
-        ) {
-          // handle when we get data after last entry
-          setAndPlayWelcomeSound(articlesResponse.intro_audio);
-        } else {
-          setWelcomeSoundStatus("ignored");
-        }
       } catch (err) {
         if (err.message >= 400) {
           logout();
@@ -658,7 +746,13 @@ export default function Player() {
     setIsLoading(false);
   }
 
+  const handleLeavePlayer = () => {
+    setLastInactive();
+    flushQueue();
+  };
+
   useEffect(() => {
+    if (sharedArticle) return;
     if (welcomeSoundStatus === "completed") {
       playSound();
     }
@@ -688,9 +782,8 @@ export default function Player() {
         appState.current.match(/active/) &&
         nextAppState.match(/inactive|background/)
       ) {
-        console.log("App has come to the background!");
-        setLastInactive();
-        flushQueue();
+        // console.log("App has come to the background!");
+        handleLeavePlayer();
       }
       trackEvent("visibilityChange", null, null, null, null, { nextAppState });
 
@@ -702,29 +795,60 @@ export default function Player() {
         subscription.remove();
       }
     };
-  }, [welcomeSoundStatus, currentlyPlaying.current, isPlaying]);
+  }, [welcomeSoundStatus, currentlyPlaying.current]);
 
   useEffect(() => {
-    console.log("***********callling load");
-    load();
+    // console.log("***********callling load");
+    // load();
     return async () => {
-      await currentlyPlaying.current?.stopAsync();
-      await currentlyPlaying.current?.unloadAsync();
-      await welcomeSoundRef.current?.stopAsync();
-      await welcomeSoundRef.current?.unloadAsync();
+      handleLeavePlayer();
+      if (currentlyPlaying.current?._loaded) {
+        await currentlyPlaying.current?.stopAsync();
+        await currentlyPlaying.current?.unloadAsync();
+      }
+      if (welcomeSoundRef.current?._loaded) {
+        await welcomeSoundRef.current?.stopAsync();
+        await welcomeSoundRef.current?.unloadAsync();
+      }
     };
   }, []);
 
   useEffect(() => {
+    console.log("will call play sound with currentNewsIndex", {
+      currentNewsIndex,
+    });
+
     if (mounted.current && currentNewsIndex < articles.length) {
       playSound();
-      prepareSounds();
+      prepareSounds(currentNewsIndex);
     }
-    if (currentNewsIndex >= articles.length) {
+    if (
+      currentNewsIndex >= articles.length &&
+      welcomeSoundStatus !== "playing"
+    ) {
       setWelcomeSoundStatus("ignored");
+    }
+    if (!mounted.current) {
+      console.log("***********callling load", { sharedArticle });
+      if (sharedArticle) {
+        setArticles([sharedArticle]);
+        setCurrentNewsIndex(0);
+        setWelcomeSoundStatus("ignored");
+      } else {
+        load();
+      }
     }
     mounted.current = true;
   }, [currentNewsIndex]);
+
+  useEffect(() => {
+    if (currentlyPlaying.current) {
+      currentlyPlaying.current.setStatusAsync({
+        rate,
+        shouldCorrectPitch: true,
+      });
+    }
+  }, [rate]);
 
   const handleNext = async () => {
     if (currentlyPlaying.current) {
@@ -732,8 +856,16 @@ export default function Player() {
       // await currentlyPlaying.current?.unloadAsync();
       currentlyPlaying.current = null;
     }
+    setIsPlaying(false);
     const newIndex = currentNewsIndex + 1;
-    if (newIndex >= articles.length - 2) {
+    console.log("handleNext", {
+      newIndex,
+      currentNewsIndex,
+      articles: articles.length,
+    });
+    await AsyncStorage.setItem("currentNewsIndex", "" + newIndex);
+    setCurrentNewsIndex(newIndex);
+    if (newIndex === articles.length - 1) {
       await load(true);
     }
     trackEvent(
@@ -743,12 +875,12 @@ export default function Player() {
       currentNewsIndex,
       progress,
     );
-    AsyncStorage.setItem("currentNewsIndex", "" + newIndex);
-    setCurrentNewsIndex(newIndex);
   };
 
   const handlePrev = async () => {
     await currentlyPlaying.current?.stopAsync();
+    setIsPlaying(false);
+
     // await currentlyPlaying.current?.unloadAsync();
     currentlyPlaying.current = null;
     const newIndex = currentNewsIndex - 1;
@@ -759,7 +891,7 @@ export default function Player() {
       currentNewsIndex,
       progress,
     );
-    AsyncStorage.setItem("currentNewsIndex", "" + newIndex);
+    await AsyncStorage.setItem("currentNewsIndex", "" + newIndex);
     setCurrentNewsIndex(newIndex);
   };
 
@@ -807,68 +939,184 @@ export default function Player() {
     velocityThreshold: 0.3,
     directionalOffsetThreshold: 80,
   };
+
+  const toggleShowArticleDetails = (val: boolean) => {
+    console.log("will show details", {
+      val,
+      url: articles[currentNewsIndex].url,
+    });
+    if (val) {
+      pauseSound();
+      if (Platform.OS === "web")
+        Linking.openURL(articles[currentNewsIndex].url);
+      else {
+        setIsLoading(true);
+        setShowWebView(true);
+      }
+    } else {
+      playSound();
+      setIsLoading(false);
+      setShowWebView(false);
+    }
+  };
+  const [webViewHeight, setWebViewHeight] = useState(null);
+  const onMessage = (event) => {
+    console.log(event.nativeEvent.data);
+    setWebViewHeight(Number(event.nativeEvent.data));
+  };
+  const injectedJavaScript = `
+  window.ReactNativeWebView.postMessage(
+    Math.max(document.body.offsetHeight, document.body.scrollHeight)
+  );`;
+
+  const handleGoToPreferences = async () => {
+    if (currentlyPlaying.current) {
+      await currentlyPlaying.current.stopAsync();
+      await currentlyPlaying.current.unloadAsync();
+    }
+    router.push("/preferences");
+  };
+  const handleShareClick = async () => {
+    if (Platform.OS === "web") {
+      if (navigator?.share) {
+        navigator.share({
+          text: `Open this link to listen to article \n \n ${process.env.EXPO_PUBLIC_ESSENCE_APP_URL}/sharedNews/${articles[currentNewsIndex].public_key}`,
+        });
+      } else {
+        alert("Not supported");
+      }
+    } else {
+      const options = {
+        // message: "https://getessence.app",
+        message: `Open this link to listen to article \n \n ${process.env.EXPO_PUBLIC_ESSENCE_APP_URL}/sharedNews/${articles[currentNewsIndex].public_key}`,
+      };
+      console.log("will share", {
+        article: articles[currentNewsIndex],
+        options,
+      });
+      try {
+        const result = await Share.share(options);
+        console.log("will share", { result });
+        if (result.action === Share.sharedAction) {
+          if (result.activityType) {
+            // shared with activity type of result.activityType
+          } else {
+            // shared
+          }
+        } else if (result.action === Share.dismissedAction) {
+          // dismissed
+        }
+      } catch (error: any) {
+        Alert.alert(error.message);
+      }
+    }
+  };
+
+  const handleShowSpeedOptions = () => {
+    setShowSpeedOptions(true);
+  };
+
+  const handleSpeedChange = (_rate: number) => {
+    setRate(_rate);
+    setShowSpeedOptions(false);
+  };
   // console.log({ progress, showPlayerControls });
   // console.log({
   //   welcomeSoundStatus,
+  //   showWelcomeScreen,
   //   isPlaying,
   //   isLoading,
   //   needsUserInput,
   //   articles: articles.length,
   //   currentNewsIndex,
-  //   u: userRef.current,
-  //   user,
+  //   OS: Platform.OS,
   // });
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={styles.container}
+      onTouchEnd={() => console.log("touch end")}
+    >
       <BrandHeader />
-      <GestureRecognizer
-        onSwipeLeft={handleLeftSwipe}
-        onSwipeRight={handleRightSwipe}
-        config={config}
-        style={styles.container}
-      >
-        <View
-          style={{
-            flex: 1,
-            width: "100%",
-            maxWidth: 500,
-            justifyContent: "flex-start",
-            marginTop: "0px",
-            border: "none",
-          }}
+      {user && (
+        <Pressable
+          style={{ zIndex: 11, position: "absolute", right: 20, top: 22 }}
+          onPress={handleGoToPreferences}
         >
-          <ScrollView
-            contentContainerStyle={{
-              flex: 1,
-              justifyContent: "space-between",
-              // backgroundColor: "rgba(0, 0, 0, 0.7)",
-            }}
+          <AntDesign name="setting" color={theme.colors.brand} size={24} />
+        </Pressable>
+      )}
+      {showWebView ? (
+        <CollapsibleHeaderScrollViewContainer>
+          <StyledCollapsibleHeaderScrollView
+            CollapsibleHeaderComponent={
+              <BackButton onPress={() => toggleShowArticleDetails(false)}>
+                <AntDesign name="left" size={20} color={theme.colors.primary} />
+                <BackToPlayerText>Back to player</BackToPlayerText>
+              </BackButton>
+            }
+            headerHeight={110}
+            headerContainerBackgroundColor={theme.colors.secondary}
+            statusBarHeight={Platform.OS === "ios" ? 20 : 0}
           >
+            <WebViewContainer>
+              {Platform.OS === "web" ? (
+                <iframe
+                  src={articles[currentNewsIndex].url}
+                  style={styles.webview}
+                />
+              ) : (
+                <>
+                  {isLoading && (
+                    <StyledActivityIndicator
+                      size="large"
+                      color={theme.colors.primary}
+                    />
+                  )}
+                  <WebView
+                    onMessage={onMessage}
+                    injectedJavaScript={injectedJavaScript}
+                    originWhitelist={["*"]}
+                    onNavigationStateChange={(p) => {
+                      console.log("state change", p);
+                      setIsLoading(p.loading);
+                    }}
+                    // nestedScrollEnabled
+                    source={{
+                      uri: articles[currentNewsIndex].url,
+                    }}
+                    style={{ ...styles.webview, height: webViewHeight }}
+                  />
+                </>
+              )}
+            </WebViewContainer>
+          </StyledCollapsibleHeaderScrollView>
+        </CollapsibleHeaderScrollViewContainer>
+      ) : (
+        <GestureRecognizer
+          onSwipeLeft={handleLeftSwipe}
+          onSwipeRight={handleRightSwipe}
+          config={config}
+          style={styles.container}
+        >
+          <PlayerContainer>
             <ImageBackground
               source={
                 showWelcomeScreen
                   ? require("@/assets/cliparts/podcast.jpg")
                   : articles.length > 0 && currentNewsIndex < articles.length
                     ? {
-                      uri: articles[currentNewsIndex].image,
-                    }
+                        uri: articles[currentNewsIndex].image,
+                      }
                     : require("@/assets/cliparts/ecommerce.jpg")
               }
               resizeMode="cover"
               style={styles.image}
             >
-              <LinearGradient
+              <StyledLinearGradient
                 id="gradient"
                 colors={["rgba(0,0,0,0.3)", "rgba(0,0,0,0.7)"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={{
-                  position: "absolute",
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  height: "100%",
-                }}
               />
               {needsUserInput && (
                 <CenterButton
@@ -879,155 +1127,236 @@ export default function Player() {
                   <AntDesign name="caretright" size={36} color="black" />
                 </CenterButton>
               )}
-              <View style={styles.container}>
-                <TopSection>
-                  {showWelcomeScreen && welcomeSoundStatus !== "loading" && (
-                    <PlaylistInfo>
-                      <Title>
-                        Hello {userRef.current?.firstName ?? user?.firstName}
-                      </Title>
-                      <Subtitle>Your {getTimeOfDay()} newscast</Subtitle>
-                    </PlaylistInfo>
-                  )}
-                  <NewsInfo>{renderContent()}</NewsInfo>
-                </TopSection>
-              </View>
-              {showPlayerControls && (
-                <View style={styles.playerControls}>
-                  <RatingButtons>
-                    <RatingMessage visible={!!ratingMessage}>
-                      {ratingMessage}
-                    </RatingMessage>
-                    <RatingButton
-                      onPress={() => handleRating("negative")}
-                      disabled={isLoading}
-                    >
-                      <Svg fill="#fff" viewBox="0 0 24 24">
-                        <Path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" />
-                      </Svg>
-                    </RatingButton>
-                    <RatingButton
-                      onPress={() => handleRating("positive")}
-                      disabled={isLoading}
-                    >
-                      <Svg fill="#fff" viewBox="0 0 24 24">
-                        <Path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
-                      </Svg>
-                    </RatingButton>
-                  </RatingButtons>
-                  <ProgressBar>
-                    <Progress progress={progress} />
-                  </ProgressBar>
-                  <Controls>
-                    <ControlButton onPress={handlePrev} disabled={prevDisabled}>
-                      <Svg
-                        viewBox="0 0 24 24"
-                        width={30}
-                        height={30}
-                        fill={theme.colors.text}
-                      >
-                        <Path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
-                      </Svg>
-                    </ControlButton>
-                    <ControlButton
-                      onPress={() => (isPlaying ? pauseSound() : playSound())}
-                      disabled={
-                        isLoading || currentNewsIndex >= articles.length
-                      }
-                    >
-                      {isLoading ? (
-                        <Svg
-                          viewBox="0 0 24 24"
-                          width={30}
-                          height={30}
-                          fill={theme.colors.text}
-                        >
-                          <Path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z" />
-                        </Svg>
-                      ) : isPlaying ? (
-                        <Svg
-                          viewBox="0 0 24 24"
-                          width={30}
-                          height={30}
-                          fill={theme.colors.text}
-                        >
-                          <Path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                        </Svg>
-                      ) : (
-                        <Svg
-                          viewBox="0 0 24 24"
-                          width={30}
-                          height={30}
-                          fill={theme.colors.text}
-                        >
-                          <Path d="M8 5v14l11-7z" />
-                        </Svg>
+              <ContentWrapper style={styles.container}>
+                <MainContent>
+                  <TopSection>
+                    {showWelcomeScreen && welcomeSoundStatus !== "loading" ? (
+                      <PlaylistInfo>
+                        <Title>Hello {user?.first_name}</Title>
+                        <Subtitle>Your {getTimeOfDay()} newscast</Subtitle>
+                      </PlaylistInfo>
+                    ) : (
+                      <NewsInfo>{renderContent()}</NewsInfo>
+                    )}
+                  </TopSection>
+
+                  {showPlayerControls && (
+                    <View style={styles.playerControls}>
+                      {user && (
+                        <RatingButtons>
+                          <RatingMessage visible={!!ratingMessage}>
+                            {ratingMessage}
+                          </RatingMessage>
+                          <RatingButton
+                            onPress={() => handleRating("negative")}
+                            disabled={isLoading}
+                          >
+                            <Svg fill="#fff" viewBox="0 0 24 24">
+                              <Path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" />
+                            </Svg>
+                          </RatingButton>
+                          <RatingButton
+                            onPress={() => handleRating("positive")}
+                            disabled={isLoading}
+                          >
+                            <Svg fill="#fff" viewBox="0 0 24 24">
+                              <Path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+                            </Svg>
+                          </RatingButton>
+                        </RatingButtons>
                       )}
-                    </ControlButton>
-                    <ControlButton onPress={handleNext} disabled={nextDisabled}>
-                      <Svg
-                        viewBox="0 0 24 24"
-                        width={30}
-                        height={30}
-                        fill={theme.colors.text}
-                      >
-                        <Path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
-                      </Svg>
-                    </ControlButton>
-                    <Text style={{ color: "white" }}>
-                      {currentNewsIndex + 1}/{articles.length}
-                    </Text>
-                  </Controls>
-                  <SummaryWrapper>
-                    <SummaryTitle>Summary</SummaryTitle>
-                    <SummaryText>
-                      {articles[currentNewsIndex]?.summary_50 ||
-                        "No summary available."}
-                    </SummaryText>
-                  </SummaryWrapper>
-                </View>
-              )}
+                      <ProgressBar>
+                        <Progress progress={progress} />
+                      </ProgressBar>
+                      <Controls>
+                        <ControlButton onPress={handleShowSpeedOptions}>
+                          <AntDesign
+                            name="dashboard"
+                            color={theme.colors.text}
+                            size={26}
+                          />
+                          {showSpeedOptions && (
+                            <OutsidePressHandler
+                              onOutsidePress={() => {
+                                setShowSpeedOptions(false);
+                              }}
+                            >
+                              <SpeedOptionsContainer>
+                                <Pressable
+                                  onPress={() => handleSpeedChange(0.75)}
+                                >
+                                  <SpeedText selected={rate === 0.75}>
+                                    0.75x
+                                  </SpeedText>
+                                </Pressable>
+                                <Pressable
+                                  onPress={() => handleSpeedChange(1.0)}
+                                >
+                                  <SpeedText selected={rate === 1.0}>
+                                    1.0x
+                                  </SpeedText>
+                                </Pressable>
+                                <Pressable
+                                  onPress={() => handleSpeedChange(1.25)}
+                                >
+                                  <SpeedText selected={rate === 1.25}>
+                                    1.25x
+                                  </SpeedText>
+                                </Pressable>
+                                <Pressable
+                                  onPress={() => handleSpeedChange(1.5)}
+                                >
+                                  <SpeedText selected={rate === 1.5}>
+                                    1.5x
+                                  </SpeedText>
+                                </Pressable>
+                                <Pressable
+                                  onPress={() => handleSpeedChange(1.75)}
+                                >
+                                  <SpeedText selected={rate === 1.75}>
+                                    1.75x
+                                  </SpeedText>
+                                </Pressable>
+                                <Pressable
+                                  onPress={() => handleSpeedChange(2.0)}
+                                >
+                                  <SpeedText selected={rate === 2.0}>
+                                    2.0x
+                                  </SpeedText>
+                                </Pressable>
+                              </SpeedOptionsContainer>
+                            </OutsidePressHandler>
+                          )}
+                        </ControlButton>
+                        <ControlButton
+                          onPress={handlePrev}
+                          disabled={prevDisabled}
+                        >
+                          <AntDesign
+                            name="stepbackward"
+                            color={theme.colors.text}
+                            size={26}
+                          />
+                          {/* <Svg
+                            viewBox="0 0 24 24"
+                            width={30}
+                            height={30}
+                            fill={theme.colors.text}
+                          >
+                            <Path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+                          </Svg> */}
+                        </ControlButton>
+                        <ControlButton
+                          onPress={() =>
+                            isPlaying ? pauseSound() : playSound()
+                          }
+                          disabled={
+                            isLoading || currentNewsIndex >= articles.length
+                          }
+                        >
+                          {isLoading ? (
+                            <AntDesign
+                              name="hourglass"
+                              color={theme.colors.text}
+                              size={26}
+                            />
+                          ) : // <Svg
+                          //   viewBox="0 0 24 24"
+                          //   width={30}
+                          //   height={30}
+                          //   fill={theme.colors.text}
+                          // >
+                          //   <Path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z" />
+                          // </Svg>
+                          isPlaying ? (
+                            // <Svg
+                            //   viewBox="0 0 24 24"
+                            //   width={30}
+                            //   height={30}
+                            //   fill={theme.colors.text}
+                            // >
+                            //   <Path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                            // </Svg>
+                            <AntDesign
+                              name="pause"
+                              color={theme.colors.text}
+                              size={26}
+                            />
+                          ) : (
+                            <AntDesign
+                              name="caretright"
+                              color={theme.colors.text}
+                              size={26}
+                            />
+                            // <Svg
+                            //   viewBox="0 0 24 24"
+                            //   width={30}
+                            //   height={30}
+                            //   fill={theme.colors.text}
+                            // >
+                            //   <Path d="M8 5v14l11-7z" />
+                            // </Svg>
+                          )}
+                        </ControlButton>
+                        <ControlButton
+                          onPress={handleNext}
+                          disabled={nextDisabled}
+                        >
+                          {/* <Svg
+                            viewBox="0 0 24 24"
+                            width={30}
+                            height={30}
+                            fill={theme.colors.text}
+                          >
+                            <Path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+                          </Svg> */}
+                          <AntDesign
+                            name="stepforward"
+                            color={theme.colors.text}
+                            size={26}
+                          />
+                        </ControlButton>
+                        {/* <Text style={{ color: "white" }}>
+                          {currentNewsIndex + 1}/{articles.length}
+                        </Text> */}
+                        {articles[currentNewsIndex]?.public_key && (
+                          <ControlButton onPress={handleShareClick}>
+                            <AntDesign
+                              name="sharealt"
+                              color={theme.colors.text}
+                              size={26}
+                            />
+                          </ControlButton>
+                        )}
+                      </Controls>
+                      <SummaryWrapper>
+                        <SummaryTitleContainer>
+                          <SummaryTitle>Summary</SummaryTitle>
+                          <Pressable
+                            onPress={() => {
+                              toggleShowArticleDetails(true);
+                            }}
+                          >
+                            <Ionicons
+                              name="open-outline"
+                              size={24}
+                              color={theme.colors.white}
+                            />
+                          </Pressable>
+                        </SummaryTitleContainer>
+                        <SummaryText>
+                          {articles[currentNewsIndex]?.summary_50 ||
+                            "No summary available."}
+                        </SummaryText>
+                      </SummaryWrapper>
+                    </View>
+                  )}
+                </MainContent>
+              </ContentWrapper>
             </ImageBackground>
-          </ScrollView>
-        </View>
-      </GestureRecognizer>
+          </PlayerContainer>
+        </GestureRecognizer>
+      )}
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: "100%",
-    alignItems: "center",
-  },
-  playerControls: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    justifyContent: "space-around",
-    alignItems: "center",
-    padding: 20,
-  },
-  flex: {
-    flex: 1,
-  },
-  image: {
-    width: "100%",
-    flex: 1,
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  text: {
-    color: "white",
-    fontSize: 42,
-    lineHeight: 84,
-    fontWeight: "bold",
-    textAlign: "center",
-    backgroundColor: "#000000c0",
-  },
-});

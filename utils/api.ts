@@ -70,12 +70,16 @@ export const signIn = async (
     return {
       isNewUser: true,
       message: data.message,
+      welcomeSound: data.intro_audio,
+      // "https://essence-news.s3.amazonaws.com/live/175c5a0f-4230-424a-b836-2c3f52eeaa94/intro/False_False_morning.mp3?AWSAccessKeyId=AKIAUWF6I5PZFWK4M3PL&Signature=SkMi%2B7U7otk44YcHDpV4JP6zLTg%3D&Expires=1733214812",
     };
   } else {
     return {
       isNewUser: false,
       verificationRequired: data.verificationRequired,
       token: data.token,
+      welcomeSound: data.intro_audio,
+      // "https://essence-news.s3.amazonaws.com/live/175c5a0f-4230-424a-b836-2c3f52eeaa94/intro/False_False_morning.mp3?AWSAccessKeyId=AKIAUWF6I5PZFWK4M3PL&Signature=SkMi%2B7U7otk44YcHDpV4JP6zLTg%3D&Expires=1733214812",
     };
   }
 };
@@ -111,12 +115,18 @@ export const fetchNews = async (user: {
   }).toString();
 
   console.log(`Fetching news with query params: ${queryParams}`);
-  const response = await apiCall(`/public/latest_news?${queryParams}`, "GET");
-  console.log({ response });
-  if (!response.ok) {
-    throw new Error("" + response.status);
+  try {
+    const response = await apiCall(`/public/latest_news?${queryParams}`, "GET");
+    console.log({ response });
+    if (!response.ok) {
+      throw new Error("" + response.status);
+    }
+    return await response.json();
+  } catch (err) {
+    if (err.message === "Unauthorized") {
+      throw new Error("401");
+    }
   }
-  return await response.json();
   // i++;
   // return Promise.resolve(i > 1 ? { articles: [] } : mockNewsData);
 };
@@ -131,6 +141,20 @@ export const verifyToken = async () => {
   } catch (error) {
     await clearToken();
     throw error;
+  }
+};
+
+export const getArticleFromServer = async (publicKey: string) => {
+  try {
+    const response = await apiCall(`/public/article/${publicKey}`, "GET");
+    if (!response.ok) {
+      throw new Error("Failed to get article from server");
+    }
+    const article = await response.json();
+    return article;
+  } catch (error) {
+    console.error("Failed to get article from server:", error);
+    throw new Error("Failed to get article from server");
   }
 };
 
@@ -162,6 +186,32 @@ export const trackEvents = async (events: unknown) => {
     return await response.json();
   } catch (error) {
     console.error("Error tracking events:", error);
+    throw error;
+  }
+};
+
+export const savePreferences = async (payload) => {
+  try {
+    const response = await apiCall("/user/update_preferences", "POST", payload);
+    if (!response.ok) {
+      throw new Error("Failed to update preferences");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating user preferences:", error);
+    throw error;
+  }
+};
+
+export const getUserData = async () => {
+  try {
+    const response = await apiCall("/user/get_user", "GET");
+    if (!response.ok) {
+      throw new Error("Failed to get user preferences");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error get user preferences:", error);
     throw error;
   }
 };

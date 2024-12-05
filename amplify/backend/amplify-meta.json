@@ -1,0 +1,60 @@
+{
+  "providers": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-essencefrontend-dev-37192-authRole",
+      "UnauthRoleArn": "arn:aws:iam::322521590770:role/amplify-essencefrontend-dev-37192-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::322521590770:role/amplify-essencefrontend-dev-37192-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-essencefrontend-dev-37192-deployment",
+      "UnauthRoleName": "amplify-essencefrontend-dev-37192-unauthRole",
+      "StackName": "amplify-essencefrontend-dev-37192",
+      "StackId": "arn:aws:cloudformation:us-east-1:322521590770:stack/amplify-essencefrontend-dev-37192/fcf9a7f0-b173-11ef-883f-0ee756e81a1d",
+      "AmplifyAppId": "d11kximpj7uc3v"
+    }
+  },
+  "auth": {
+    "essencefrontend": {
+      "service": "Cognito",
+      "serviceType": "managed",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "frontendAuthConfig": {
+        "socialProviders": [],
+        "usernameAttributes": [],
+        "signupAttributes": [],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": []
+        },
+        "mfaTypes": [],
+        "verificationMechanisms": []
+      },
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-essencefrontend-dev-37192-deployment/amplify-cfn-templates/auth/essencefrontend-cloudformation-template.json",
+        "logicalId": "authessencefrontend"
+      },
+      "lastPushTimeStamp": "2024-12-03T12:45:53.867Z",
+      "output": {
+        "IdentityPoolId": "us-east-1:7046e156-0ccc-464d-8ed3-0bb9cdf551b5",
+        "IdentityPoolName": "essencefrontend_identitypool_37879985__dev"
+      },
+      "lastPushDirHash": "Q1uFAH0eX97kDsI9BS9RmqA234M="
+    }
+  },
+  "analytics": {
+    "essencefrontend": {
+      "service": "Pinpoint",
+      "providerPlugin": "awscloudformation",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-essencefrontend-dev-37192-deployment/amplify-cfn-templates/analytics/pinpoint-cloudformation-template.json",
+        "logicalId": "analyticsessencefrontend"
+      },
+      "lastPushTimeStamp": "2024-12-03T12:45:54.224Z",
+      "output": {
+        "appName": "essencefrontend-dev",
+        "Region": "us-east-1",
+        "Id": "6b4a7558e1c044109085f007534b134d"
+      },
+      "lastPushDirHash": "YAyXiIkAy6i1W+fV1EhVs/3y/KY="
+    }
+  }
+}

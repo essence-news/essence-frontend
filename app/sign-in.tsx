@@ -18,6 +18,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, View, Dimensions } from "react-native";
+import styled from "styled-components/native";
+
+const StyledInput = styled(Input)`
+  margin-top: 10px;
+`;
 
 export default function Login() {
   const { login, verify } = useAuth();
@@ -30,11 +35,11 @@ export default function Login() {
   const [userFirstName, setUserFirstName] = useState("");
   useEffect(() => {
     async function init() {
-      const storageFirstName = await AsyncStorage.getItem("firstName");
+      const user = await AsyncStorage.getItem("user");
       await AsyncStorage.clear();
-      if (storageFirstName) {
-        await AsyncStorage.setItem("firstName", storageFirstName);
-        setUserFirstName(storageFirstName);
+      if (user) {
+        await AsyncStorage.setItem("user", user);
+        setUserFirstName(JSON.parse(user).first_name);
       }
     }
     init();
@@ -63,16 +68,28 @@ export default function Login() {
     setError("");
     setIsLoading(true);
     try {
-      const success = await verify(email.toLowerCase(), verificationCode);
-      if (success) {
+      const userObj = await verify(
+        email.toLowerCase(),
+        verificationCode,
+        userFirstName || firstName,
+      );
+      if (
+        userObj?.preferences?.json &&
+        Object.keys(userObj.preferences.json).length > 0
+      ) {
+        console.log("will go to player");
         router.replace("/player");
       } else {
-        throw new Error(
-          "Verification failed. Please check your code and try again.",
-        );
+        console.log("will go to preferences");
+        router.replace({
+          pathname: "/preferences",
+          params: {
+            fromSignIn: "yes",
+          },
+        });
       }
     } catch (error) {
-      console.error("Verification error:", error);
+      console.error("Verify token error:", error);
       setError("An error occurred during verification.");
     } finally {
       setIsLoading(false);
@@ -94,12 +111,10 @@ export default function Login() {
                 </Header>
                 <FormContainer>
                   <SubtitleDark>Enter the verification code</SubtitleDark>
-                  <Input
+                  <StyledInput
                     placeholder="Verification Code"
                     value={verificationCode}
                     onChangeText={onChangeVerificationCode}
-                    // disabled={isLoading}
-                    style={{ marginTop: 10 }}
                   />
                   {error ? <ErrorMessage>{error}</ErrorMessage> : <Text></Text>}
                   <Button onPress={handleVerify} disabled={isLoading}>

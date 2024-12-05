@@ -1,4 +1,44 @@
+import { StyleSheet } from "react-native";
 import styled from "styled-components/native";
+
+export const H1 = styled.Text`
+  font-size: 36px;
+  font-family: "${({ theme }) => theme.fonts.body}";
+`;
+export const H2 = styled.Text`
+  font-size: 32px;
+  font-family: "${({ theme }) => theme.fonts.body}";
+`;
+export const H3 = styled.Text`
+  font-size: 24px;
+  font-family: "${({ theme }) => theme.fonts.body}";
+`;
+export const H4 = styled.Text`
+  font-size: 20px;
+  font-family: "${({ theme }) => theme.fonts.body}";
+`;
+export const H5 = styled.Text`
+  font-size: 16px;
+  font-family: "${({ theme }) => theme.fonts.body}";
+`;
+export const StyledText = styled.Text`
+  font-size: 12px;
+  font-family: "${({ theme }) => theme.fonts.body}";
+`;
+export const FinerText = styled.Text`
+  font-size: 10px;
+  font-family: "${({ theme }) => theme.fonts.body}";
+`;
+
+export const DangerText = styled.Text`
+  color: ${({ theme }) => theme.colors.error};
+`;
+
+export const commonStyles = StyleSheet.create({
+  flex_1: {
+    flex: 1,
+  },
+});
 
 export const MainContainer = styled.View`
   width: 100%;
@@ -6,16 +46,15 @@ export const MainContainer = styled.View`
   margin: 0 auto;
   flex: 1;
   align-self: center;
-  overflow: auto; 
+  overflow: auto;
   /* Hide scrollbar for Chrome, Safari and Opera */
   &::-webkit-scrollbar {
     display: none;
   }
-  
-  /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
 
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 `;
 
 // Styles for home screen
@@ -222,8 +261,6 @@ export const BetaPressable = styled.Pressable`
   text-align: center;
 `;
 
-
-
 export const AppContainer = styled.View<{ width: number; height: number }>`
   width: 100%;
   height: 100%;
@@ -262,6 +299,7 @@ export const ContentContainer = styled.View`
   height: 100%;
   max-width: 500px;
   margin: 0 auto;
+  margin-top: 50px;
   position: relative;
   background-color: ${({ theme }) => theme.colors.background};
 `;
@@ -271,7 +309,7 @@ export const VideoContainer = styled.View<{ smallScreen: boolean }>`
   aspect-ratio: 16/9;
   border: 0;
   overflow: hidden;
-  border-radius: 10px;  
+  border-radius: 10px;
 `;
 
 export const Card = styled.View`
@@ -302,32 +340,25 @@ export const Header = styled.View`
   margin-top: 40px;
 `;
 
-export const Title = styled.Text`
-  font-size: 24px;
+export const Title = styled(H3)`
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-block: 5px;
   text-transform: capitalize;
   color: ${({ theme }) => theme.colors.brand};
   font-family: "${({ theme }) => theme.fonts.heading}";
 `;
 
-export const Subtitle = styled.Text`
-  font-size: 20px;
+export const Subtitle = styled(H4)`
   margin-top: 0;
-  font-family: "${({ theme }) => theme.fonts.body}";
   color: ${({ theme }) => theme.colors.text};
 `;
 
-export const SubtitleDark = styled.Text`
-  font-size: 20px;
+export const SubtitleDark = styled(H4)`
   margin-top: 0;
-  font-family: "${({ theme }) => theme.fonts.body}";
   color: "${({ theme }) => theme.colors.primary}";
 `;
 
-export const ButtonText = styled.Text`
-  font-size: 18px;
-  font-family: "${({ theme }) => theme.fonts.body}";
+export const ButtonText = styled(H5)`
   text-align: center;
   color: inherit;
 `;
@@ -344,6 +375,11 @@ export const Button = styled.Pressable`
   transition: background-color 0.3s ease;
 `;
 
+export const StyledActivityIndicator = styled.ActivityIndicator`
+  flex: 1;
+  justify-content: center;
+`;
+
 export const Input = styled.TextInput`
   height: 40px;
   border: 1px solid ${({ theme }) => theme.colors.secondary};
@@ -357,20 +393,20 @@ export const Input = styled.TextInput`
 `;
 
 // Add this near the top of the file with other styled components
-export const ErrorMessage = styled.Text`
-  font-family: "${({ theme }) => theme.fonts.body}";
+export const ErrorMessage = styled(H5)`
   color: ${({ theme }) => theme.colors.error};
   text-align: center;
-  font-size: 16px;
   padding: 10px;
 `;
 
-export const InfoMessage = styled.Text`
-  font-family: "${({ theme }) => theme.fonts.body}";
+export const FormErrorMessage = styled(StyledText)`
+  color: ${({ theme }) => theme.colors.error};
+`;
+
+export const InfoMessage = styled(H5)`
   color: ${({ theme }) => theme.colors.secondary};
   text-align: center;
   margin-top: 20px;
-  font-size: 16px;
   padding: 10px;
 `;
 
@@ -421,10 +457,10 @@ export const ContentWrapper = styled.View<{ width: number }>`
 export const MainContent = styled.View`
   flex: 1;
   display: flex;
+  width: 100%;
   flex-direction: column;
   justify-content: space-between;
   padding: 20px;
-  padding-top: 100px;
 `;
 
 export const SigninMainContent = styled.View`
@@ -437,14 +473,12 @@ export const SigninMainContent = styled.View`
 `;
 
 export const TopSection = styled.View`
-  padding-top: 90px;
   width: 100%;
   position: relative;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  transition: padding-top 1s ease-out;
 `;
 
 export const CenterButton = styled.Pressable`
@@ -541,6 +575,7 @@ export const Controls = styled.View`
 `;
 
 export const ControlButton = styled.Pressable`
+  position: relative;
   border: none;
   cursor: pointer;
   padding: 0;
@@ -559,14 +594,12 @@ export const ControlButton = styled.Pressable`
   }
 `;
 
-export const NewsHeadline = styled.Text`
-  font-size: 20px;
+export const NewsHeadline = styled(H4)`
   font-weight: 500;
   text-align: left;
   padding: 10px;
   color: #fff;
   margin: auto;
-  font-family: "${({ theme }) => theme.fonts.body}";
 `;
 
 export const SummaryWrapper = styled.View`
@@ -578,17 +611,13 @@ export const SummaryWrapper = styled.View`
   font-family: "${({ theme }) => theme.fonts.body}";
 `;
 
-export const SummaryTitle = styled.Text`
-  font-size: 18px;
+export const SummaryTitle = styled(H5)`
   color: ${({ theme }) => theme.colors.text};
   margin: 0 0 10px 0;
-  font-family: "${({ theme }) => theme.fonts.body}";
 `;
 
-export const SummaryText = styled.Text`
-  font-size: 15px;
+export const SummaryText = styled(StyledText)`
   color: ${({ theme }) => theme.colors.secondary};
-  font-family: "${({ theme }) => theme.fonts.body}";
 `;
 
 export const FullScreenBackground = styled.View<{ src: string }>`
@@ -605,23 +634,19 @@ export const FullScreenBackground = styled.View<{ src: string }>`
   z-index: -1;
 `;
 
-export const RatingMessage = styled.Text<{ visible: boolean }>`
+export const RatingMessage = styled(H5)<{ visible: boolean }>`
   opacity: ${(props) => (props.visible ? 1 : 0)};
-  font-size: 14px;
   color: ${({ theme }) => theme.colors.accent};
   margin-left: 10px;
-  font-family: "${({ theme }) => theme.fonts.body}";
   transition: opacity 0.3s ease;
 `;
 
-export const CategoryButton = styled.Text`
+export const CategoryButton = styled(H5)`
   display: inline-block;
   margin: 10px;
   color: ${(props) => props.theme.colors.background};
   border-radius: 5px;
   font-weight: 500;
-  font-size: 16px;
-  font-family: "${({ theme }) => theme.fonts.body}";
   text-transform: capitalize;
 `;
 
@@ -634,13 +659,16 @@ export const CategoryContainer = styled.View`
   margin-top: 8px;
 `;
 
-export const BrandName = styled.Text`
+export const BrandName = styled(H3)`
   margin: 0;
+  padding: 0;
+  height: 50px;
   color: ${({ theme }) => theme.colors.white};
   font-family: "${({ theme }) => theme.fonts.brand}";
-  font-size: 28px;
-  display: inline;
-  text-align: left;
+  flex: 1;
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
 `;
 
 export const LogoContainer = styled.View`
@@ -653,7 +681,6 @@ export const LogoContainer = styled.View`
 export const Logo = styled.Image`
   height: 28px;
   width: 28px;
-  margin-right: 20px;
 `;
 
 export const PrivacyContainer = styled.View`

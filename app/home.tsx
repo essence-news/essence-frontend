@@ -1,7 +1,4 @@
-import styled from "styled-components/native";
-
 import { useAuth } from "../utils/AuthProvider";
-import { ScrollView, View } from "react-native";
 import { Link, router } from "expo-router";
 import "@expo/match-media";
 import { useMediaQuery } from "react-responsive";
@@ -27,13 +24,10 @@ import {
   StyledPressable,
   StyledImageBackground,
   Overlay,
-  Logo,
-  LogoContainer,
   InsightCardRight,
-  InsightCardLeft
+  InsightCardLeft,
+  commonStyles,
 } from "@/components/SharedComponents";
-import { useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { WebView } from "react-native-web-webview";
 import { record } from 'aws-amplify/analytics';
 
@@ -97,7 +91,11 @@ const Home = () => {
             <StyledPressable
               onPress={() => (user ? handleGotoNews() : handleSignin())}
             >
-              {user ? <ButtonText>Go to News</ButtonText> : <ButtonText>Sign in</ButtonText>}
+              {user ? (
+                <ButtonText>Go to News</ButtonText>
+              ) : (
+                <ButtonText>Sign in</ButtonText>
+              )}
             </StyledPressable>
           </ButtonSection>
         </LeftSection>
@@ -151,9 +149,9 @@ const Home = () => {
                         </div>
                       </body>
                     </html>
-                  `
+                  `,
               }}
-              style={{ flex: 1 }}
+              style={commonStyles.flex_1}
               javaScriptEnabled={true}
               domStorageEnabled={true}
               allowsFullscreenVideo={true}
@@ -181,9 +179,9 @@ const Home = () => {
             <InsightTitleSmall>Listen, Don't Read</InsightTitleSmall>
             <InsightTitle>Audio-First Experience</InsightTitle>
             <InsightSubtitle>
-              Transform your daily routine into a learning opportunity. Catch
-              up on industry trends while you commute, exercise, or prep for
-              your day.
+              Transform your daily routine into a learning opportunity. Catch up
+              on industry trends while you commute, exercise, or prep for your
+              day.
             </InsightSubtitle>
           </InsightContent>
         </InsightCardRight>
@@ -208,8 +206,8 @@ const Home = () => {
             <InsightTitleSmall>Engaging dialogue</InsightTitleSmall>
             <InsightTitle>News That Feels Like Conversation</InsightTitle>
             <InsightSubtitle>
-              Our hosts present insights in a lively, podcast-style format.
-              It's not just information—it's infotainment.
+              Our hosts present insights in a lively, podcast-style format. It's
+              not just information—it's infotainment.
             </InsightSubtitle>
           </InsightContent>
         </InsightCardRight>
@@ -223,7 +221,11 @@ const Home = () => {
           <StyledPressable
             onPress={() => (user ? handleGotoNews() : handleSignin())}
           >
-            {user ? <ButtonText>Go to News</ButtonText> : <ButtonText>Sign in</ButtonText>}
+            {user ? (
+              <ButtonText>Go to News</ButtonText>
+            ) : (
+              <ButtonText>Sign in</ButtonText>
+            )}
           </StyledPressable>
         </ButtonSection>
         <FooterLinks>

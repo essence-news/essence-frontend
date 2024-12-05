@@ -1,38 +1,34 @@
+import { H4, H5 } from "@/components/SharedComponents";
 import { Link, Stack } from "expo-router";
-import { Text, View, StyleSheet } from "react-native";
+import styled from "styled-components/native";
+
+const StyledView = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+`;
+
+const StyledHeading = styled(H4)`
+  font-family: "${({ theme }) => theme.fonts.body}";
+`;
+
+const StyledLink = styled(Link)`
+margin-top: 15,
+    padding-block: 15
+`;
 
 export default function NotFoundScreen() {
   return (
     <>
       <Stack.Screen options={{ title: "Oops!" }} />
-      <View style={styles.container}>
-        <Text style={styles.title}>This screen doesn't exist.</Text>
+      <StyledView>
+        <StyledHeading>This screen doesn't exist.</StyledHeading>
 
-        <Link href="/" style={styles.link}>
-          <Text style={styles.linkText}>Go to home screen!</Text>
-        </Link>
-      </View>
+        <StyledLink href="/">
+          <H5>Go to home screen!</H5>
+        </StyledLink>
+      </StyledView>
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-  linkText: {
-    fontSize: 14,
-    color: "#2e78b7",
-  },
-});
