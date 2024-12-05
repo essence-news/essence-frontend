@@ -28,7 +28,7 @@ import {
   InsightCardLeft,
   commonStyles,
 } from "@/components/SharedComponents";
-import { WebView } from "react-native-webview";
+import { WebView } from "react-native-web-webview";
 
 import screenshot1 from "@/assets/screenshots/1.jpg";
 import ecommercePic from "@/assets/cliparts/ecommerce.jpg";
