@@ -144,6 +144,20 @@ export const verifyToken = async () => {
   }
 };
 
+export const getArticleFromServer = async (publicKey: string) => {
+  try {
+    const response = await apiCall(`/public/article/${publicKey}`, "GET");
+    if (!response.ok) {
+      throw new Error("Failed to get article from server");
+    }
+    const article = await response.json();
+    return article;
+  } catch (error) {
+    console.error("Failed to get article from server:", error);
+    throw new Error("Failed to get article from server");
+  }
+};
+
 export const refreshToken = async () => {
   try {
     const response = await apiCall("/user/refresh_token", "POST");

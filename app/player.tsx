@@ -8,6 +8,8 @@ import {
   Pressable,
   Platform,
   Linking,
+  Share,
+  Alert,
 } from "react-native";
 import GestureRecognizer from "react-native-swipe-gestures";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -45,6 +47,7 @@ import {
   H5,
   StyledActivityIndicator,
   StyledText,
+  FinerText,
 } from "@/components/SharedComponents";
 import { useTheme } from "styled-components/native";
 import BrandHeader from "@/components/BrandHeader";
@@ -58,6 +61,7 @@ import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { CollapsibleHeaderScrollView } from "react-native-collapsible-header-views";
 import { Article, News } from "@/utils/types";
+import OutsidePressHandler from "react-native-outside-press";
 
 const StyledCollapsibleHeaderScrollView = styled(CollapsibleHeaderScrollView)`
   &::-webkit-scrollbar {
@@ -180,9 +184,26 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Player() {
+const SpeedOptionsContainer = styled.View`
+  position: absolute;
+  top: -250px;
+  right: -75px;
+`;
+
+const SpeedText = styled(H5)<{ selected: boolean }>`
+  background: white;
+  color: ${({ selected, theme }) =>
+    selected ? theme.colors.accent : "inherit"};
+  border: 1px solid black;
+  padding: 10px 30px;
+  font-family: "${({ theme }) => theme.fonts.bodyBold}";
+`;
+
+export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
   const [currentNewsIndex, setCurrentNewsIndex] = useState<number>(-1);
   const { user, prepareWelcomeSound, initialWelcomeSound } = useAuth();
+  const [showSpeedOptions, setShowSpeedOptions] = useState(false);
+  const [rate, setRate] = useState(1.0);
   const mounted = useRef(false);
   const userRef = useRef(user);
   const theme = useTheme();
@@ -203,9 +224,7 @@ export default function Player() {
   const { logout } = useAuth();
   const [showWebView, setShowWebView] = useState(false);
   const showWelcomeScreen =
-    welcomeSoundStatus === "playing" ||
-    welcomeSoundStatus === "loading" ||
-    needsUserInput;
+    welcomeSoundStatus === "playing" || welcomeSoundStatus === "loading";
 
   const showPlayerControls = useMemo(() => {
     return (
@@ -355,6 +374,7 @@ export default function Player() {
       index: currentNewsIndex,
       ref: soundRefs.current[currentNewsIndex],
       file: articles[currentNewsIndex].audio_summary,
+      publicKey: articles[currentNewsIndex].public_key,
       sound,
     });
     setIsLoading(false);
@@ -433,6 +453,7 @@ export default function Player() {
             });
         }, 500);
       }
+      sound.setStatusAsync({ rate, shouldCorrectPitch: true });
     }
   }
 
@@ -731,6 +752,7 @@ export default function Player() {
   };
 
   useEffect(() => {
+    if (sharedArticle) return;
     if (welcomeSoundStatus === "completed") {
       playSound();
     }
@@ -795,10 +817,7 @@ export default function Player() {
     console.log("will call play sound with currentNewsIndex", {
       currentNewsIndex,
     });
-    if (!mounted.current) {
-      console.log("***********callling load");
-      load();
-    }
+
     if (mounted.current && currentNewsIndex < articles.length) {
       playSound();
       prepareSounds(currentNewsIndex);
@@ -809,8 +828,27 @@ export default function Player() {
     ) {
       setWelcomeSoundStatus("ignored");
     }
+    if (!mounted.current) {
+      console.log("***********callling load", { sharedArticle });
+      if (sharedArticle) {
+        setArticles([sharedArticle]);
+        setCurrentNewsIndex(0);
+        setWelcomeSoundStatus("ignored");
+      } else {
+        load();
+      }
+    }
     mounted.current = true;
   }, [currentNewsIndex]);
+
+  useEffect(() => {
+    if (currentlyPlaying.current) {
+      currentlyPlaying.current.setStatusAsync({
+        rate,
+        shouldCorrectPitch: true,
+      });
+    }
+  }, [rate]);
 
   const handleNext = async () => {
     if (currentlyPlaying.current) {
@@ -938,6 +976,50 @@ export default function Player() {
     }
     router.push("/preferences");
   };
+  const handleShareClick = async () => {
+    if (Platform.OS === "web") {
+      if (navigator?.share) {
+        navigator.share({
+          text: `Open this link to listen to article \n \n ${process.env.EXPO_PUBLIC_ESSENCE_APP_URL}/sharedNews/${articles[currentNewsIndex].public_key}`,
+        });
+      } else {
+        alert("Not supported");
+      }
+    } else {
+      const options = {
+        // message: "https://getessence.app",
+        message: `Open this link to listen to article \n \n ${process.env.EXPO_PUBLIC_ESSENCE_APP_URL}/sharedNews/${articles[currentNewsIndex].public_key}`,
+      };
+      console.log("will share", {
+        article: articles[currentNewsIndex],
+        options,
+      });
+      try {
+        const result = await Share.share(options);
+        console.log("will share", { result });
+        if (result.action === Share.sharedAction) {
+          if (result.activityType) {
+            // shared with activity type of result.activityType
+          } else {
+            // shared
+          }
+        } else if (result.action === Share.dismissedAction) {
+          // dismissed
+        }
+      } catch (error: any) {
+        Alert.alert(error.message);
+      }
+    }
+  };
+
+  const handleShowSpeedOptions = () => {
+    setShowSpeedOptions(true);
+  };
+
+  const handleSpeedChange = (_rate: number) => {
+    setRate(_rate);
+    setShowSpeedOptions(false);
+  };
   // console.log({ progress, showPlayerControls });
   // console.log({
   //   welcomeSoundStatus,
@@ -950,14 +1032,19 @@ export default function Player() {
   //   OS: Platform.OS,
   // });
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={styles.container}
+      onTouchEnd={() => console.log("touch end")}
+    >
       <BrandHeader />
-      <Pressable
-        style={{ zIndex: 11, position: "absolute", right: 20, top: 22 }}
-        onPress={handleGoToPreferences}
-      >
-        <AntDesign name="setting" color={theme.colors.brand} size={24} />
-      </Pressable>
+      {user && (
+        <Pressable
+          style={{ zIndex: 11, position: "absolute", right: 20, top: 22 }}
+          onPress={handleGoToPreferences}
+        >
+          <AntDesign name="setting" color={theme.colors.brand} size={24} />
+        </Pressable>
+      )}
       {showWebView ? (
         <CollapsibleHeaderScrollViewContainer>
           <StyledCollapsibleHeaderScrollView
@@ -1055,43 +1142,109 @@ export default function Player() {
 
                   {showPlayerControls && (
                     <View style={styles.playerControls}>
-                      <RatingButtons>
-                        <RatingMessage visible={!!ratingMessage}>
-                          {ratingMessage}
-                        </RatingMessage>
-                        <RatingButton
-                          onPress={() => handleRating("negative")}
-                          disabled={isLoading}
-                        >
-                          <Svg fill="#fff" viewBox="0 0 24 24">
-                            <Path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" />
-                          </Svg>
-                        </RatingButton>
-                        <RatingButton
-                          onPress={() => handleRating("positive")}
-                          disabled={isLoading}
-                        >
-                          <Svg fill="#fff" viewBox="0 0 24 24">
-                            <Path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
-                          </Svg>
-                        </RatingButton>
-                      </RatingButtons>
+                      {user && (
+                        <RatingButtons>
+                          <RatingMessage visible={!!ratingMessage}>
+                            {ratingMessage}
+                          </RatingMessage>
+                          <RatingButton
+                            onPress={() => handleRating("negative")}
+                            disabled={isLoading}
+                          >
+                            <Svg fill="#fff" viewBox="0 0 24 24">
+                              <Path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" />
+                            </Svg>
+                          </RatingButton>
+                          <RatingButton
+                            onPress={() => handleRating("positive")}
+                            disabled={isLoading}
+                          >
+                            <Svg fill="#fff" viewBox="0 0 24 24">
+                              <Path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+                            </Svg>
+                          </RatingButton>
+                        </RatingButtons>
+                      )}
                       <ProgressBar>
                         <Progress progress={progress} />
                       </ProgressBar>
                       <Controls>
+                        <ControlButton onPress={handleShowSpeedOptions}>
+                          <AntDesign
+                            name="dashboard"
+                            color={theme.colors.text}
+                            size={26}
+                          />
+                          {showSpeedOptions && (
+                            <OutsidePressHandler
+                              onOutsidePress={() => {
+                                setShowSpeedOptions(false);
+                              }}
+                            >
+                              <SpeedOptionsContainer>
+                                <Pressable
+                                  onPress={() => handleSpeedChange(0.75)}
+                                >
+                                  <SpeedText selected={rate === 0.75}>
+                                    0.75x
+                                  </SpeedText>
+                                </Pressable>
+                                <Pressable
+                                  onPress={() => handleSpeedChange(1.0)}
+                                >
+                                  <SpeedText selected={rate === 1.0}>
+                                    1.0x
+                                  </SpeedText>
+                                </Pressable>
+                                <Pressable
+                                  onPress={() => handleSpeedChange(1.25)}
+                                >
+                                  <SpeedText selected={rate === 1.25}>
+                                    1.25x
+                                  </SpeedText>
+                                </Pressable>
+                                <Pressable
+                                  onPress={() => handleSpeedChange(1.5)}
+                                >
+                                  <SpeedText selected={rate === 1.5}>
+                                    1.5x
+                                  </SpeedText>
+                                </Pressable>
+                                <Pressable
+                                  onPress={() => handleSpeedChange(1.75)}
+                                >
+                                  <SpeedText selected={rate === 1.75}>
+                                    1.75x
+                                  </SpeedText>
+                                </Pressable>
+                                <Pressable
+                                  onPress={() => handleSpeedChange(2.0)}
+                                >
+                                  <SpeedText selected={rate === 2.0}>
+                                    2.0x
+                                  </SpeedText>
+                                </Pressable>
+                              </SpeedOptionsContainer>
+                            </OutsidePressHandler>
+                          )}
+                        </ControlButton>
                         <ControlButton
                           onPress={handlePrev}
                           disabled={prevDisabled}
                         >
-                          <Svg
+                          <AntDesign
+                            name="stepbackward"
+                            color={theme.colors.text}
+                            size={26}
+                          />
+                          {/* <Svg
                             viewBox="0 0 24 24"
                             width={30}
                             height={30}
                             fill={theme.colors.text}
                           >
                             <Path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
-                          </Svg>
+                          </Svg> */}
                         </ControlButton>
                         <ControlButton
                           onPress={() =>
@@ -1102,50 +1255,79 @@ export default function Player() {
                           }
                         >
                           {isLoading ? (
-                            <Svg
-                              viewBox="0 0 24 24"
-                              width={30}
-                              height={30}
-                              fill={theme.colors.text}
-                            >
-                              <Path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z" />
-                            </Svg>
-                          ) : isPlaying ? (
-                            <Svg
-                              viewBox="0 0 24 24"
-                              width={30}
-                              height={30}
-                              fill={theme.colors.text}
-                            >
-                              <Path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                            </Svg>
+                            <AntDesign
+                              name="hourglass"
+                              color={theme.colors.text}
+                              size={26}
+                            />
+                          ) : // <Svg
+                          //   viewBox="0 0 24 24"
+                          //   width={30}
+                          //   height={30}
+                          //   fill={theme.colors.text}
+                          // >
+                          //   <Path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z" />
+                          // </Svg>
+                          isPlaying ? (
+                            // <Svg
+                            //   viewBox="0 0 24 24"
+                            //   width={30}
+                            //   height={30}
+                            //   fill={theme.colors.text}
+                            // >
+                            //   <Path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                            // </Svg>
+                            <AntDesign
+                              name="pause"
+                              color={theme.colors.text}
+                              size={26}
+                            />
                           ) : (
-                            <Svg
-                              viewBox="0 0 24 24"
-                              width={30}
-                              height={30}
-                              fill={theme.colors.text}
-                            >
-                              <Path d="M8 5v14l11-7z" />
-                            </Svg>
+                            <AntDesign
+                              name="caretright"
+                              color={theme.colors.text}
+                              size={26}
+                            />
+                            // <Svg
+                            //   viewBox="0 0 24 24"
+                            //   width={30}
+                            //   height={30}
+                            //   fill={theme.colors.text}
+                            // >
+                            //   <Path d="M8 5v14l11-7z" />
+                            // </Svg>
                           )}
                         </ControlButton>
                         <ControlButton
                           onPress={handleNext}
                           disabled={nextDisabled}
                         >
-                          <Svg
+                          {/* <Svg
                             viewBox="0 0 24 24"
                             width={30}
                             height={30}
                             fill={theme.colors.text}
                           >
                             <Path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
-                          </Svg>
+                          </Svg> */}
+                          <AntDesign
+                            name="stepforward"
+                            color={theme.colors.text}
+                            size={26}
+                          />
                         </ControlButton>
-                        <Text style={{ color: "white" }}>
+                        {/* <Text style={{ color: "white" }}>
                           {currentNewsIndex + 1}/{articles.length}
-                        </Text>
+                        </Text> */}
+                        {articles[currentNewsIndex]?.public_key && (
+                          <ControlButton onPress={handleShareClick}>
+                            <AntDesign
+                              name="sharealt"
+                              color={theme.colors.text}
+                              size={26}
+                            />
+                          </ControlButton>
+                        )}
                       </Controls>
                       <SummaryWrapper>
                         <SummaryTitleContainer>

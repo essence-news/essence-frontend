@@ -575,6 +575,7 @@ export const Controls = styled.View`
 `;
 
 export const ControlButton = styled.Pressable`
+  position: relative;
   border: none;
   cursor: pointer;
   padding: 0;

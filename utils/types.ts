@@ -5,6 +5,7 @@ export interface News {
 }
 
 export interface Article {
+  public_key: string | null;
   audio_summary: string;
   audio_summary_url: any;
   categories: string[];

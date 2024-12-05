@@ -1,10 +1,11 @@
 import theme from "@/constants/theme";
 import { AuthProvider } from "@/utils/AuthProvider";
-import { Platform, StyleSheet, ScrollView } from "react-native";
+import { Platform } from "react-native";
 import { SplashScreen } from "expo-router";
 import { ThemeProvider } from "styled-components/native";
 import { Slot } from "expo-router";
 import { useEffect } from "react";
+import { EventProvider as OutsideEventProvider } from "react-native-outside-press";
 
 import {
   Inter_100Thin,
@@ -101,13 +102,15 @@ export default function Root() {
     <ThemeProvider theme={theme}>
       <AuthProvider>
         <SafeAreaProvider>
-          <SafeAreaView style={commonStyles.flex_1} edges={["top"]}>
-            <MainContainer>
-              {/* <ScrollView> */}
-              <Slot />
-              {/* </ScrollView> */}
-            </MainContainer>
-          </SafeAreaView>
+          <OutsideEventProvider>
+            <SafeAreaView style={commonStyles.flex_1} edges={["top"]}>
+              <MainContainer>
+                {/* <ScrollView> */}
+                <Slot />
+                {/* </ScrollView> */}
+              </MainContainer>
+            </SafeAreaView>
+          </OutsideEventProvider>
         </SafeAreaProvider>
       </AuthProvider>
     </ThemeProvider>
