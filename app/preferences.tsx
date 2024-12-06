@@ -81,7 +81,7 @@ const DropDownContainer = styled.View`
 `;
 
 const CollapsibleContainer = styled.View`
-  margin-top: 50px;
+  margin-top: 30px;
 `;
 
 const SelectedView = styled.View`
@@ -135,7 +135,7 @@ const PreferencesLabel = styled(StyledTextLargeDark)`
   font-family: "${({ theme }) => theme.fonts.body}";
 `;
 
-const StyledAction = styled(AntDesign) <{ mt: string }>`
+const StyledAction = styled(AntDesign)<{ mt: string }>`
   margin-top: ${({ mt }) => mt};
   color: ${({ theme }) => theme.colors.primary};
 `;
@@ -190,11 +190,10 @@ const InputFormFieldContainer = styled.View`
   margin-top: 30px;
 `;
 
-const FormInput = styled(Input) <{ isDisabled: boolean }>`
+const FormInput = styled(Input)<{ isDisabled: boolean }>`
   margin-top: 10px;
   background-color: ${({ isDisabled }) =>
     isDisabled ? "rgba(0, 0, 0, 0.1)" : "initial"};
-  
 `;
 
 const PAGE_SIZE = 5;
@@ -411,8 +410,19 @@ export default function Preferences() {
               statusBarHeight={Platform.OS === "ios" ? 20 : 0}
             >
               <PreferencesContainer>
-                <StyledTextDark style={{ paddingVertical: 10 }}>To serve you with the relevant retail news articles we would like to know a bit more about you and your preferences</StyledTextDark>
-                <H5 style={{ padding: 10, marginVertical: 10, backgroundColor: theme.colors.secondaryLight }}>About You</H5>
+                <StyledTextDark style={{ paddingVertical: 10 }}>
+                  To serve you with the relevant retail news articles we would
+                  like to know a bit more about you and your preferences
+                </StyledTextDark>
+                <H5
+                  style={{
+                    padding: 10,
+                    marginVertical: 10,
+                    backgroundColor: theme.colors.secondaryLight,
+                  }}
+                >
+                  About You
+                </H5>
                 {textFields.map((f) => {
                   // console.log({
                   //   value: payload?.[f.id] || "",
@@ -430,7 +440,12 @@ export default function Preferences() {
                         placeholder={f.placeholder ?? ""}
                         placeholderTextColor={theme.colors.secondaryDarker}
                         isDisabled={f.disabled}
-                        value={payload?.[f.id] ?? userData?.[f.id] ?? f.defaultValue ?? ""}
+                        value={
+                          payload?.[f.id] ??
+                          userData?.[f.id] ??
+                          f.defaultValue ??
+                          ""
+                        }
                         onChangeText={(v) => {
                           setPayload((p) => ({
                             ...p,
@@ -452,7 +467,15 @@ export default function Preferences() {
                 {sliceIndex > 0 && (
                   <>
                     <Divider />
-                    <H5 style={{ padding: 10, marginVertical: 10, backgroundColor: theme.colors.secondaryLight }}>Your Interests</H5>
+                    <H5
+                      style={{
+                        padding: 10,
+                        marginVertical: 10,
+                        backgroundColor: theme.colors.secondaryLight,
+                      }}
+                    >
+                      Your Interests
+                    </H5>
                   </>
                 )}
                 {multiSelectFields.slice(0, sliceIndex).map((p) => {
