@@ -6,6 +6,7 @@ import { ThemeProvider } from "styled-components/native";
 import { Slot } from "expo-router";
 import { useEffect } from "react";
 import { EventProvider as OutsideEventProvider } from "react-native-outside-press";
+import { usePathname } from 'expo-router';
 
 import {
   Inter_100Thin,
@@ -46,6 +47,7 @@ import {
 import { useFonts } from "expo-font";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { commonStyles, MainContainer } from "@/components/SharedComponents";
+import { initGA, logPageView } from '@/utils/analytics';
 
 export default function Root() {
   const [loaded, error] = useFonts({
@@ -98,6 +100,24 @@ export default function Root() {
   if (!loaded) {
     return null;
   }
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      if (document) {
+        document.title = "Essence - Your own news player";
+      }
+      initGA();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS === "web" && pathname) {
+      logPageView(pathname);
+    }
+  }, [pathname]);
+
   return (
     <ThemeProvider theme={theme}>
       <AuthProvider>
