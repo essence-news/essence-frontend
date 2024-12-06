@@ -15,11 +15,11 @@ export const H3 = styled.Text`
 `;
 export const H4 = styled.Text`
   font-size: 20px;
-  font-family: "${({ theme }) => theme.fonts.body}";
+  font-family: "${({ theme }) => theme.fonts.bodyMedium}";
 `;
 export const H5 = styled.Text`
   font-size: 16px;
-  font-family: "${({ theme }) => theme.fonts.body}";
+  font-family: "${({ theme }) => theme.fonts.bodyMedium}";
 `;
 
 export const StyledTextLarge = styled.Text`
@@ -36,13 +36,13 @@ export const StyledTextLargeDark = styled.Text`
 
 
 export const StyledText = styled.Text`
-  font-size: 12px;
+  font-size: 14px;
   font-family: "${({ theme }) => theme.fonts.body}";
   color: #fff;
 `;
 
 export const StyledTextDark = styled.Text`
-  font-size: 12px;
+  font-size: 14px;
   font-family: "${({ theme }) => theme.fonts.body}";
   color: ${({ theme }) => theme.colors.primaryLight};
 `;
@@ -547,7 +547,7 @@ export const PlaylistInfo = styled.View`
 export const NewsInfo = styled.View`
   text-align: center;
   color: ${({ theme }) => theme.colors.text};
-  margin: 40px 0;
+  margin: 100px 0;
   transition: transform 1s ease-out;
 `;
 
@@ -562,9 +562,8 @@ export const RatingButtons = styled.View`
   display: flex;
   justify-content: flex-end;
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
   flex-direction: row;
-  padding-inline: 20px;
 `;
 
 export const RatingButton = styled.Pressable`
@@ -581,7 +580,7 @@ export const ProgressBar = styled.View`
   width: 100%;
   height: 4px;
   background-color: rgba(255, 255, 255, 0.3);
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 `;
 
 export const Progress = styled.View<{ progress: number }>`
@@ -593,9 +592,9 @@ export const Progress = styled.View<{ progress: number }>`
 export const Controls = styled.View`
   display: flex;
   width: 100%;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
   flex-direction: row;
 `;
 
@@ -605,6 +604,7 @@ export const ControlButton = styled.Pressable`
   cursor: pointer;
   padding: 0;
   transition: opacity 0.3s ease;
+  font-size: 20px;
   &:disabled {
     opacity: 0.5;
   }
@@ -632,13 +632,12 @@ export const SummaryWrapper = styled.View`
   padding: 20px;
   background-color: ${({ theme }) => theme.colors.darkOverlay};
   border-radius: 10px;
-  margin-bottom: 20px;
+  margin: 20px 0;
   font-family: "${({ theme }) => theme.fonts.body}";
 `;
 
-export const SummaryTitle = styled(H5)`
+export const SummaryTitle = styled(H4)`
   color: ${({ theme }) => theme.colors.text};
-  margin: 0 0 10px 0;
 `;
 
 export const SummaryText = styled(StyledText)`

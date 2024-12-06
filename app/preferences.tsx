@@ -581,7 +581,7 @@ export default function Preferences() {
         <OkCancelModal
           onCancel={onCancel}
           onOk={onOkInAddModal}
-          label={"Add Custom " + showAddModal.label}
+          label={showAddModal.addNewLabel}
         >
           <StyledInput
             onChangeText={setAddValue}
