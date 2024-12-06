@@ -46,8 +46,7 @@ import {
   MainContent,
   H5,
   StyledActivityIndicator,
-  StyledText,
-  FinerText,
+  H3,
 } from "@/components/SharedComponents";
 import { useTheme } from "styled-components/native";
 import BrandHeader from "@/components/BrandHeader";
@@ -62,6 +61,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { CollapsibleHeaderScrollView } from "react-native-collapsible-header-views";
 import { Article, News } from "@/utils/types";
 import OutsidePressHandler from "react-native-outside-press";
+import JoinButton from "@/components/JoinButton";
+import FadeInView from "@/components/FadeInView";
 
 const StyledCollapsibleHeaderScrollView = styled(CollapsibleHeaderScrollView)`
   &::-webkit-scrollbar {
@@ -101,6 +102,9 @@ const ReplayButtonContainer = styled.View`
 `;
 
 const ReplayText = styled.Text`
+  color: #fff;
+`;
+const SpeedLabel = styled(H3)`
   color: #fff;
 `;
 
@@ -199,6 +203,14 @@ const SpeedText = styled(H5)<{ selected: boolean }>`
   font-family: "${({ theme }) => theme.fonts.bodyBold}";
 `;
 
+const JoinEssenceContainer = styled(View)`
+  flex-direction: column;
+  gap: 10px;
+  margin-block: 10px;
+  justify-content: center;
+  align-items: center;
+`;
+
 export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
   const [currentNewsIndex, setCurrentNewsIndex] = useState<number>(-1);
   const { user, prepareWelcomeSound, initialWelcomeSound } = useAuth();
@@ -244,11 +256,18 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
     ) {
       return (
         <InfoMessage>
-          <Text>
-            Great job on listening!{"\n\n"}
-            All caught up!{"\n"}
-            Please check back later for more news
-          </Text>
+          {user ? (
+            <Text>
+              Great job on listening!{"\n\n"}
+              All caught up!{"\n"}
+              Please check back later for more news
+            </Text>
+          ) : (
+            <JoinEssenceContainer>
+              <Text>Join essence for more news.</Text>
+              <JoinButton />
+            </JoinEssenceContainer>
+          )}
           <ReplayButtonContainer>
             <ReplayButton
               onPress={async () => {
@@ -751,7 +770,38 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
     flushQueue();
   };
 
+  const handleSharedArticlePresent = async () => {
+    let articlesToSet = [];
+    const newsDataFromStorage = await AsyncStorage.getItem("newsData");
+    const newIndexFromStorage = await AsyncStorage.getItem("currentNewsIndex");
+
+    if (user && newsDataFromStorage) {
+      const parsed = JSON.parse(newsDataFromStorage);
+      articlesToSet = [
+        sharedArticle,
+        ...parsed.articles.splice(+(newIndexFromStorage || 0)),
+      ];
+      await AsyncStorage.setItem(
+        "newsData",
+        JSON.stringify({
+          ...parsed,
+          articles: articlesToSet,
+        }),
+      );
+    } else {
+      articlesToSet.push(sharedArticle);
+    }
+    setArticles(articlesToSet);
+    setCurrentNewsIndex(0);
+    AsyncStorage.setItem("currentNewsIndex", "0");
+    setWelcomeSoundStatus("ignored");
+  };
+
   useEffect(() => {
+    console.log("useEffect", {
+      currentNewsIndex,
+      currentlyPlaying: currentlyPlaying.current,
+    });
     if (sharedArticle) return;
     if (welcomeSoundStatus === "completed") {
       playSound();
@@ -764,6 +814,7 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
         console.log("App has come to the foreground!", {
           welcomeSoundStatus,
           isPlaying,
+          currentNewsIndex,
           currentlyPlaying: currentlyPlaying.current,
         });
         if (
@@ -782,7 +833,12 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
         appState.current.match(/active/) &&
         nextAppState.match(/inactive|background/)
       ) {
-        // console.log("App has come to the background!");
+        console.log("App has come to the background!", {
+          welcomeSoundStatus,
+          isPlaying,
+          currentNewsIndex,
+          currentlyPlaying: currentlyPlaying.current,
+        });
         handleLeavePlayer();
       }
       trackEvent("visibilityChange", null, null, null, null, { nextAppState });
@@ -816,6 +872,7 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
   useEffect(() => {
     console.log("will call play sound with currentNewsIndex", {
       currentNewsIndex,
+      currentlyPlaying: currentlyPlaying.current,
     });
 
     if (mounted.current && currentNewsIndex < articles.length) {
@@ -831,9 +888,7 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
     if (!mounted.current) {
       console.log("***********callling load", { sharedArticle });
       if (sharedArticle) {
-        setArticles([sharedArticle]);
-        setCurrentNewsIndex(0);
-        setWelcomeSoundStatus("ignored");
+        handleSharedArticlePresent();
       } else {
         load();
       }
@@ -851,6 +906,13 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
   }, [rate]);
 
   const handleNext = async () => {
+    if (!user && isPlaying) {
+      goToHome();
+      return;
+    }
+    console.log("handleNext before", {
+      currentlyPlaying: currentlyPlaying.current,
+    });
     if (currentlyPlaying.current) {
       await currentlyPlaying.current?.stopAsync();
       // await currentlyPlaying.current?.unloadAsync();
@@ -860,6 +922,7 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
     const newIndex = currentNewsIndex + 1;
     console.log("handleNext", {
       newIndex,
+      currentlyPlaying: currentlyPlaying.current,
       currentNewsIndex,
       articles: articles.length,
     });
@@ -878,6 +941,10 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
   };
 
   const handlePrev = async () => {
+    if (!user && isPlaying) {
+      goToHome();
+      return;
+    }
     await currentlyPlaying.current?.stopAsync();
     setIsPlaying(false);
 
@@ -1020,6 +1087,10 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
     setRate(_rate);
     setShowSpeedOptions(false);
   };
+
+  const goToHome = () => {
+    router.push("/home");
+  };
   // console.log({ progress, showPlayerControls });
   // console.log({
   //   welcomeSoundStatus,
@@ -1037,14 +1108,15 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
       onTouchEnd={() => console.log("touch end")}
     >
       <BrandHeader />
-      {user && (
-        <Pressable
-          style={{ zIndex: 11, position: "absolute", right: 20, top: 22 }}
-          onPress={handleGoToPreferences}
-        >
-          <AntDesign name="setting" color={theme.colors.brand} size={24} />
-        </Pressable>
-      )}
+      <View style={{ zIndex: 11, position: "absolute", right: 20, top: 22 }}>
+        {user ? (
+          <Pressable onPress={handleGoToPreferences}>
+            <AntDesign name="setting" color={theme.colors.brand} size={24} />
+          </Pressable>
+        ) : (
+          <JoinButton />
+        )}
+      </View>
       {showWebView ? (
         <CollapsibleHeaderScrollViewContainer>
           <StyledCollapsibleHeaderScrollView
@@ -1170,61 +1242,64 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
                       </ProgressBar>
                       <Controls>
                         <ControlButton onPress={handleShowSpeedOptions}>
-                          <AntDesign
+                          <SpeedLabel>{rate}x</SpeedLabel>
+                          {/* <AntDesign
                             name="dashboard"
                             color={theme.colors.text}
                             size={26}
-                          />
+                          /> */}
                           {showSpeedOptions && (
                             <OutsidePressHandler
                               onOutsidePress={() => {
                                 setShowSpeedOptions(false);
                               }}
                             >
-                              <SpeedOptionsContainer>
-                                <Pressable
-                                  onPress={() => handleSpeedChange(0.75)}
-                                >
-                                  <SpeedText selected={rate === 0.75}>
-                                    0.75x
-                                  </SpeedText>
-                                </Pressable>
-                                <Pressable
-                                  onPress={() => handleSpeedChange(1.0)}
-                                >
-                                  <SpeedText selected={rate === 1.0}>
-                                    1.0x
-                                  </SpeedText>
-                                </Pressable>
-                                <Pressable
-                                  onPress={() => handleSpeedChange(1.25)}
-                                >
-                                  <SpeedText selected={rate === 1.25}>
-                                    1.25x
-                                  </SpeedText>
-                                </Pressable>
-                                <Pressable
-                                  onPress={() => handleSpeedChange(1.5)}
-                                >
-                                  <SpeedText selected={rate === 1.5}>
-                                    1.5x
-                                  </SpeedText>
-                                </Pressable>
-                                <Pressable
-                                  onPress={() => handleSpeedChange(1.75)}
-                                >
-                                  <SpeedText selected={rate === 1.75}>
-                                    1.75x
-                                  </SpeedText>
-                                </Pressable>
-                                <Pressable
-                                  onPress={() => handleSpeedChange(2.0)}
-                                >
-                                  <SpeedText selected={rate === 2.0}>
-                                    2.0x
-                                  </SpeedText>
-                                </Pressable>
-                              </SpeedOptionsContainer>
+                              <FadeInView>
+                                <SpeedOptionsContainer>
+                                  <Pressable
+                                    onPress={() => handleSpeedChange(0.75)}
+                                  >
+                                    <SpeedText selected={rate === 0.75}>
+                                      0.75x
+                                    </SpeedText>
+                                  </Pressable>
+                                  <Pressable
+                                    onPress={() => handleSpeedChange(1)}
+                                  >
+                                    <SpeedText selected={rate === 1}>
+                                      1x
+                                    </SpeedText>
+                                  </Pressable>
+                                  <Pressable
+                                    onPress={() => handleSpeedChange(1.25)}
+                                  >
+                                    <SpeedText selected={rate === 1.25}>
+                                      1.25x
+                                    </SpeedText>
+                                  </Pressable>
+                                  <Pressable
+                                    onPress={() => handleSpeedChange(1.5)}
+                                  >
+                                    <SpeedText selected={rate === 1.5}>
+                                      1.5x
+                                    </SpeedText>
+                                  </Pressable>
+                                  <Pressable
+                                    onPress={() => handleSpeedChange(1.75)}
+                                  >
+                                    <SpeedText selected={rate === 1.75}>
+                                      1.75x
+                                    </SpeedText>
+                                  </Pressable>
+                                  <Pressable
+                                    onPress={() => handleSpeedChange(2)}
+                                  >
+                                    <SpeedText selected={rate === 2}>
+                                      2x
+                                    </SpeedText>
+                                  </Pressable>
+                                </SpeedOptionsContainer>
+                              </FadeInView>
                             </OutsidePressHandler>
                           )}
                         </ControlButton>
@@ -1300,7 +1375,7 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
                         </ControlButton>
                         <ControlButton
                           onPress={handleNext}
-                          disabled={nextDisabled}
+                          disabled={user ? nextDisabled : false}
                         >
                           {/* <Svg
                             viewBox="0 0 24 24"

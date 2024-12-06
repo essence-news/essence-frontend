@@ -24,6 +24,7 @@ export const H5 = styled.Text`
 export const StyledText = styled.Text`
   font-size: 12px;
   font-family: "${({ theme }) => theme.fonts.body}";
+  color: #fff;
 `;
 export const FinerText = styled.Text`
   font-size: 10px;
