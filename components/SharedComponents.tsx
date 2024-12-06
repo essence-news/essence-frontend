@@ -21,14 +21,38 @@ export const H5 = styled.Text`
   font-size: 16px;
   font-family: "${({ theme }) => theme.fonts.body}";
 `;
+
+export const StyledTextLarge = styled.Text`
+  font-size: 14px;
+  font-family: "${({ theme }) => theme.fonts.body}";
+  color: #fff;
+`;
+
+export const StyledTextLargeDark = styled.Text`
+  font-size: 14px;
+  font-family: "${({ theme }) => theme.fonts.body}";
+  color: ${({ theme }) => theme.colors.primary};
+`;
+
+
 export const StyledText = styled.Text`
   font-size: 12px;
   font-family: "${({ theme }) => theme.fonts.body}";
   color: #fff;
 `;
-export const FinerText = styled.Text`
-  font-size: 10px;
+
+export const StyledTextDark = styled.Text`
+  font-size: 12px;
   font-family: "${({ theme }) => theme.fonts.body}";
+  color: ${({ theme }) => theme.colors.primaryLight};
+`;
+
+
+export const FinerText = styled.Text`
+  font-size: 12px;
+  font-style: italic;
+  font-family: "${({ theme }) => theme.fonts.body}";
+  color: ${({ theme }) => theme.colors.primaryLighter};
 `;
 
 export const DangerText = styled.Text`
@@ -635,7 +659,7 @@ export const FullScreenBackground = styled.View<{ src: string }>`
   z-index: -1;
 `;
 
-export const RatingMessage = styled(H5)<{ visible: boolean }>`
+export const RatingMessage = styled(H5) <{ visible: boolean }>`
   opacity: ${(props) => (props.visible ? 1 : 0)};
   color: ${({ theme }) => theme.colors.accent};
   margin-left: 10px;
@@ -663,7 +687,7 @@ export const CategoryContainer = styled.View`
 export const BrandName = styled(H3)`
   margin: 0;
   padding: 0;
-  height: 50px;
+  height: 30px;
   color: ${({ theme }) => theme.colors.white};
   font-family: "${({ theme }) => theme.fonts.brand}";
   flex: 1;

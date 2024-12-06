@@ -10,6 +10,9 @@ import {
   Input,
   StyledText,
   StyledActivityIndicator,
+  StyledTextDark,
+  H4,
+  StyledTextLargeDark,
 } from "@/components/SharedComponents";
 import theme from "@/constants/theme";
 import { getUserData, savePreferences } from "@/utils/api";
@@ -36,7 +39,7 @@ export const PreferencesContainer = styled.View`
   max-width: 500px;
   margin: 0 auto;
   background-color: ${({ theme }) => theme.colors.background};
-  padding: 20px 10px;
+  padding: 20px;
   margin-bottom: 20px;
   position: relative;
 `;
@@ -78,7 +81,7 @@ const DropDownContainer = styled.View`
 `;
 
 const CollapsibleContainer = styled.View`
-  margin-top: 70px;
+  margin-top: 50px;
 `;
 
 const SelectedView = styled.View`
@@ -126,12 +129,13 @@ const LoadMoreButtonText = styled(StyledText)`
   border-radius: 5px;
 `;
 
-const PreferencesLabel = styled(StyledText)`
-  color: ${({ theme }) => theme.colors.primary};
-  font-family: "${({ theme }) => theme.fonts.bodyBold}";
+const PreferencesLabel = styled(StyledTextLargeDark)`
+  font-size: 16px;
+  color: ${({ theme }) => theme.colors.primaryDark};
+  font-family: "${({ theme }) => theme.fonts.body}";
 `;
 
-const StyledAction = styled(AntDesign)<{ mt: string }>`
+const StyledAction = styled(AntDesign) <{ mt: string }>`
   margin-top: ${({ mt }) => mt};
   color: ${({ theme }) => theme.colors.primary};
 `;
@@ -154,19 +158,19 @@ const StyledContainer = styled.View`
 `;
 
 const HeaderContainer = styled.View`
-  padding: 20px;
+  padding: 10px 20px;
   flex-direction: row;
   align-items: center;
   width: 100%;
   justify-content: space-between;
 `;
 
-const PreferencesText = styled(H5)`
+const PreferencesText = styled(H4)`
   padding: 10px;
   margin: 0px;
   text-align: left;
-  color: ${({ theme }) => theme.colors.primary};
-  font-family: ${({ theme }) => theme.fonts.headingBold};
+  color: ${({ theme }) => theme.colors.primaryDark};
+  font-family: ${({ theme }) => theme.fonts.body};
   flex: 1;
 `;
 
@@ -183,16 +187,24 @@ const MultiSelectFormFieldContainer = styled.View`
 `;
 
 const InputFormFieldContainer = styled.View`
-  margin-top: 10px;
+  margin-top: 30px;
 `;
 
-const FormInput = styled(Input)<{ isDisabled: boolean }>`
+const FormInput = styled(Input) <{ isDisabled: boolean }>`
   margin-top: 10px;
   background-color: ${({ isDisabled }) =>
     isDisabled ? "rgba(0, 0, 0, 0.1)" : "initial"};
+  
 `;
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 5;
+
+const Divider = styled.View`
+  height: 1px;
+  width: 100%;
+  background-color: ${({ theme }) => theme.colors.secondaryLight};
+  margin: 40px 0 20px;
+`;
 
 export default function Preferences() {
   const [isFocus, setIsFocus] = useState("");
@@ -393,12 +405,14 @@ export default function Preferences() {
                   </TouchableOpacity>
                 </HeaderContainer>
               }
-              headerHeight={80}
-              headerContainerBackgroundColor={theme.colors.secondary}
+              headerHeight={60}
+              headerContainerBackgroundColor={theme.colors.secondaryLight}
               // headerContainerBackgroundColor="red"
               statusBarHeight={Platform.OS === "ios" ? 20 : 0}
             >
               <PreferencesContainer>
+                <StyledTextDark style={{ paddingVertical: 10 }}>To serve you with the relevant retail news articles we would like to know a bit more about you and your preferences</StyledTextDark>
+                <H5 style={{ padding: 10, marginVertical: 10, backgroundColor: theme.colors.secondaryLight }}>About You</H5>
                 {textFields.map((f) => {
                   // console.log({
                   //   value: payload?.[f.id] || "",
@@ -410,22 +424,19 @@ export default function Preferences() {
                         {f.label}
                         {f.mandatory && <DangerText>*</DangerText>}
                       </PreferencesLabel>
-                      {f.footnote && <FinerText>{f.footnote}</FinerText>}
                       <FormInput
                         id={f.id}
                         ref={(element) => (elementRefs.current[f.id] = element)}
-                        // placeholder="Verification Code"
+                        placeholder={f.placeholder ?? ""}
+                        placeholderTextColor={theme.colors.secondaryDarker}
                         isDisabled={f.disabled}
-                        value={payload?.[f.id] ?? userData?.[f.id] ?? ""}
+                        value={payload?.[f.id] ?? userData?.[f.id] ?? f.defaultValue ?? ""}
                         onChangeText={(v) => {
-                          // console.log({ f, v });
                           setPayload((p) => ({
                             ...p,
                             [f.id]: v,
                           }));
                         }}
-                        // disabled={isLoading}
-
                         focusable={!f.disabled}
                         editable={!f.disabled}
                       />
@@ -434,9 +445,16 @@ export default function Preferences() {
                       ) : (
                         <Text></Text>
                       )}
+                      {f.footnote && <FinerText>{f.footnote}</FinerText>}
                     </InputFormFieldContainer>
                   );
                 })}
+                {sliceIndex > 0 && (
+                  <>
+                    <Divider />
+                    <H5 style={{ padding: 10, marginVertical: 10, backgroundColor: theme.colors.secondaryLight }}>Your Interests</H5>
+                  </>
+                )}
                 {multiSelectFields.slice(0, sliceIndex).map((p) => {
                   const data = [...(p.defaultValues || [])];
                   console.log({ payload });
@@ -473,7 +491,6 @@ export default function Preferences() {
                           {p.label}
                           {p.mandatory && <DangerText>*</DangerText>}
                         </PreferencesLabel>
-                        {p.footnote && <FinerText>{p.footnote}</FinerText>}
                       </View>
                       <DropDownContainer>
                         <View style={commonStyles.flex_1}>
@@ -484,6 +501,7 @@ export default function Preferences() {
                                 borderColor: theme.colors.primaryLight,
                               },
                             ]}
+                            placeholder={p.placeholder ?? ""}
                             placeholderStyle={styles.placeholderStyle}
                             data={data}
                             // search
@@ -539,6 +557,7 @@ export default function Preferences() {
                           <StyledActionText>Add new</StyledActionText>
                         </AddNewButton>
                       </DropDownContainer>
+                      {p.footnote && <FinerText>{p.footnote}</FinerText>}
                     </MultiSelectFormFieldContainer>
                   );
                 })}

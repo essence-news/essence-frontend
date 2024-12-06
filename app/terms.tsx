@@ -9,7 +9,7 @@ import {
   MainContainer
 } from '@/components/SharedComponents';
 
-const TermsOfUse = () => {
+export default function TermsOfUse() {
   return (
     <PrivacyContainer>
       <PrivacyHeading>Essence Terms of Use</PrivacyHeading>
@@ -103,5 +103,3 @@ const TermsOfUse = () => {
     </PrivacyContainer>
   );
 };
-
-export default TermsOfUse;

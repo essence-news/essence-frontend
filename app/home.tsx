@@ -41,7 +41,7 @@ import theme from "@/constants/theme";
 
 // Keep the existing styled components that are specific to Home
 
-const Home = () => {
+export default function Home() {
   const { user } = useAuth();
   const isTabletOrMobileDevice = useMediaQuery({
     query: "(max-device-width: 768px)",
@@ -242,6 +242,4 @@ const Home = () => {
       </Footer>
     </HomeContainer>
   );
-};
-
-export default Home;
+}
