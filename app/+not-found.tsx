@@ -14,8 +14,8 @@ const StyledHeading = styled(H4)`
 `;
 
 const StyledLink = styled(Link)`
-margin-top: 15,
-    padding-block: 15
+  margin-top: 15;
+  padding-block: 15;
 `;
 
 export default function NotFoundScreen() {

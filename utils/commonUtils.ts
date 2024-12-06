@@ -35,3 +35,10 @@ export const getTimeOfDay = () => {
   if (hour < 17) return "afternoon";
   return "evening";
 };
+
+export const updateMetaTag = (tagName: string, value: string) => {
+  const el =
+    document.querySelector(`meta[name='${tagName}']`) ||
+    document.querySelector(`meta[property='${tagName}']`);
+  if (el) el.setAttribute("content", value);
+};
