@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { trackEvents } from "./api";
 
 const eventQueue: {
@@ -36,7 +37,8 @@ export const flushQueue = async () => {
 
   const eventsToSend = [...eventQueue];
   eventQueue.length = 0;
-
+  const userToken = await AsyncStorage.getItem("userToken");
+  if (!userToken) return;
   try {
     console.log({ eventsToSendLength: eventsToSend.length });
     await trackEvents(eventsToSend);
