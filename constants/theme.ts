@@ -9,6 +9,7 @@ const theme = {
 
     secondary: "#ecdfcc",
     secondaryDark: "#bcb2a3",
+    secondaryDarker: "#a3998c",
     secondaryLight: "#f1e8db",
     background: "#fcfaf7",
     text: "#FFFFFF",
@@ -25,6 +26,18 @@ const theme = {
     heading: "Nunito_400Regular",
     headingBold: "Nunito_700Bold",
     brand: "Comfortaa_400Regular",
+  },
+  typography: {
+    fontSize: {
+      default: 12,
+      small: 10,
+      large: 14,
+      h1: 36,
+      h2: 32,
+      h3: 24,
+      h4: 20,
+      h5: 16,
+    },
   },
   sizes: {
     maxWidth: "1400px",
