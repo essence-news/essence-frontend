@@ -43,7 +43,6 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-ga4": "^2.1.0",
-    "react-helmet": "^6.1.0",
     "react-native": "0.76.3",
     "react-native-collapsible-header-views": "^1.1.2",
     "react-native-element-dropdown": "^2.12.2",

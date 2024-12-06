@@ -1,9 +1,10 @@
 import styled from "styled-components/native";
-import { Button, H5, StyledText } from "./SharedComponents";
+import { Button, StyledText } from "./SharedComponents";
 import { router } from "expo-router";
 
-const JoinText = styled(H5)`
+const JoinText = styled(StyledText)`
   color: #fff;
+  text-transform: uppercase;
 `;
 
 const JoinButton = () => {
