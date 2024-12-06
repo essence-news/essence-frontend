@@ -616,6 +616,7 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
               );
               clearInterval(tryToPlay);
               setWelcomeSoundStatus("completed");
+              welcomeSoundRef.current = null;
             }
           });
       }, 500);
@@ -851,7 +852,7 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
         subscription.remove();
       }
     };
-  }, [welcomeSoundStatus, currentlyPlaying.current]);
+  }, [welcomeSoundStatus]);
 
   useEffect(() => {
     // console.log("***********callling load");
