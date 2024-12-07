@@ -19,6 +19,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@aws-amplify/react-native": "^1.1.6",
     "@expo-google-fonts/comfortaa": "^0.2.3",
     "@expo-google-fonts/inter": "^0.2.3",
     "@expo-google-fonts/nunito": "^0.2.3",
@@ -26,6 +27,7 @@
     "@expo/vector-icons": "^14.0.2",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-navigation/native": "^7.0.0",
+    "aws-amplify": "^6.10.0",
     "dotenv-cli": "^7.4.3",
     "expo": "~52.0.17",
     "expo-av": "~15.0.1",
@@ -36,9 +38,11 @@
     "expo-splash-screen": "~0.29.16",
     "expo-status-bar": "~2.0.0",
     "expo-system-ui": "~4.0.5",
+    "expo-tracking-transparency": "~5.1.0",
     "expo-web-browser": "~14.0.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "react-ga4": "^2.1.0",
     "react-native": "0.76.3",
     "react-native-collapsible-header-views": "^1.1.2",
     "react-native-element-dropdown": "^2.12.2",
