@@ -29,7 +29,7 @@ import {
   commonStyles,
 } from "@/components/SharedComponents";
 import { WebView } from "react-native-web-webview";
-import { record } from "aws-amplify/analytics";
+// import { record } from "aws-amplify/analytics";
 
 import ecommercePic from "@/assets/cliparts/ecommerce.jpg";
 import audioPic from "@/assets/cliparts/audio.jpg";
@@ -63,10 +63,10 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    record({ name: "PAGE_VIEW" });
-    // init();
-  }, []);
+  // useEffect(() => {
+  //   record({ name: "PAGE_VIEW" });
+  //   // init();
+  // }, []);
 
   const handleJoinBeta = () => {
     router.push("/beta-access");
