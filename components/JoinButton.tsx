@@ -3,7 +3,7 @@ import { Button, StyledText } from "./SharedComponents";
 import { router } from "expo-router";
 
 const JoinText = styled(StyledText)`
-  color: red;
+  color: #fff;
   text-transform: uppercase;
 `;
 
