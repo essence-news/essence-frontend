@@ -34,7 +34,6 @@ export const StyledTextLargeDark = styled.Text`
   color: ${({ theme }) => theme.colors.primary};
 `;
 
-
 export const StyledText = styled.Text`
   font-size: 14px;
   font-family: "${({ theme }) => theme.fonts.body}";
@@ -46,7 +45,6 @@ export const StyledTextDark = styled.Text`
   font-family: "${({ theme }) => theme.fonts.body}";
   color: ${({ theme }) => theme.colors.primaryLight};
 `;
-
 
 export const FinerText = styled.Text`
   font-size: 12px;
@@ -658,7 +656,7 @@ export const FullScreenBackground = styled.View<{ src: string }>`
   z-index: -1;
 `;
 
-export const RatingMessage = styled(H5) <{ visible: boolean }>`
+export const RatingMessage = styled(H5)<{ visible: boolean }>`
   opacity: ${(props) => (props.visible ? 1 : 0)};
   color: ${({ theme }) => theme.colors.accent};
   margin-left: 10px;
