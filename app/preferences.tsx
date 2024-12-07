@@ -537,7 +537,6 @@ export default function Preferences() {
                             maxHeight={300}
                             labelField="label"
                             valueField="value"
-                            placeholder={!isFocus ? "" : ""}
                             searchPlaceholder="Search..."
                             onFocus={() => setIsFocus(p.id)}
                             onBlur={() => setIsFocus("")}
