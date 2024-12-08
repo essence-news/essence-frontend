@@ -81,7 +81,7 @@ const DropDownContainer = styled.View`
 `;
 
 const CollapsibleContainer = styled.View`
-  margin-top: 30px;
+  margin-top: 50px;
 `;
 
 const SelectedView = styled.View`

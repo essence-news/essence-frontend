@@ -148,7 +148,6 @@ const PlayerContainer = styled.View`
   width: 100%;
   max-width: 500px;
   justify-content: flex-start;
-  margin-top: 20px;
   border: none;
 `;
 
