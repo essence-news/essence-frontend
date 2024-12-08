@@ -1111,7 +1111,7 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
       onTouchEnd={() => console.log("touch end")}
     >
       <BrandHeader />
-      <View style={{ zIndex: 11, position: "absolute", right: 20, top: 8 }}>
+      <View style={{ zIndex: 11, position: "absolute", right: 20, top: 12 }}>
         {user ? (
           <Pressable onPress={handleGoToPreferences}>
             <AntDesign name="setting" color={theme.colors.brand} size={24} />
