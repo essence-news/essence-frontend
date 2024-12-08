@@ -1,7 +1,4 @@
-import styled from "styled-components/native";
-
 import { useAuth } from "../utils/AuthProvider";
-import { ScrollView, View } from "react-native";
 import { Link, router } from "expo-router";
 import "@expo/match-media";
 import { useMediaQuery } from "react-responsive";
@@ -27,26 +24,23 @@ import {
   StyledPressable,
   StyledImageBackground,
   Overlay,
-  Logo,
-  LogoContainer,
   InsightCardRight,
-  InsightCardLeft
+  InsightCardLeft,
+  commonStyles,
 } from "@/components/SharedComponents";
-import { useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { WebView } from "react-native-web-webview";
+import { record } from "aws-amplify/analytics";
 
-import screenshot1 from "@/assets/screenshots/1.jpg";
 import ecommercePic from "@/assets/cliparts/ecommerce.jpg";
 import audioPic from "@/assets/cliparts/audio.jpg";
 import hourglassPic from "@/assets/cliparts/hourglass.jpg";
 import podcastPic from "@/assets/cliparts/podcast.jpg";
-import BrandHeader from "@/components/BrandHeader";
-import theme from "@/constants/theme";
+import { useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Keep the existing styled components that are specific to Home
 
-const Home = () => {
+export default function Home() {
   const { user } = useAuth();
   const isTabletOrMobileDevice = useMediaQuery({
     query: "(max-device-width: 768px)",
@@ -70,23 +64,23 @@ const Home = () => {
   };
 
   useEffect(() => {
-    init();
+    record({ name: "PAGE_VIEW" });
+    // init();
   }, []);
-
-  console.log("Home page");
 
   const handleJoinBeta = () => {
     router.push("/beta-access");
   };
-
+  console.log("home page");
   return (
     <HomeContainer smallScreen={isTabletOrMobileDevice}>
       <HeroSection smallScreen={isTabletOrMobileDevice}>
         <LeftSection smallScreen={isTabletOrMobileDevice}>
           <Brand>essence</Brand>
-          <Headline>Business News That Speaks to You</Headline>
+          <Headline>Business news that speaks to you</Headline>
           <Subheadline>
-            Purpose-built for Retail Leaders—concise 30-second audio news, expertly curated for your role and industry
+            Purpose-built for Retail Leaders—concise 30-second audio news,
+            expertly curated for your role and industry
           </Subheadline>
           <ButtonSection smallScreen={isTabletOrMobileDevice}>
             <BetaPressable onPress={handleJoinBeta}>
@@ -95,7 +89,11 @@ const Home = () => {
             <StyledPressable
               onPress={() => (user ? handleGotoNews() : handleSignin())}
             >
-              {user ? <ButtonText>Go to News</ButtonText> : <ButtonText>Sign in</ButtonText>}
+              {user ? (
+                <ButtonText>Go to News</ButtonText>
+              ) : (
+                <ButtonText>Sign in</ButtonText>
+              )}
             </StyledPressable>
           </ButtonSection>
         </LeftSection>
@@ -149,9 +147,9 @@ const Home = () => {
                         </div>
                       </body>
                     </html>
-                  `
+                  `,
               }}
-              style={{ flex: 1 }}
+              style={commonStyles.flex_1}
               javaScriptEnabled={true}
               domStorageEnabled={true}
               allowsFullscreenVideo={true}
@@ -167,8 +165,9 @@ const Home = () => {
             <InsightTitleSmall>Your Industry. Your News.</InsightTitleSmall>
             <InsightTitle>Tailored for You</InsightTitle>
             <InsightSubtitle>
-              Essence curates content from top sources, even from behind paywalls, tailored to your
-              specific industry and role. Stay relevant without the noise and hassle.
+              Essence curates content from top sources, even from behind
+              paywalls, tailored to your specific industry and role. Stay
+              relevant without the noise and hassle.
             </InsightSubtitle>
           </InsightContent>
         </InsightCardLeft>
@@ -179,9 +178,9 @@ const Home = () => {
             <InsightTitleSmall>Listen, Don't Read</InsightTitleSmall>
             <InsightTitle>Audio-First Experience</InsightTitle>
             <InsightSubtitle>
-              Transform your daily routine into a learning opportunity. Catch
-              up on industry trends while you commute, exercise, or prep for
-              your day.
+              Transform your daily routine into a learning opportunity. Catch up
+              on industry trends while you commute, exercise, or prep for your
+              day.
             </InsightSubtitle>
           </InsightContent>
         </InsightCardRight>
@@ -206,8 +205,8 @@ const Home = () => {
             <InsightTitleSmall>Engaging dialogue</InsightTitleSmall>
             <InsightTitle>News That Feels Like Conversation</InsightTitle>
             <InsightSubtitle>
-              Our hosts present insights in a lively, podcast-style format.
-              It's not just information—it's infotainment.
+              Our hosts present insights in a lively, podcast-style format. It's
+              not just information—it's infotainment.
             </InsightSubtitle>
           </InsightContent>
         </InsightCardRight>
@@ -221,7 +220,11 @@ const Home = () => {
           <StyledPressable
             onPress={() => (user ? handleGotoNews() : handleSignin())}
           >
-            {user ? <ButtonText>Go to News</ButtonText> : <ButtonText>Sign in</ButtonText>}
+            {user ? (
+              <ButtonText>Go to News</ButtonText>
+            ) : (
+              <ButtonText>Sign in</ButtonText>
+            )}
           </StyledPressable>
         </ButtonSection>
         <FooterLinks>
@@ -238,6 +241,4 @@ const Home = () => {
       </Footer>
     </HomeContainer>
   );
-};
-
-export default Home;
+}

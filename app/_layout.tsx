@@ -1,11 +1,12 @@
 import theme from "@/constants/theme";
 import { AuthProvider } from "@/utils/AuthProvider";
-import { Platform, StyleSheet, ScrollView } from "react-native";
+import { Platform } from "react-native";
 import { SplashScreen } from "expo-router";
 import { ThemeProvider } from "styled-components/native";
 import { Slot } from "expo-router";
 import { useEffect } from "react";
-import { usePathname } from 'expo-router';
+import { EventProvider as OutsideEventProvider } from "react-native-outside-press";
+import { usePathname } from "expo-router";
 
 import {
   Inter_100Thin,
@@ -45,8 +46,18 @@ import {
 } from "@expo-google-fonts/comfortaa";
 import { useFonts } from "expo-font";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { MainContainer } from "@/components/SharedComponents";
-import { initGA, logPageView } from '@/utils/analytics';
+import { commonStyles, MainContainer } from "@/components/SharedComponents";
+import { initGA, logPageView } from "@/utils/analytics";
+import { Amplify } from "aws-amplify";
+
+Amplify.configure({
+  Analytics: {
+    Pinpoint: {
+      appId: "6b4a7558e1c044109085f007534b134d",
+      region: "us-east-1",
+    },
+  },
+});
 
 export default function Root() {
   const [loaded, error] = useFonts({
@@ -96,9 +107,6 @@ export default function Root() {
     }
   }, [loaded]);
   console.log({ loaded });
-  if (!loaded) {
-    return null;
-  }
 
   const pathname = usePathname();
 
@@ -117,25 +125,25 @@ export default function Root() {
     }
   }, [pathname]);
 
+  if (!loaded) {
+    return null;
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <AuthProvider>
         <SafeAreaProvider>
-          <SafeAreaView style={styles.container} edges={["top"]}>
-            <MainContainer>
-              {/* <ScrollView> */}
-              <Slot />
-              {/* </ScrollView> */}
-            </MainContainer>
-          </SafeAreaView>
+          <OutsideEventProvider>
+            <SafeAreaView style={commonStyles.flex_1} edges={["top"]}>
+              <MainContainer>
+                {/* <ScrollView> */}
+                <Slot />
+                {/* </ScrollView> */}
+              </MainContainer>
+            </SafeAreaView>
+          </OutsideEventProvider>
         </SafeAreaProvider>
       </AuthProvider>
     </ThemeProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
