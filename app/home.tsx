@@ -214,8 +214,8 @@ export default function Home() {
       <Footer>
         <Brand>essence</Brand>
         <ButtonSection smallScreen={isTabletOrMobileDevice}>
-          <BetaPressable onPress={handleJoinBeta}>
-            <ButtonText>Join the Beta</ButtonText>
+          <BetaPressable onPress={handleSignin}>
+            <ButtonText>Sign up</ButtonText>
           </BetaPressable>
           <StyledPressable
             onPress={() => (user ? handleGotoNews() : handleSignin())}
