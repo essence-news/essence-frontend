@@ -197,7 +197,7 @@ const SpeedOptionsContainer = styled.View`
   right: -75px;
 `;
 
-const SpeedText = styled(H5)<{ selected: boolean }>`
+const SpeedText = styled(H5) <{ selected: boolean }>`
   background-color: ${({ theme }) => theme.colors.overlay};
   color: ${({ selected, theme }) =>
     selected ? theme.colors.accent : theme.colors.text};
@@ -1180,8 +1180,8 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
                   ? require("@/assets/cliparts/podcast.jpg")
                   : articles.length > 0 && currentNewsIndex < articles.length
                     ? {
-                        uri: articles[currentNewsIndex].image,
-                      }
+                      uri: articles[currentNewsIndex].image,
+                    }
                     : require("@/assets/cliparts/ecommerce.jpg")
               }
               resizeMode="cover"
@@ -1343,42 +1343,42 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
                               size={26}
                             />
                           ) : // <Svg
-                          //   viewBox="0 0 24 24"
-                          //   width={30}
-                          //   height={30}
-                          //   fill={theme.colors.text}
-                          // >
-                          //   <Path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z" />
-                          // </Svg>
-                          isPlaying ? (
-                            // <Svg
                             //   viewBox="0 0 24 24"
                             //   width={30}
                             //   height={30}
                             //   fill={theme.colors.text}
                             // >
-                            //   <Path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                            //   <Path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z" />
                             // </Svg>
-                            <AntDesign
-                              name="pausecircleo"
-                              color={theme.colors.text}
-                              size={30}
-                            />
-                          ) : (
-                            <AntDesign
-                              name="playcircleo"
-                              color={theme.colors.text}
-                              size={26}
-                            />
-                            // <Svg
-                            //   viewBox="0 0 24 24"
-                            //   width={30}
-                            //   height={30}
-                            //   fill={theme.colors.text}
-                            // >
-                            //   <Path d="M8 5v14l11-7z" />
-                            // </Svg>
-                          )}
+                            isPlaying ? (
+                              // <Svg
+                              //   viewBox="0 0 24 24"
+                              //   width={30}
+                              //   height={30}
+                              //   fill={theme.colors.text}
+                              // >
+                              //   <Path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                              // </Svg>
+                              <AntDesign
+                                name="pausecircleo"
+                                color={theme.colors.text}
+                                size={30}
+                              />
+                            ) : (
+                              <AntDesign
+                                name="playcircleo"
+                                color={theme.colors.text}
+                                size={26}
+                              />
+                              // <Svg
+                              //   viewBox="0 0 24 24"
+                              //   width={30}
+                              //   height={30}
+                              //   fill={theme.colors.text}
+                              // >
+                              //   <Path d="M8 5v14l11-7z" />
+                              // </Svg>
+                            )}
                         </ControlButton>
                         <ControlButton
                           onPress={handleNext}
@@ -1401,7 +1401,7 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
                         {/* <Text style={{ color: "white" }}>
                           {currentNewsIndex + 1}/{articles.length}
                         </Text> */}
-                        {articles[currentNewsIndex]?.public_key && (
+                        {/* {articles[currentNewsIndex]?.public_key && (
                           <ControlButton onPress={handleShareClick}>
                             <AntDesign
                               name="sharealt"
@@ -1409,7 +1409,7 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
                               size={30}
                             />
                           </ControlButton>
-                        )}
+                        )} */}
                       </Controls>
                       <SummaryWrapper>
                         <SummaryTitleContainer>

@@ -135,7 +135,7 @@ const PreferencesLabel = styled(StyledTextLargeDark)`
   font-family: "${({ theme }) => theme.fonts.body}";
 `;
 
-const StyledAction = styled(AntDesign)<{ mt: string }>`
+const StyledAction = styled(AntDesign) <{ mt: string }>`
   margin-top: ${({ mt }) => mt};
   color: ${({ theme }) => theme.colors.primary};
 `;
@@ -190,7 +190,7 @@ const InputFormFieldContainer = styled.View`
   margin-top: 30px;
 `;
 
-const FormInput = styled(Input)<{ isDisabled: boolean }>`
+const FormInput = styled(Input) <{ isDisabled: boolean }>`
   margin-top: 10px;
   background-color: ${({ isDisabled }) =>
     isDisabled ? "rgba(0, 0, 0, 0.1)" : "initial"};
@@ -588,7 +588,7 @@ export default function Preferences() {
                     onPress={() => setSliceIndex((s) => s + PAGE_SIZE)}
                   >
                     <LoadMoreButtonText>
-                      Load more preferences
+                      Your Interests {'>>'}
                     </LoadMoreButtonText>
                   </LoadMoreButton>
                 ) : (

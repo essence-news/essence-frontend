@@ -590,7 +590,7 @@ export const Progress = styled.View<{ progress: number }>`
 export const Controls = styled.View`
   display: flex;
   width: 100%;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   margin-bottom: 40px;
   flex-direction: row;
@@ -656,7 +656,7 @@ export const FullScreenBackground = styled.View<{ src: string }>`
   z-index: -1;
 `;
 
-export const RatingMessage = styled(H5)<{ visible: boolean }>`
+export const RatingMessage = styled(H5) <{ visible: boolean }>`
   opacity: ${(props) => (props.visible ? 1 : 0)};
   color: ${({ theme }) => theme.colors.accent};
   margin-left: 10px;
