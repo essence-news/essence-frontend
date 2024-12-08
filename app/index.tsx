@@ -21,7 +21,7 @@ export default function RootLayout() {
     if (token) {
       router.push("/player");
     } else {
-      router.push("/sign-in");
+      router.push("/home");
     }
   };
 

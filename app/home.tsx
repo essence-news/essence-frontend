@@ -83,8 +83,8 @@ export default function Home() {
             expertly curated for your role and industry
           </Subheadline>
           <ButtonSection smallScreen={isTabletOrMobileDevice}>
-            <BetaPressable onPress={handleJoinBeta}>
-              <ButtonText>Join the Beta</ButtonText>
+            <BetaPressable onPress={handleSignin}>
+              <ButtonText>Sign up</ButtonText>
             </BetaPressable>
             <StyledPressable
               onPress={() => (user ? handleGotoNews() : handleSignin())}

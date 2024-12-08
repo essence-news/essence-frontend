@@ -102,7 +102,7 @@ export default function Root() {
   useEffect(() => {
     if (loaded) {
       if (Platform.OS === "web" && document)
-        document.title = "Essence - Your own news player";
+        document.title = "Essence - Business news that speaks to you";
       SplashScreen.hideAsync();
     }
   }, [loaded]);
@@ -113,7 +113,7 @@ export default function Root() {
   useEffect(() => {
     if (Platform.OS === "web") {
       if (document) {
-        document.title = "Essence - Your own news player";
+        document.title = "Essence - Business news that speaks to you";
       }
       initGA();
     }

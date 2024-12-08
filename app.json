@@ -45,9 +45,7 @@
     "experiments": {
       "typedRoutes": true
     },
-    "expo": {
-      "entryPoint": "./index.tsx"
-    },
+    "entryPoint": "./index.tsx",
     "extra": {
       "router": {
         "origin": false

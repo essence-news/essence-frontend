@@ -53,7 +53,8 @@ const styles = {
     paddingHorizontal: 8,
   },
   placeholderStyle: {
-    fontSize: 12,
+    fontSize: 14,
+    color: theme.colors.secondaryDarker,
   },
 };
 
@@ -438,6 +439,7 @@ export default function Preferences() {
                         id={f.id}
                         ref={(element) => (elementRefs.current[f.id] = element)}
                         placeholder={f.placeholder ?? ""}
+                        placeholderStyle={styles.placeholderStyle}
                         placeholderTextColor={theme.colors.secondaryDarker}
                         isDisabled={f.disabled}
                         value={
