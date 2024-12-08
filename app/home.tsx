@@ -29,15 +29,14 @@ import {
   commonStyles,
 } from "@/components/SharedComponents";
 import { WebView } from "react-native-web-webview";
-import { record } from 'aws-amplify/analytics';
+import { record } from "aws-amplify/analytics";
 
-import screenshot1 from "@/assets/screenshots/1.jpg";
 import ecommercePic from "@/assets/cliparts/ecommerce.jpg";
 import audioPic from "@/assets/cliparts/audio.jpg";
 import hourglassPic from "@/assets/cliparts/hourglass.jpg";
 import podcastPic from "@/assets/cliparts/podcast.jpg";
-import BrandHeader from "@/components/BrandHeader";
-import theme from "@/constants/theme";
+import { useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Keep the existing styled components that are specific to Home
 
@@ -65,16 +64,14 @@ export default function Home() {
   };
 
   useEffect(() => {
-    record({ name: 'PAGE_VIEW' });
-    init();
+    record({ name: "PAGE_VIEW" });
+    // init();
   }, []);
-
-  console.log("Home page");
 
   const handleJoinBeta = () => {
     router.push("/beta-access");
   };
-
+  console.log("home page");
   return (
     <HomeContainer smallScreen={isTabletOrMobileDevice}>
       <HeroSection smallScreen={isTabletOrMobileDevice}>
@@ -82,7 +79,8 @@ export default function Home() {
           <Brand>essence</Brand>
           <Headline>Business news that speaks to you</Headline>
           <Subheadline>
-            Purpose-built for Retail Leaders—concise 30-second audio news, expertly curated for your role and industry
+            Purpose-built for Retail Leaders—concise 30-second audio news,
+            expertly curated for your role and industry
           </Subheadline>
           <ButtonSection smallScreen={isTabletOrMobileDevice}>
             <BetaPressable onPress={handleJoinBeta}>
@@ -167,8 +165,9 @@ export default function Home() {
             <InsightTitleSmall>Your Industry. Your News.</InsightTitleSmall>
             <InsightTitle>Tailored for You</InsightTitle>
             <InsightSubtitle>
-              Essence curates content from top sources, even from behind paywalls, tailored to your
-              specific industry and role. Stay relevant without the noise and hassle.
+              Essence curates content from top sources, even from behind
+              paywalls, tailored to your specific industry and role. Stay
+              relevant without the noise and hassle.
             </InsightSubtitle>
           </InsightContent>
         </InsightCardLeft>

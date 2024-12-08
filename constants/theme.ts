@@ -16,11 +16,13 @@ const theme = {
     error: "red",
     white: "#FFFFFF",
     accent: "#4790ff",
+    bgTransparent: "rgba(255, 255, 255, 0.7)",
     overlay: "rgba(45, 42, 39, 0.6)",
     darkOverlay: "rgba(45, 42, 39, 0.8)",
   },
   fonts: {
     body: "Inter_400Regular",
+    bodyMedium: "Inter_500Medium",
     bodyBold: "Inter_700Bold",
     bodyLight: "Inter_300Light",
     heading: "Nunito_400Regular",

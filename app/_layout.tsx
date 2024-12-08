@@ -6,7 +6,7 @@ import { ThemeProvider } from "styled-components/native";
 import { Slot } from "expo-router";
 import { useEffect } from "react";
 import { EventProvider as OutsideEventProvider } from "react-native-outside-press";
-import { usePathname } from 'expo-router';
+import { usePathname } from "expo-router";
 
 import {
   Inter_100Thin,
@@ -47,7 +47,17 @@ import {
 import { useFonts } from "expo-font";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { commonStyles, MainContainer } from "@/components/SharedComponents";
-import { initGA, logPageView } from '@/utils/analytics';
+import { initGA, logPageView } from "@/utils/analytics";
+import { Amplify } from "aws-amplify";
+
+Amplify.configure({
+  Analytics: {
+    Pinpoint: {
+      appId: "6b4a7558e1c044109085f007534b134d",
+      region: "us-east-1",
+    },
+  },
+});
 
 export default function Root() {
   const [loaded, error] = useFonts({
@@ -97,9 +107,6 @@ export default function Root() {
     }
   }, [loaded]);
   console.log({ loaded });
-  if (!loaded) {
-    return null;
-  }
 
   const pathname = usePathname();
 
@@ -117,6 +124,10 @@ export default function Root() {
       logPageView(pathname);
     }
   }, [pathname]);
+
+  if (!loaded) {
+    return null;
+  }
 
   return (
     <ThemeProvider theme={theme}>

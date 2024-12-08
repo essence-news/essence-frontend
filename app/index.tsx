@@ -2,15 +2,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRootNavigationState, Redirect, router } from "expo-router";
 import { useEffect } from "react";
 import { Text } from "react-native";
-import { Amplify } from 'aws-amplify';
+import { Amplify } from "aws-amplify";
 
 Amplify.configure({
   Analytics: {
     Pinpoint: {
-      appId: '6b4a7558e1c044109085f007534b134d',
-      region: 'us-east-1'
-    }
-  }
+      appId: "6b4a7558e1c044109085f007534b134d",
+      region: "us-east-1",
+    },
+  },
 });
 
 export default function RootLayout() {

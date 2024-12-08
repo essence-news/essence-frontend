@@ -277,6 +277,7 @@ export const preferencesFormConfig = [
   {
     id: "news_sources",
     label: "What are your favorite sources for industry news?",
+    addNewLabel: "Add new sources",
     defaultValues: newsSources,
     placeholder: "ex. retaildive.com, retail-week.com, etc.",
     footnote: "We will ensure that you never miss out on articles from these sources (blogs, news sites etc.) ",
@@ -287,6 +288,7 @@ export const preferencesFormConfig = [
   {
     id: "brands",
     label: "Which companies do you want to keep an eye on?",
+    addNewLabel: "Add new brands",
     footnote:
       "We will help you stay updated on news about these companies",
     defaultValues: brands,
@@ -298,6 +300,7 @@ export const preferencesFormConfig = [
   {
     id: "industries",
     label: "Are there other industries you’re interested in?",
+    addNewLabel: "Add new industries",
     defaultValues: industries,
     placeholder: "ex. Fashion, Electronics, etc.",
     footnote: "Retail innovation happens across industries. We’ll include cross-industry updates that may interest you.",
@@ -309,6 +312,7 @@ export const preferencesFormConfig = [
   {
     id: "geographies",
     label: "Other Geographies on your watchlist?",
+    addNewLabel: "Add new geographies",
     defaultValues: geographies,
     placeholder: "ex. UK, Europe, etc.",
     footnote:
@@ -320,6 +324,7 @@ export const preferencesFormConfig = [
   {
     id: "topics",
     label: "What topics are you interested in?",
+    addNewLabel: "Add new topics",
     defaultValues: topics,
     placeholder: "ex. eCommerce, Marketing, Leadership changes, M&A, Jobs, etc.",
     footnote: "We’ll prioritize updates on these topics in your newsfeed",
