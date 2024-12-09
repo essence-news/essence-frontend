@@ -1,0 +1,17 @@
+version: 1.0
+runtime: nodejs21
+build:
+  commands:
+    build:
+      - npm ci
+      - npm run build:web-dev
+      - npx tsc server.ts  # Add this line to compile server.ts
+run:
+  command: node server.js
+  network:
+    port: 80
+  env:
+    - name: NODE_ENV
+      value: "production"
+    - name: EXPO_PUBLIC_ESSENCE_REST_API_URL
+      value: "https://mkhg9ap0r7.execute-api.us-east-1.amazonaws.com"

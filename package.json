@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "node server.ts",
+    "start": "expo start",
     "android": "expo start --android",
     "build:web": "dotenv -e ./.env.local -- expo export -p web --output-dir build && npx workbox-cli generateSW workbox-config.js",
     "build:web-dev": "dotenv -e ./.env.dev -- expo export -p web --output-dir build && npx workbox-cli generateSW workbox-config.js",
