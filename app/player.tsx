@@ -1047,23 +1047,19 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
     router.push("/preferences");
   };
   const handleShareClick = async () => {
-    if (Platform.OS === "web") {
+    const articleUrl = `${process.env.EXPO_PUBLIC_SITE_URL}/sharedNews/_preview/${articles[currentNewsIndex].public_key}`;
+
+    if (Platform.OS === 'web') {
       if (navigator?.share) {
         navigator.share({
-          text: `Open this link to listen to article \n \n ${process.env.EXPO_PUBLIC_ESSENCE_APP_URL}/sharedNews/${articles[currentNewsIndex].public_key}`,
+          title: articles[currentNewsIndex].title,
+          url: articleUrl,
         });
-      } else {
-        alert("Not supported");
       }
     } else {
       const options = {
-        // message: "https://getessence.app",
-        message: `Open this link to listen to article \n \n ${process.env.EXPO_PUBLIC_ESSENCE_APP_URL}/sharedNews/${articles[currentNewsIndex].public_key}`,
+        message: `${articles[currentNewsIndex].title}\n\n${articleUrl}`,
       };
-      console.log("will share", {
-        article: articles[currentNewsIndex],
-        options,
-      });
       try {
         const result = await Share.share(options);
         console.log("will share", { result });
@@ -1401,7 +1397,7 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
                         {/* <Text style={{ color: "white" }}>
                           {currentNewsIndex + 1}/{articles.length}
                         </Text> */}
-                        {/* {articles[currentNewsIndex]?.public_key && (
+                        {articles[currentNewsIndex]?.public_key && (
                           <ControlButton onPress={handleShareClick}>
                             <AntDesign
                               name="sharealt"
@@ -1409,7 +1405,7 @@ export default function Player({ sharedArticle }: { sharedArticle?: Article }) {
                               size={30}
                             />
                           </ControlButton>
-                        )} */}
+                        )}
                       </Controls>
                       <SummaryWrapper>
                         <SummaryTitleContainer>

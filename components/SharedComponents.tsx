@@ -366,9 +366,10 @@ export const Header = styled.View`
 export const Title = styled(H3)`
   font-weight: bold;
   margin-block: 5px;
+  margin-bottom: 20px;
   text-transform: capitalize;
   color: ${({ theme }) => theme.colors.brand};
-  font-family: "${({ theme }) => theme.fonts.heading}";
+  font-family: "${({ theme }) => theme.fonts.body}";
 `;
 
 export const Subtitle = styled(H4)`
@@ -378,7 +379,7 @@ export const Subtitle = styled(H4)`
 
 export const SubtitleDark = styled(H4)`
   margin-top: 0;
-  color: "${({ theme }) => theme.colors.primary}";
+  color: "${({ theme }) => theme.colors.primaryLight}";
 `;
 
 export const ButtonText = styled(H5)`

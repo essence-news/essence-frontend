@@ -136,9 +136,7 @@ export default function Root() {
           <OutsideEventProvider>
             <SafeAreaView style={commonStyles.flex_1} edges={["top"]}>
               <MainContainer>
-                {/* <ScrollView> */}
                 <Slot />
-                {/* </ScrollView> */}
               </MainContainer>
             </SafeAreaView>
           </OutsideEventProvider>

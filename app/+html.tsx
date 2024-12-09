@@ -11,8 +11,8 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta property="og:title" content="Essence" />
-        <meta property="og:description" content="Your news player" />
-
+        <meta property="og:description" content="Business news that speaks to you" />
+        <meta name="google-site-verification" content="L8Ylmf1dNdnvbVuXW9dFqRsFfkY9iU2T3tzZF5dL_8A" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no"
