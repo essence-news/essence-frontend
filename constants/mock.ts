@@ -102,3 +102,32 @@ export const mockNewsData = {
   intro_audio:
     "https://essence-news.s3.amazonaws.com/live/175c5a0f-4230-424a-b836-2c3f52eeaa94/intro/False_False_morning.mp3?AWSAccessKeyId=AKIAUWF6I5PZFWK4M3PL&Signature=SkMi%2B7U7otk44YcHDpV4JP6zLTg%3D&Expires=1733214812",
 };
+
+export const mockSharedArticle = {
+  audio_summary:
+    "https://essence-news.s3.amazonaws.com/dev/06f65592619cefe59c5b5b03704f2597610a99d0a25d7db1367c6bcf758a9fcd/en-UK-False.mp3?AWSAccessKeyId=AKIAUWF6I5PZFWK4M3PL&Signature=9nNw9BVedLZpY6JFYp2TdidzoM4%3D&Expires=1734319132",
+  categories: ["Grocery", "Consumer Trends", "Retail Tech"],
+  date_created: "2024-12-06T09:01:01.370734+00:00",
+  date_published: "2024-12-04T17:55:21+00:00",
+  domain: "nbcdfw.com",
+  full_text: null,
+  function: "Marketing",
+  id: "06f65592619cefe59c5b5b03704f2597610a99d0a25d7db1367c6bcf758a9fcd",
+  image:
+    "https://media.nbcdfw.com/2024/12/heb.jpg?quality=85&strip=all&resize=1200,675",
+  industry: "Grocery",
+  processing_status: "audio_summary_generated",
+  public_key: "5bc20cd4",
+  region: "United States",
+  rss_summary: "The grocery game is heating up in North Texas.",
+  single_news_item: true,
+  source_name: "grocerydive",
+  summary_200:
+    "H-E-B is making significant strides in North Texas, opening multiple new grocery stores and challenging established competitors such as Kroger, Tom Thumb, and Walmart. The grocery landscape is becoming increasingly competitive, influenced by the region's population boom and a robust local economy. H-E-B has recently broken ground on new locations in Euless/Bedford, Rockwall, Irving, Prosper, Murphy, and Melissa, with openings planned for 2025 and 2026. The Texas Retailers Association notes that this competition will likely lead to improvements in customer service and loyalty programs among existing stores. Kroger is renovating its locations and exploring new openings, while Tom Thumb focuses on loyalty initiatives. Walmart is enhancing its curbside pickup and home delivery services. The DFW grocery market generates an estimated $20 billion annually, making it one of the highest in the country. Experts anticipate that 2025 will see further technological advancements and competitive pricing strategies as stores adapt to maintain customer loyalty in this evolving landscape.",
+  summary_50:
+    "H-E-B expands aggressively in North Texas, opening new stores and intensifying competition with Kroger, Tom Thumb, and Walmart. Experts predict a reshaping of the local grocery landscape, driven by population growth and economic factors, with a projected $20 billion in annual grocery sales in the DFW market.",
+  summary_vector: null,
+  title: "Grocery Wars Intensify in North Texas with H-E-B Expansion",
+  type: "ecommerce",
+  url: "https://www.nbcdfw.com/news/local/grocery-wars-heat-up-in-north-texas-as-h-e-b-challenges-local-heavyweights/3711580/",
+};

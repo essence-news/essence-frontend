@@ -1,5 +1,6 @@
 // import { mockResponse } from "@/constants/mock";
-// import { promises as fs } from "fs";
+import { mockSharedArticle } from "@/constants/mock";
+import { promises as fs } from "fs";
 
 const html = `
 <!DOCTYPE html>
@@ -224,6 +225,7 @@ export const getArticleFromServer = async (publicKey: string) => {
     }
     const article = await response.json();
     return article;
+    // return mockSharedArticle;
   } catch (error) {
     console.error("Failed to get article from server:", error);
     throw new Error("Failed to get article from server");
@@ -236,14 +238,19 @@ export async function GET(request: Request) {
   const newsId = url.searchParams.get("newsId") || "";
   console.log({ news: newsId });
   const article = await getArticleFromServer(newsId);
-  // let html = await fs.readFile("./components/StaticPlayer.html", "utf-8");
+  let html = await fs.readFile("./assets/StaticPlayer.html", "utf-8");
   const response = html
     .replaceAll("ARTICLE_TITLE", article.title)
     .replaceAll("ARTICLE_IMAGE", article.image)
     .replaceAll("ARTICLE_DESCRIPTION", article.summary_50)
     .replaceAll("ARTICLE_URL", article.url)
+    .replaceAll("ARTICLE_CATEGORIES", JSON.stringify(article.categories))
+    .replaceAll(
+      "EXPO_PUBLIC_ESSENCE_APP_URL",
+      process.env.EXPO_PUBLIC_ESSENCE_APP_URL || "",
+    )
     .replaceAll("SOUND_URL", article.audio_summary)
-    .replaceAll("PUBLIC_KEY_HERE", newsId);
+    .replaceAll("PUBLIC_KEY", newsId);
 
   return new Response(response, {
     status: 200,
