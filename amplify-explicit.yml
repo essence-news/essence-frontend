@@ -16,7 +16,7 @@ frontend:
       commands:
         - expo build:web
   artifacts:
-    baseDirectory: web-build
+    baseDirectory: build
     files:
       - '**/*'
   cache:
