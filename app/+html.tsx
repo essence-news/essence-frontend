@@ -12,6 +12,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta property="og:title" content="Essence" />
         <meta property="og:description" content="Business news that speaks to you" />
+        <meta name="robots" content="index, follow" />
         <meta name="google-site-verification" content="L8Ylmf1dNdnvbVuXW9dFqRsFfkY9iU2T3tzZF5dL_8A" />
         <meta
           name="viewport"
